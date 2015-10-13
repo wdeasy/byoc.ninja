@@ -1,0 +1,60 @@
+<% provide(:title, "Privacy Policy")  %>
+<div class="jumbotron">
+<h4 class="text-center"><strong>PRIVACY POLICY</strong></h4><br />
+
+<div class="row">
+  <div class="col-md-8 col-md-offset-2">
+
+<h5><strong>What personal information do we collect?</strong></h5>
+  <ul>Information is collected using the Steam Web API. This information includes your 64bit Steam Identifier, Display name, Avatar, Profile URL, and Current game.
+    <br />
+    <br /><%= link_to "Steam Subscriber Agreement", "http://store.steampowered.com/subscriber_agreement/", :target => '_blank' %>
+  </ul>
+
+<h5><strong>When do we collect information?</strong></h5>
+  <ul>Information is collected every minute for any members of quakecon steam group(s) who are currently in a multiplayer game and have a publicly viewable profile.</ul>
+
+<h5><strong>How do we use your information?</strong></h5>
+  <ul>Your information is used to populate the server list to help users find games being played by quakecon attendees.</ul>
+
+<h5><strong>Where do we save your information?</strong></h5>
+  <ul>Information is stored in a secure data center in the USA. </ul>
+
+<h5><strong>Your Consent</strong></h5>
+  <ul>Any of the following ways will stop your information from being collected:
+  <ul>
+    <li>Change your <%= link_to "Steam Profile Privacy", "https://support.steampowered.com/kb_article.php?ref=4113-YUDH-6401", :target => '_blank' %> to friends only, or private.</li>
+      <li>Leave the following steam groups:
+      <ul>
+      <% @groups.each do |g| %>
+        <li><%= link_to g.name, g.url, :target => '_blank' %></li>
+      <% end %>  
+      </ul>
+    </li>
+    <li><%= link_to "Sign in through Steam", "/servers/auth/steam" %> and navigate your settings page.<br /> Change "Display game information" to no, and save.</li></ul>
+  </ul>
+<h5><strong>Third Party Links</strong></h5>
+  <ul>We may display links to third party websites or services on this website. These sites have separate and independent privacy polices. We have no responsibility or liabliltiy for the content and activities on these sites.</ul>
+
+<h5><strong>Disclaimer</strong></h5>
+  <ul>This website is provided "as is", "with all faults", and "as available".</ul>
+
+<h5><strong>Google Analytics</strong></h5>
+  <ul>This website uses Google Analytics to improve our web service.
+    <br />
+    <br /><%= link_to "Google Analytics Opt-out Browser Addon", "https://tools.google.com/dlpage/gaoptout", :target => '_blank' %>
+    <br /><%= link_to "Google Privacy Policy", "http://www.google.com/policies/privacy/", :target => '_blank' %></ul>
+
+<h5><strong>Changes to our Privacy Policy</strong></h5>
+  <ul>If we decide to change our privacy policy, we will post those changes on this page.<br />
+
+  <br /><br /><div class="text-center">Last Edited on 2015-04-07</div></ul>
+  </div>
+</div>
+</ul>
+</div>
+
+
+
+
+

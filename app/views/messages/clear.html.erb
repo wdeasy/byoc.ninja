@@ -1,0 +1,13 @@
+<% provide(:title, "Clear Messages")  %>
+<div class="jumbotron">
+<h3 class="center">Clear Messages</h3>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+	<%= form_tag(messages_clear_path, method: "get") do %>
+	  <%= hidden_field :clear, "true" %>
+	  <%= submit_tag("Clear", class: "btn btn-50 btn-primary pull-left") %>
+	  <%= link_to "Back", protocols_url, class: "btn btn-50 btn-primary pull-right" %>
+	<% end %>
+  </div>
+</div> 
+</div>

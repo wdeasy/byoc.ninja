@@ -1,0 +1,13 @@
+<% provide(:title, "Update Networks")  %>
+<div class="jumbotron">
+<h3 class="center">Update Networks</h3>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+	<%= form_tag(networks_update_all_path, method: "get") do %>
+	  <%= hidden_field :update, "true" %>
+	  <%= submit_tag("Update", class: "btn btn-50 btn-primary pull-left") %>
+	  <%= link_to "Back", networks_url, class: "btn btn-50 btn-primary pull-right" %>
+	<% end %>
+  </div>
+</div> 
+</div>

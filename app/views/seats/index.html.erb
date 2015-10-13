@@ -1,0 +1,22 @@
+<% provide(:title, "Seat List")  %>
+<div class="jumbotron">
+  <h3 class="center">Seats</h3>
+
+  <table class="table table-striped table-condensed games">
+    <thead>
+      <tr class="row">
+        <th class="col-md-1 text-left"><%= link_to "seat", :sort => "seat" %></th>
+        <th class="col-md-4 text-left"><%= link_to "clan", :sort => "clan" %></th>        
+        <th class="col-md-7 text-left"><%= link_to "handle", :sort => "handle" %></th>
+
+      </tr>
+    </thead>
+    <tbody>
+      <% if @seats.empty? %>
+        <tr class="row"><td colspan="3" class="col-md-offset-2 text-center">No Seats Found.</td></tr>
+      <% else %>
+        <%= render @seats %>
+      <% end %>             
+    </tbody>
+  </table>
+</div>

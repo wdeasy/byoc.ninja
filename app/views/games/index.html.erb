@@ -1,0 +1,20 @@
+<% provide(:title, "Games List")  %>
+<div class="jumbotron">
+  <h3 class="center">Games</h3>
+  <table class="table table-striped table-condensed games">
+    <thead>
+      <tr class="row">
+        <th class="col-md-2 text-left">ID</th>
+        <th class="col-md-8 text-left">Name</th>
+        <th class="col-md-2 text-left">Protocol</th>
+      </tr>
+    </thead>
+    <tbody>      
+      <% if @games.empty? %>
+        <tr class="row"><td colspan="3" class="col-md-offset-2 text-center">No Games Found.</td></tr>
+      <% else %>
+        <%= render @games %>
+      <% end %>              
+    </tbody>
+  </table>
+</div>

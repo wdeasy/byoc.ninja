@@ -1,0 +1,34 @@
+    <script>
+      $(document).ready(function() {
+        setTimeout(executeQuery, 60000);
+      });
+    </script>
+  <div id="servers">
+    <div id="message">
+      <% @messages.each do |m| %>
+        <div class="alert alert-<%= m.message_type %>"><%= sanitize m.message %></div>
+      <% end %>    
+    </div> 
+    <div class="jumbotron">
+    <table class="table table-striped table-condensed table-responsive">
+      <thead>
+        <tr>
+          <th class="col-md-2 text-left">Game</th>
+          <th class="col-md-1 text-center"><span class="glyphicon glyphicon-tags" title="Tags"></span></th>
+          <th class="col-md-3 text-left">Name</th>
+          <th class="col-md-1 text-right">Players</th>
+          <th class="col-md-1 text-center"><span class="glyphicon glyphicon-user" title="Quakecon Attendees"></span></th>
+          <th class="col-md-2 text-left">Map</th>
+         <th class="col-md-2 text-right">Address</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @servers.empty? %>
+          <tr><td colspan="7" class="text-center">No Games Found.</td></tr>
+        <% else %>
+          <%= render @servers %>
+        <% end %>                
+      </tbody>
+    </table>
+    </div>
+  </div>

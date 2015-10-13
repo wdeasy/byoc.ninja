@@ -1,0 +1,21 @@
+<% provide(:title, "Network List")  %>
+<div class="jumbotron">
+  <h3 class="center">Networks</h3>
+
+  <table class="table table-striped table-condensed games">
+    <thead>
+      <tr class="row">
+        <th class="col-md-8 text-left">Network</th>
+        <th class="col-md-2 text-left">Min</th>
+        <th class="col-md-2 text-left">Max</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @networks.empty? %>
+        <tr class="row"><td colspan="3" class="col-md-offset-2 text-center">No Networks Found.</td></tr>
+      <% else %>
+        <%= render @networks %>
+      <% end %>             
+    </tbody>
+  </table>
+</div>

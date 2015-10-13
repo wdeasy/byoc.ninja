@@ -1,0 +1,36 @@
+<% provide(:title, "Edit Game") %>
+<div class="jumbotron">
+<h3 class="center">Edit Game</h3>
+
+<% if @game.gameid.length < 7 %>
+	<div class="row">
+	  <div class="col-md-6 col-md-offset-3">  	
+	  	<div class="container center"><%= full_img @game, {:class => "img-responsive"} %></div>
+	  	<%= store_link @game, "store link", {:class => "pull-left", :target => "_blank"} %>
+	  	<%= comm_link @game,"community link", {:class => "pull-right", :target => "_blank"} %>
+	  </div>
+	</div>
+	<br />
+<% end %> 
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+
+	<%= form_for(@game) do |f| %>
+	  <%= render 'shared/error_messages', object: f.object %>
+
+	  <%= f.label :id %>
+	  <%= f.text_field :gameid, class: 'form-control', :disabled => true %>
+
+	  <%= f.label :name %>
+	  <%= f.text_field :gameextrainfo, class: 'form-control' %>
+
+	  <%= f.label :protocol %>
+	  <%= f.collection_select :protocol, Protocol.order("name ASC"), :protocol, :name, {:include_blank => true},{:class => 'form-control'} %>
+
+	  <%= f.submit "Save changes", class: "btn btn-50 btn-primary pull-left" %>
+	  <%= link_to "Back", games_url, class: "btn btn-50 btn-primary pull-right" %>
+	<% end %>
+  </div>
+</div>
+</div>

@@ -1,0 +1,25 @@
+<% provide(:title, "Edit Network")  %>
+<div class="jumbotron">
+<h3 class="center">Edit Network</h3>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+
+	<%= form_for(@network) do |f| %>
+	  <%= render 'shared/error_messages', object: f.object %>
+
+	  <%= f.label :network %>
+	  <%= f.text_field :network, class: 'form-control' %>
+
+	  <%= f.label :min %>
+	  <%= f.text_field :min, class: 'form-control' %>
+
+	  <%= f.label :max %>
+	  <%= f.text_field :max, class: 'form-control' %>
+
+	  <%= f.submit "Save changes", class: "btn btn-33 btn-primary pull-left" %>
+	  <%= link_to "Delete", @network, method: :delete, data: { confirm: "You sure?" }, class: "btn btn-33 btn-primary" %>
+	  <%= link_to "Back", networks_url, class: "btn btn-33 btn-primary pull-right" %>
+	<% end %>
+  </div>
+</div>
+</div>

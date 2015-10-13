@@ -1,0 +1,46 @@
+<% provide(:title, "Edit Server")  %>
+<div class="jumbotron">
+<h3 class="center">Edit Server</h3>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+
+	<%= form_for(@server) do |f| %>
+	  <%= render 'shared/error_messages', object: f.object %>
+
+	  <%= f.label :auto_update %>
+	  <%= f.select :auto_update, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+
+	  <%= f.label :banned %>
+	  <%= f.select :banned, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+
+	  <%= f.label :refresh %>
+	  <%= f.select :refresh, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+
+	  <%= f.label :address %>
+	  <%= f.text_field :gameserverip, class: 'form-control', :disabled => true %>
+
+	  <%= f.label :name %>
+	  <%= f.text_field :name, class: 'form-control' %>
+
+	  <%= f.label :network %>
+	  <%= f.collection_select :network, Network.select(:network).distinct.order("network ASC"), :network, :network, {:include_blank => true},{:class => 'form-control'} %>
+
+	  <%= f.label :map %>
+	  <%= f.text_field :map, class: 'form-control' %>
+
+	  <%= f.label :query_port %>
+	  <%= f.text_field :query_port, class: 'form-control' %>
+
+	  <%= f.label :last_successful_query %>
+	  <%= f.text_field :last_successful_query, class: 'form-control', :disabled => true  %>
+
+	  <%= f.label :tried_query %>
+	  <%= f.select :tried_query, [['yes',true],['no',false]], {}, {:class => 'form-control'} %>
+
+	  <%= f.submit "Save changes", class: "btn btn-33 btn-primary pull-left" %>
+	  <%= link_to "Go to Game", edit_game_path(@server.gameid), class: "btn btn-33 btn-primary pull-center" %>
+	  <%= link_to "Back", admin_servers_url, class: "btn btn-33 btn-primary pull-right" %>
+	<% end %>
+  </div>
+</div>
+</div>

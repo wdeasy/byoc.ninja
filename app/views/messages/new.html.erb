@@ -1,0 +1,24 @@
+<% provide(:title, "Add Message")  %>
+<div class="jumbotron">
+<h3 class="center">Add Message</h3>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+
+	<%= form_for(@message) do |f| %>
+	  <%= render 'shared/error_messages', object: f.object %>
+
+	  <%= f.label :message %>
+	  <%= f.text_field :message, class: 'form-control' %>
+
+	  <%= f.label :message_type %>
+	  <%= f.select :message_type, options_for_select([['success (green)','success'], ['info (blue)','info'], ['warning (yellow)','warning'], ['danger (red)','danger']]), {},{:class => 'form-control'} %>
+
+	  <%= f.label :show %>
+	  <%= f.select :show, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+
+	  <%= f.submit "Save changes", class: "btn btn-50 btn-primary pull-left" %>
+	  <%= link_to "Back", messages_url, class: "btn btn-50 btn-primary pull-right" %>
+	<% end %>
+  </div>
+</div>
+</div>

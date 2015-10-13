@@ -1,0 +1,23 @@
+<% provide(:title, "Servers List")  %>
+<div class="jumbotron">
+  <h3 class="center">Servers</h3>
+
+  <table class="table table-striped table-condensed games">
+    <thead>
+      <tr class="row">
+        <th class="col-md-3 text-left">Game</th>        
+        <th class="col-md-7 text-left">Name</th>
+        <th class="col-md-2 text-left">Address</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @servers.each do |server| %>
+        <tr class="row">
+            <td class="text-left longtext"><%= server.game.gameextrainfo %></td>            
+            <td class="text-left longtext"><%= server.name %></td>
+            <td class="text-left"><%= link_to server.gameserverip, edit_server_path(server) %></td>
+        </tr>      
+      <% end %>                           
+    </tbody>
+  </table>
+</div>

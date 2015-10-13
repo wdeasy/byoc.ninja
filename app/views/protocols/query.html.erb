@@ -1,0 +1,24 @@
+<% provide(:title, "Query Server")  %>
+<div class="jumbotron">
+<h3 class="center">Query Server</h3>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+	<%= form_tag(protocols_query_path, method: "get") do %>
+	  <%= select_tag :protocol, options_from_collection_for_select(@protocols, "protocol", "name", params[:protocol]),{:class => 'form-control'} %>	
+	  <%= text_field_tag(:ip, params[:ip], :placeholder => "ip", :class => "form-control") %>
+	  <%= text_field_tag(:port, params[:port], :placeholder => "port", :class => "form-control") %>	  
+	  <%= submit_tag("Query", class: "btn btn-50 btn-primary pull-left") %>
+	  <%= link_to "Back", protocols_url, class: "btn btn-50 btn-primary pull-right" %>
+	<% end %>
+  </div>
+</div> 
+</div> 
+  <% if @query != nil %>
+  	<div class="jumbotron">
+		<div class="row">
+		  <div class="col-md-6 col-md-offset-3">
+  			<%= sanitize @query %>
+		  </div>
+		</div>   	
+  	</div>
+  <% end %>

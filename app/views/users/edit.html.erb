@@ -1,0 +1,52 @@
+<% provide(:title, "Settings")  %>
+<div class="jumbotron">
+<h3 class="center">Settings</h3>
+
+  	<% if current_user.admin? %>
+		<div class="row">
+		  <div class="col-md-6 col-md-offset-3">  	
+			<div class="container center">
+				<%= @user.avatar == nil ? '' : full_av(@user) %><br />
+				<%= link_to @user.personaname, @user.profileurl, {:target => "_blank"} %>			
+			</div>
+		  </div>
+		</div>  		
+  	<% end %>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+	<%= form_for(@user) do |f| %>
+	  <%= render 'shared/error_messages', object: f.object %>
+
+	  <% if current_user?(@user) || current_user.admin? %>
+		  <%= f.label :seat %>
+		  <%= f.collection_select :seat, Seat.order("seat asc"), :seat, :seat_clan_handle, {:include_blank => true},{:class => 'form-control'} %>
+		  <%= f.label "Display game information" %>
+		  <%= f.select :display, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+	  <% end %>
+
+	  <% if current_user.admin? %>
+		  <%= f.label :banned %>
+		  <%= f.select :banned, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+
+		  <%= f.label :auto_update %>
+		  <%= f.select :auto_update, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+		  
+		  <%= f.label :id %>
+		  <%= f.text_field :steamid, class: 'form-control', :disabled => true %>
+
+		  <%= f.label :name %>
+		  <%= f.text_field :personaname, class: 'form-control' %>
+
+		  <%= f.label :url %>
+		  <%= f.text_field :profileurl, class: 'form-control' %>
+		<% end %>
+		
+		<% if current_user?(@user) || current_user.admin? %>
+		  <%= f.submit "Save changes", class: "btn btn-50 btn-primary pull-left" %>
+		  <%= link_to "Back", users_url, class: "btn btn-50 btn-primary pull-right" %>
+		<% end %>
+	<% end %>
+  </div>
+</div>
+</div>

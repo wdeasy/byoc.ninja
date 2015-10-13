@@ -1,0 +1,20 @@
+<% provide(:title, "Users List")  %>
+<div class="jumbotron">
+  <h3 class="center">Users</h3>
+  <table class="table table-striped table-condensed games">
+    <thead>
+      <tr class="row">
+        <th class="col-md-2 text-left">Steam ID</th>
+        <th class="col-md-1 text-left">Seat</th>
+        <th class="col-md-9 text-left">Display Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @users.empty? %>
+        <tr class="row"><td colspan="3" class="col-md-offset-2 text-center">No Users Found.</td></tr>
+      <% else %>
+        <%= render @users %>
+      <% end %>              
+    </tbody>
+  </table>
+</div>
