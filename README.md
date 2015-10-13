@@ -8,7 +8,7 @@ In v2 i plan to:
 - use angular / json to update the server list instead of page refreshes.
 
 
-If you do not want this to run in a subdirectory, you will need to edit the following files:
+If you do not want this to run in /servers subdirectory, you will need to edit the following files:
 
 >app/assets/javascripts/servers.js  
 >change /servers/servers #servers to /servers #servers
@@ -129,7 +129,7 @@ setup vhosts file
 
 >server {  
 >  listen 80;  
->  server_name qconsteambrowser-dev;  
+>  server_name qconsteambrowser;  
 
 >  location /servers {  
 >    alias /home/user/Development/qcon_steam_browser/public$1;  
@@ -148,13 +148,14 @@ edit /etc/hosts
 >sudo nano /etc/hosts  
 
 add and save  
->127.0.0.1	qconsteambrowser-dev
+>127.0.0.1	qconsteambrowser
 
 >sudo service nginx restart  
 >rake assets:clobber  
 >rake assets:precompile  
 
-once everything is set up, you should be able to sign in through steam with the user you put in the seeds.rb file and see athe admin bar.
+Once everything is set up, you should be able to navigate to qconsteambrowser/servers.   
+You will see the admin bar once you sign in through steam with the user you put in the seeds.rb file.
 
 
 
