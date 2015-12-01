@@ -25,9 +25,6 @@
 	  <%= f.label :name %>
 	  <%= f.text_field :gameextrainfo, class: 'form-control' %>
 
-	  <%= f.label :protocol %>
-	  <%= f.collection_select :protocol, Protocol.order("name ASC"), :protocol, :name, {:include_blank => true},{:class => 'form-control'} %>
-
 	  <%= f.submit "Save changes", class: "btn btn-50 btn-primary pull-left" %>
 	  <%= link_to "Back", games_url, class: "btn btn-50 btn-primary pull-right" %>
 	<% end %>

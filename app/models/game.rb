@@ -2,17 +2,21 @@ class Game < ActiveRecord::Base
   require 'open-uri'
 
   self.primary_key = :gameid
-  has_many :servers, :foreign_key => :gameid
-  belongs_to :protocols, :foreign_key => :protocol  
+  has_many :hosts, :foreign_key => :gameid  
 
   def Game.update(player)
   	Game.where(gameid: player["gameid"]).first_or_create do |game|
       name = name_from_gameid(player)
 
       game.gameextrainfo = name
-      game.protocol = Protocol.lookup(name)
       game.gameid = player["gameid"]
-  	end
+
+      if player["gameid"].length < 7
+         game.store_link = "http://store.steampowered.com/app/#{player['gameid']}"
+         game.comm_link = "http://steamcommunity.com/app/#{player['gameid']}"
+         game.full_img = "http://cdn.akamai.steamstatic.com/steam/apps/#{player['gameid']}/header.jpg"
+      end
+    end
   end
 
   def self.name_from_gameid(player)
@@ -28,7 +32,7 @@ class Game < ActiveRecord::Base
       end                
     end
 
-    if name.blank? || name == "Welcome to Steam" || (name[0,5] == "Save " && name[-9,9] == " on Steam")
+    if name.blank? || name == "Welcome to Steam" || name[0,5] == "Save "
       page = lookup(player["profileurl"])
       if !page.blank?
         name = page.css('div.profile_in_game_name').text

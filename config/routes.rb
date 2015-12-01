@@ -1,28 +1,28 @@
 Rails.application.routes.draw do
-  root      'servers#index'
+  root      'hosts#index'
   get       'login'               => 'sessions#login'
   post      'auth/steam/callback' => 'sessions#create'
   match     'auth/failure', :to   => 'sessions#failure', via: [:get, :post]
   delete    'logout'              => 'sessions#destroy'
   get       'privacy_policy'      => 'static_pages#privacy_policy'
 
-  get       'admin/servers'       => 'admin#servers'
+  get       'admin/hosts'       => 'admin#hosts'
   get       'groups/auto'         => 'groups#auto'
-  get       'protocols/query'     => 'protocols#query'
   get       'networks/update_all' => 'networks#update_all'
   get       'messages/clear'      => 'messages#clear'
   get       'settings'            => 'users#edit'
   get       'seats'               => 'seats#index'
   get       'seats/update'        => 'seats#update'
+  get       'json'          => 'hosts#json'
+  get       'list'          => 'hosts#list'
 
   resources :contacts, :only      => [:new, :create]
   resources :games, :param        => :gameid
-  resources :servers, :param      => :gameserverip
+  resources :hosts, :param      => :gameserverip
   resources :users, :param        => :steamid
   resources :groups, :param       => :groupid64
   resources :networks
   resources :messages
-  resources :protocols
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

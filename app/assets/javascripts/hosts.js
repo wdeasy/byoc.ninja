@@ -1,5 +1,5 @@
 function executeQuery() {
-  $('#servers').load('/servers/servers #servers', function() {
+  $('#hosts').load('/hosts #hosts', function() {
   	$('.dropdown-toggle').dropdown();
   });
   setTimeout(executeQuery, 60000);

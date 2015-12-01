@@ -22,7 +22,7 @@ class GamesController < ApplicationController
 
   private
     def game_params
-      params.require(:game).permit(:gameextrainfo, :protocol)
+      params.require(:game).permit(:gameextrainfo)
     end
 
     # Confirms a logged-in user.

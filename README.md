@@ -8,22 +8,12 @@ In v2 i plan to:
 - use angular / json to update the server list instead of page refreshes.
 
 
-If you do not want this to run in /servers subdirectory, you will need to edit the following files:
-
->app/assets/javascripts/servers.js  
->change /servers/servers #servers to /servers #servers
-
->config/environments/production.rb  
->comment out or delete config.relative_url_root = "/servers"
-
-
 ### tasks ###
 
-rake update:servers updates the server list  
-rake update:protocols checks gameq for any new protocols and adds them. (for use after you git fetch/pull gameq)   
-rake update:networks updates servers network info (for updating existing servers when a new network is added)  
+rake update:hosts updates the server list  
+rake update:networks updates hosts network info (for updating existing hosts when a new network is added)  
 rake update:seats updates seat information from quakecon.org  
-rake cleanup:servers removes old servers from the database  
+rake cleanup:hosts removes old hosts from the database  
 
 ### Here are the quick and dirty instructions to get this up and running: ###
 

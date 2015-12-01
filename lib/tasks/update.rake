@@ -1,21 +1,14 @@
 namespace :update do
 
-  desc "Queries server information from steam groups"
-  task :servers => :environment do
+  desc "Queries host information from steam groups"
+  task :hosts => :environment do
   	beginning = start_time
-  	puts Server.update_servers
+  	puts Host.update_hosts
   	finish_time(beginning)
   	system("touch /tmp/finished")
   end
 
-  desc "Update GameQ protocols" 
-  task :protocols => :environment do
-  	beginning = start_time   	
-  	puts Protocol.update_protocols
-  	finish_time(beginning)  	
-  end
-
-  desc "Update server networks"
+  desc "Update host networks"
   task :networks => :environment do
   	beginning = start_time
   	puts Network.update_all 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150701034043) do
+ActiveRecord::Schema.define(version: 20151115231140) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,9 +19,11 @@ ActiveRecord::Schema.define(version: 20150701034043) do
   create_table "games", id: false, force: :cascade do |t|
     t.string   "gameid",        null: false
     t.string   "gameextrainfo"
-    t.string   "protocol"
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
+    t.string   "store_link"
+    t.string   "comm_link"
+    t.string   "full_img"
   end
 
   add_index "games", ["gameid"], name: "index_games_on_gameid", unique: true, using: :btree
@@ -37,51 +39,7 @@ ActiveRecord::Schema.define(version: 20150701034043) do
 
   add_index "groups", ["groupid64"], name: "index_groups_on_groupid64", unique: true, using: :btree
 
-  create_table "messages", force: :cascade do |t|
-    t.string   "message"
-    t.string   "message_type"
-    t.boolean  "show",         default: true
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
-  end
-
-  create_table "networks", force: :cascade do |t|
-    t.string   "network"
-    t.string   "min"
-    t.string   "max"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "protocols", force: :cascade do |t|
-    t.string   "protocol"
-    t.string   "name"
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
-    t.string   "host",       default: "hostname"
-    t.string   "map",        default: "map"
-    t.string   "num",        default: "num_players"
-    t.string   "max",        default: "max_players"
-    t.string   "pass",       default: "password"
-    t.string   "port",       default: "port"
-    t.string   "players",    default: "players"
-    t.string   "playername", default: "name"
-  end
-
-  add_index "protocols", ["protocol"], name: "index_protocols_on_protocol", unique: true, using: :btree
-
-  create_table "seats", id: false, force: :cascade do |t|
-    t.string   "seat",                      null: false
-    t.string   "clan"
-    t.string   "handle"
-    t.boolean  "updated",    default: true
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-  end
-
-  add_index "seats", ["seat"], name: "index_seats_on_seat", unique: true, using: :btree
-
-  create_table "servers", id: false, force: :cascade do |t|
+  create_table "hosts", id: false, force: :cascade do |t|
     t.string   "gameserverip",                                                    null: false
     t.string   "ip"
     t.integer  "port"
@@ -106,9 +64,37 @@ ActiveRecord::Schema.define(version: 20150701034043) do
     t.datetime "last_successful_query",           default: '1970-01-01 00:00:00', null: false
     t.boolean  "tried_query",                     default: false
     t.integer  "lobbysteamid",          limit: 8
+    t.string   "flags"
   end
 
-  add_index "servers", ["gameserverip"], name: "index_servers_on_gameserverip", unique: true, using: :btree
+  add_index "hosts", ["gameserverip"], name: "index_hosts_on_gameserverip", unique: true, using: :btree
+
+  create_table "messages", force: :cascade do |t|
+    t.string   "message"
+    t.string   "message_type"
+    t.boolean  "show",         default: true
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  create_table "networks", force: :cascade do |t|
+    t.string   "network"
+    t.string   "min"
+    t.string   "max"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "seats", id: false, force: :cascade do |t|
+    t.string   "seat",                      null: false
+    t.string   "clan"
+    t.string   "handle"
+    t.boolean  "updated",    default: true
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "seats", ["seat"], name: "index_seats_on_seat", unique: true, using: :btree
 
   create_table "users", id: false, force: :cascade do |t|
     t.integer  "steamid",      limit: 8,                 null: false

@@ -2,10 +2,10 @@ class AdminController < ApplicationController
   before_action :logged_in_user
   before_action :admin_user
 
-  def servers
-    @servers = Server.includes(:game).where(visible: true).order("games.gameextrainfo ASC, gameserverip ASC")
-    @servers = Server.includes(:game).where(banned: true).order("games.gameextrainfo ASC, gameserverip ASC") if params[:banned].present?
-    @servers = Server.includes(:game).order("games.gameextrainfo ASC, gameserverip ASC") if params[:all].present?
+  def host
+    @hosts = Host.includes(:game).where(visible: true).order("games.gameextrainfo ASC, gameserverip ASC")
+    @hosts = Host.includes(:game).where(banned: true).order("games.gameextrainfo ASC, gameserverip ASC") if params[:banned].present?
+    @hosts = Host.includes(:game).order("games.gameextrainfo ASC, gameserverip ASC") if params[:all].present?
   end
 
   private

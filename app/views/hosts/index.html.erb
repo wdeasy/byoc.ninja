@@ -3,7 +3,7 @@
         setTimeout(executeQuery, 60000);
       });
     </script>
-  <div id="servers">
+  <div id="hosts">
     <div id="message">
       <% @messages.each do |m| %>
         <div class="alert alert-<%= m.message_type %>"><%= sanitize m.message %></div>
@@ -23,10 +23,10 @@
         </tr>
       </thead>
       <tbody>
-        <% if @servers.empty? %>
+        <% if @hosts.empty? %>
           <tr><td colspan="7" class="text-center">No Games Found.</td></tr>
         <% else %>
-          <%= render @servers %>
+          <%= render @hosts %>
         <% end %>                
       </tbody>
     </table>

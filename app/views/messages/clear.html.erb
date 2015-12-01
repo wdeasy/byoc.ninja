@@ -6,7 +6,7 @@
 	<%= form_tag(messages_clear_path, method: "get") do %>
 	  <%= hidden_field :clear, "true" %>
 	  <%= submit_tag("Clear", class: "btn btn-50 btn-primary pull-left") %>
-	  <%= link_to "Back", protocols_url, class: "btn btn-50 btn-primary pull-right" %>
+	  <%= link_to "Back", messages_url, class: "btn btn-50 btn-primary pull-right" %>
 	<% end %>
   </div>
 </div> 

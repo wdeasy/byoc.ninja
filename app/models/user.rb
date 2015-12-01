@@ -2,7 +2,7 @@ class User < ActiveRecord::Base
   require 'open-uri'
 
   self.primary_key = :steamid
-  belongs_to :server, :foreign_key => :gameserverip, counter_cache: true
+  belongs_to :host, :foreign_key => :gameserverip, counter_cache: true
   belongs_to :seats, :foreign_key => :seat
 
   def User.update(player)
@@ -32,7 +32,7 @@ class User < ActiveRecord::Base
       )
     end  
 
-    Server.reset_counters(gameserverip, :users)     
+    Host.reset_counters(gameserverip, :users)     
   end
 
   def User.lookup(steamid)

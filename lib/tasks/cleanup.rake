@@ -1,9 +1,9 @@
 namespace :cleanup do
 
-  desc "Delete inactive servers"
-  task :servers => :environment do
+  desc "Delete inactive hosts"
+  task :hosts => :environment do
   	beginning = start_time
-  	Server.where("updated_at < ? AND banned IS FALSE AND auto_update IS TRUE", 1.week.ago).delete_all
+  	Host.where("updated_at < ? AND banned IS FALSE AND auto_update IS TRUE", 1.week.ago).delete_all
   	finish_time(beginning)
   end
 

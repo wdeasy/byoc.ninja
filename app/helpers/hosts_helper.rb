@@ -1,18 +1,18 @@
-module ServersHelper
+module HostsHelper
 
-	def flags(server)
+	def flags(host)
 		html = ''
 		
-		if server.name != nil
-			if server.name.downcase.include? "quakecon"
-				if server.name.ends_with? "'s Lobby"
+		if host.name != nil
+			if host.name.downcase.include? "quakecon"
+				if host.name.ends_with? "'s Lobby"
 				else
-					html << '<span class="glyphicon glyphicon-ok" title="Quakecon in Server Name"></span>'
+					html << '<span class="glyphicon glyphicon-ok" title="Quakecon in Host Name"></span>'
 				end				
 			end	
 		end
 
-		server.users.each do |user|
+		host.users.each do |user|
 			i = 0
 			if user.seat.blank?
 			else
@@ -27,32 +27,32 @@ module ServersHelper
 			end
 		end
 
-		if server.network == "byoc"
+		if host.network == "byoc"
 			html << '<span class="glyphicon glyphicon-ok" title="Hosted in BYOC"></span>'
 		end
 
-		if server.password == true
+		if host.password == true
 			html << '<span class="glyphicon glyphicon-lock" title="Password Protected"></span>'
 		end
 
-		if server.respond == false && server.last_successful_query != Time.at(0)
+		if host.respond == false && host.last_successful_query != Time.at(0)
 			html << '<span class="glyphicon glyphicon-remove" title="Last Query Attempt Failed"></span>'
 		end	
 
 		return html		
 	end
 
-	def players(server)
+	def players(host)
 		html = ''
 
-		if server.max.blank?
+		if host.max.blank?
 		else
-			if server.current > 0
-				html << "#{server.current}"
+			if host.current > 0
+				html << "#{host.current}"
 			else
-				html << "#{server.users.size}"
+				html << "#{host.users.size}"
 			end
-			html << "/#{server.max}"
+			html << "/#{host.max}"
 		end
 
 		return html

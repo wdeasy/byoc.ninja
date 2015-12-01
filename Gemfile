@@ -18,6 +18,7 @@ gem 'pg',             '0.17.1'
 gem 'omniauth-steam'
 gem 'radix', require: 'radix/integer'
 gem 'mailgun-ruby'
+gem 'steam-condenser', '~> 1.3', '>= 1.3.11'
 
 group :development do
   gem 'sqlite3',     '1.3.9'

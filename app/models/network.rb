@@ -24,11 +24,11 @@ class Network < ActiveRecord::Base
 
   def Network.update_all
     i = 0
-    Server.all.each do |server|
-      network = Network.location(server.ip)
-      Server.update_network(server.gameserverip, network)
+    Host.all.each do |host|
+      network = Network.location(host.ip)
+      Host.update_network(host.gameserverip, network)
       i+=1
     end
-    return "Updated networks for #{i} servers." 
+    return "Updated networks for #{i} hosts." 
   end  
 end
