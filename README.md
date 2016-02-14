@@ -48,7 +48,11 @@ create environment variables
 >sudo nano ~/.profile
 
 >export STEAM_WEB_API_KEY="steam web api key"  
->export SECRET_KEY_BASE="passenger secret key base"     
+>export SECRET_KEY_BASE="passenger secret key base"
+>export HOSTNAME="localhost"  
+>export DATABASE="database name"  
+>export USERNAME="database user"  
+>export PASSWORD="database pass"   
 >export MAILGUN_URL="mailgun api url"  
 >export MAILGUN_API="mailgun api key"  
 >export MAILGUN_DOMAIN="mailgun domain"  
