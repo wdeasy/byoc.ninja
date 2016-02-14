@@ -13,24 +13,25 @@ group_list = [
 	[103582791434503100,"/r/Quakecon","http://steamcommunity.com/groups/rQuakecon"]
 ]
 
-group_list.each do |groupid64, name, url|
-	Group.create!(groupid64: groupid64, name: name, url: url)
+group_list.each do |steamid, name, url|
+	Group.create!(steamid: steamid, name: name, url: url)
 end
 
 network_list = [
-	["byoc","0.0.0.0","0.0.0.0"],
-	["private","10.0.0.0","10.255.255.255"],
-	["private","172.16.0.0","172.31.255.255"],
-	["private","192.168.0.0","192.168.255.255"]
+	["wan","0.0.0.0/0"],
+	["private","10.0.0.0/8"],
+	["private","172.16.0.0/12"],
+	["private","192.168.0.0/16"],
+	["byoc","255.255.255.255/32"]
 ]
 
-network_list.each do |network, min, max|
-	Network.create!(network: network, min: min, max: max)
+network_list.each do |name, cidr|
+	Network.create!(name: name, cidr: cidr)
 end
 
 user_list = [[76561197967593490,"|PpP| Ray Arnold","http://steamcommunity.com/id/RayArnold","http://cdn.akamai.steamstatic.com/steamcommunity/public/images/avatars/cf/cf9ad90b7219559f4259a552072e790a98befbef.jpg",true]]
 
-user_list.each do |steamid, personaname, profileurl, avatar, admin|
-	User.create!(steamid: steamid, personaname: personaname, profileurl: profileurl, avatar: avatar, admin: admin)
+user_list.each do |steamid, name, url, avatar, admin|
+	User.create!(steamid: steamid, name: name, url: url, avatar: avatar, admin: admin)
 end
 

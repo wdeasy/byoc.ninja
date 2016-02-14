@@ -11,25 +11,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151115231140) do
+ActiveRecord::Schema.define(version: 20160110222755) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "games", id: false, force: :cascade do |t|
-    t.string   "gameid",        null: false
-    t.string   "gameextrainfo"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+  create_table "games", force: :cascade do |t|
+    t.string   "steamid",    null: false
+    t.string   "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string   "store_link"
     t.string   "comm_link"
     t.string   "full_img"
   end
 
-  add_index "games", ["gameid"], name: "index_games_on_gameid", unique: true, using: :btree
+  add_index "games", ["steamid"], name: "index_games_on_steamid", unique: true, using: :btree
 
-  create_table "groups", id: false, force: :cascade do |t|
-    t.integer  "groupid64",  limit: 8,                null: false
+  create_table "groups", force: :cascade do |t|
+    t.integer  "steamid",    limit: 8,                null: false
     t.string   "name"
     t.string   "url"
     t.datetime "created_at",                          null: false
@@ -37,37 +37,40 @@ ActiveRecord::Schema.define(version: 20151115231140) do
     t.boolean  "enabled",              default: true
   end
 
-  add_index "groups", ["groupid64"], name: "index_groups_on_groupid64", unique: true, using: :btree
+  add_index "groups", ["steamid"], name: "index_groups_on_steamid", unique: true, using: :btree
 
-  create_table "hosts", id: false, force: :cascade do |t|
-    t.string   "gameserverip",                                                    null: false
+  create_table "hosts", force: :cascade do |t|
+    t.string   "address"
     t.string   "ip"
     t.integer  "port"
     t.integer  "query_port"
-    t.string   "gameid"
     t.string   "name"
     t.string   "map"
     t.integer  "current"
     t.integer  "max"
     t.boolean  "password"
     t.integer  "users_count"
-    t.string   "network",                         default: "wan"
     t.boolean  "respond",                         default: true
     t.boolean  "auto_update",                     default: true
     t.boolean  "banned",                          default: false
     t.boolean  "updated",                         default: false
     t.boolean  "visible",                         default: false
     t.boolean  "refresh",                         default: false
-    t.string   "slug"
     t.datetime "created_at",                                                      null: false
     t.datetime "updated_at",                                                      null: false
     t.datetime "last_successful_query",           default: '1970-01-01 00:00:00', null: false
     t.boolean  "tried_query",                     default: false
-    t.integer  "lobbysteamid",          limit: 8
+    t.integer  "lobby",                 limit: 8
     t.string   "flags"
+    t.string   "join_link"
+    t.string   "link_name"
+    t.string   "players"
+    t.integer  "game_id"
+    t.integer  "network_id"
   end
 
-  add_index "hosts", ["gameserverip"], name: "index_hosts_on_gameserverip", unique: true, using: :btree
+  add_index "hosts", ["game_id"], name: "index_hosts_on_game_id", using: :btree
+  add_index "hosts", ["network_id"], name: "index_hosts_on_network_id", using: :btree
 
   create_table "messages", force: :cascade do |t|
     t.string   "message"
@@ -78,40 +81,44 @@ ActiveRecord::Schema.define(version: 20151115231140) do
   end
 
   create_table "networks", force: :cascade do |t|
-    t.string   "network"
-    t.string   "min"
-    t.string   "max"
+    t.string   "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string   "cidr",       null: false
   end
 
-  create_table "seats", id: false, force: :cascade do |t|
+  create_table "seats", force: :cascade do |t|
     t.string   "seat",                      null: false
     t.string   "clan"
     t.string   "handle"
     t.boolean  "updated",    default: true
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
+    t.integer  "year"
   end
 
-  add_index "seats", ["seat"], name: "index_seats_on_seat", unique: true, using: :btree
-
-  create_table "users", id: false, force: :cascade do |t|
-    t.integer  "steamid",      limit: 8,                 null: false
-    t.string   "personaname"
-    t.string   "profileurl"
+  create_table "users", force: :cascade do |t|
+    t.integer  "steamid",     limit: 8,                 null: false
+    t.string   "name"
+    t.string   "url"
     t.string   "avatar"
-    t.string   "gameserverip"
-    t.boolean  "admin",                  default: false
-    t.boolean  "auto_update",            default: true
-    t.boolean  "display",                default: true
-    t.boolean  "banned",                 default: false
-    t.boolean  "updated",                default: false
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
-    t.string   "seat"
+    t.boolean  "admin",                 default: false
+    t.boolean  "auto_update",           default: true
+    t.boolean  "display",               default: true
+    t.boolean  "banned",                default: false
+    t.boolean  "updated",               default: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.integer  "host_id"
+    t.integer  "seat_id"
   end
 
+  add_index "users", ["host_id"], name: "index_users_on_host_id", using: :btree
+  add_index "users", ["seat_id"], name: "index_users_on_seat_id", using: :btree
   add_index "users", ["steamid"], name: "index_users_on_steamid", unique: true, using: :btree
 
+  add_foreign_key "hosts", "games"
+  add_foreign_key "hosts", "networks"
+  add_foreign_key "users", "hosts"
+  add_foreign_key "users", "seats"
 end

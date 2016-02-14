@@ -1,13 +1,12 @@
 class Seat < ActiveRecord::Base
-  self.primary_key = :seat
-  has_many :users, :foreign_key => :seat
+  has_many :users
 
   require 'open-uri'
   require 'json'
   require 'matrix'  
 
   def Seat.update(info)
-  	seat = Seat.where(seat: info["seat"]).first_or_create
+  	seat = Seat.where(seat: info["seat"], year: info["year"]).first_or_create
 
   	seat.update_attributes(
   	  :clan   => info["clan"],
@@ -21,10 +20,15 @@ class Seat < ActiveRecord::Base
   end
 
   def Seat.update_seats
-    string = "https://registration.quakecon.org/?action=byoc_data&response_type=json"
+    #string = "https://registration.quakecon.org/?action=byoc_data&response_type=json"
+    file = File.read('/home/ray/test.txt')
+
+    year = Date.today.year
+    #year = '2015'
 
     begin
-      parsed = JSON.parse(open(string).read)
+      #parsed = JSON.parse(open(string).read)
+      parsed = JSON.parse(file)
     rescue => e
       return "JSON failed to parse #{string}"
     end
@@ -42,7 +46,7 @@ class Seat < ActiveRecord::Base
     colC = Matrix.build(64,12) {|row, col| i += 1 }
     colU = Matrix.build(12,10) {|row, col| i += 1 }
 
-    Seat.update_all(:updated => false)
+    Seat.where(:year => year).update_all(:updated => false)
 
     seats.each do |seat|
 
@@ -86,13 +90,16 @@ class Seat < ActiveRecord::Base
 
       info = { "seat"   => seatLoc,
            "clan"   => clan,
-           "handle" => handle
+           "handle" => handle,
+           "year" => year
            }
 
       Seat.update(info)
       j+=1
     end
-    Seat.where(:updated => false).update_all(:handle => nil, :clan => nil)
+    Seat.where(:updated => false, :year => year).update_all(:handle => nil, :clan => nil)
+    #Users.joins(:seats).where.not(:year => year).update_all(:seat_id => nil)
+
     return "processed #{j} seats."  
   end
 end

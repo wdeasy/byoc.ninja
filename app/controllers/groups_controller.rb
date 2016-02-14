@@ -29,11 +29,11 @@ class GroupsController < ApplicationController
   end
 
   def edit
-  	@group = Group.find_by_groupid64(params[:groupid64])
+  	@group = Group.find(params[:id])
   end
 
   def update
-  	@group = Group.find_by_groupid64(params[:groupid64])
+  	@group = Group.find(params[:id])
     if @group.update_attributes(group_params)
       flash[:success] = "Group updated."
       redirect_to groups_url
@@ -43,7 +43,7 @@ class GroupsController < ApplicationController
   end
 
   def destroy
-    Group.find_by_groupid64(params[:groupid64]).destroy
+    Group.find(params[:id]).destroy
     flash[:success] = "Group deleted"
     redirect_to groups_url
   end
@@ -51,7 +51,7 @@ class GroupsController < ApplicationController
 
   private
     def group_params
-      params.require(:group).permit(:groupid64, :name, :url, :enabled)
+      params.require(:group).permit(:steamid, :name, :url, :enabled)
     end
 
     # Confirms a logged-in user.

@@ -1,86 +1,92 @@
 class Host < ActiveRecord::Base
   require 'open-uri'
 
-  self.primary_key = :gameserverip
-  belongs_to :game, :foreign_key => :gameid
-  has_many :users, :foreign_key => :gameserverip
-
-  def to_param
-    gameserverip.parameterize
-  end
-
+  belongs_to :game
+  belongs_to :network
+  has_many :users
+  has_many :seats, :through => :users
 
   def as_json(options={})
-    super(:only => [:gameserverip,:name,:map,:users_count,:flags],
-          :methods => [:player_count],
+   super(:only => [:name,:map,:users_count,:players,:flags,:join_link,:link_name],
           :include => {
-            :users => {:only => [:personaname, :profileurl]},
-            :game => {:only => [:gameextrainfo, :store_link]}
+            :users => {:only => [:name, :url]},
+            :game => {:only => [:name, :store_link]}
           }
     )
   end
 
-  def player_count
-    if current != nil && max != nil
-      "#{current}/#{max}"
+  def Host.join_link(player)
+    if player["lobbysteamid"].present?
+      "steam://joinlobby/#{player["gameid"]}/#{player["lobbysteamid"]}/#{player["steamid"]}"
+    else
+      "steam://connect/#{player["gameserverip"]}"
     end
   end
 
-  def self.slug(gameserverip)
-    return gameserverip.parameterize
+  def Host.link_name(player)
+    if player["gameserverip"].present?
+      player["gameserverip"]
+    else
+      "Join Lobby"
+    end
   end
 
-  def Host.update(player)
+  def Host.update(player, game_id)
     if player["gameserverip"].present?
-      host = Host.where(gameserverip: player["gameserverip"]).first_or_create do |h|
+      host = Host.where(address: player["gameserverip"]).first_or_create do |h|
           i, p = player["gameserverip"].split(':')
           port = p.to_i
 
-          h.gameid            = player["gameid"]
+          h.game_id           = game_id
           h.query_port        = find_query_port(player)
           h.ip                = i
           h.port              = port
-          h.network           = Network.location(i)
-          h.slug              = slug(player["gameserverip"])
-          h.lobbysteamid      = player["lobbysteamid"].present? ? player["lobbysteamid"] : nil
+          h.network_id           = Network.location(i)
+          h.lobby             = player["lobbysteamid"].present? ? player["lobbysteamid"] : nil
+          h.join_link         = join_link(player)
+          h.link_name         = link_name(player)
       end
     elsif player["lobbysteamid"].present? && !player["gameserverip"].present?
       user = User.find_by_steamid(player["steamid"])
-      if user.seat.blank?
-        personaname = player["personaname"]
+      if user.seat_id.blank?
+        name = player["personaname"]
       else
-        seat = Seat.find_by_seat(user.seat)
-        personaname = "[#{seat.seat}] #{seat.handle}"
+        seat = Seat.find(user.seat_id)
+        name = "[#{seat.seat}] #{seat.handle}"
       end      
 
-      host = Host.where(gameserverip: player["lobbysteamid"]).first_or_create do |h|
-          h.gameid            = player["gameid"]
-          h.name              = "#{personaname}'s Lobby"
-          h.slug              = slug(player["lobbysteamid"])
-          h.lobbysteamid      = player["lobbysteamid"].present? ? player["lobbysteamid"] : nil
+      host = Host.where(lobby: player["lobbysteamid"]).first_or_create do |h|
+          h.game_id           = game_id
+          h.name              = "#{name}'s Lobby"
+          h.lobby             = player["lobbysteamid"]
+          h.network_id        = Network.location('lobby')          
+          h.join_link         = join_link(player)
+          h.link_name         = link_name(player)          
       end
     end
 
-    if host.network == 'banned' && host.banned == false
+    if host.network.name == 'banned' && host.banned == false
       host.update_attributes(
         :banned            => true,
         :visible           => false
       )
     end
 
-    if host.banned == false && host.network != 'private'
-      if host["gameid"] == player["gameid"] && host.refresh == false
+    if host.banned == false && host.network.name != 'private'
+      if host["game_id"] == game_id && host.refresh == false
         host.update_attributes(
           :updated => true,
           :visible => true
         )
       else
         host.update_attributes(
-          :gameid                 => player["gameid"],
+          :game_id                => game_id,
           :query_port             => find_query_port(player),
           :refresh                => false,
           :updated                => true,
-          :visible                => true
+          :visible                => true,
+          :join_link              => join_link(player),
+          :link_name              => link_name(player)
         )
       end
 
@@ -88,8 +94,10 @@ class Host < ActiveRecord::Base
         query_host(host)
       end
 
-      flags(player,host)
+      flags(player,host)      
     end
+
+    return host.id
   end
 
   def Host.flags(player,host)
@@ -108,12 +116,12 @@ class Host < ActiveRecord::Base
     #byoc player in game
     host.users.each do |user|
       i = 0
-      if user.seat.blank?
+      if user.seat_id.blank?
       else
         i = 1
       end
 
-      if i == 1 or ["quakecon", "qcon"].any? { |q| user.personaname.downcase.include? q }       
+      if i == 1 or ["quakecon", "qcon"].any? { |q| user.name.downcase.include? q }       
         if flags.include? "BYOC Player in Game"
         else
           flags << 'BYOC Player in Game,'
@@ -122,7 +130,7 @@ class Host < ActiveRecord::Base
     end
 
     #hosted in byoc
-    if host.network == "byoc"
+    if host.network.name == "byoc"
       flags << 'Hosted in BYOC,'
     end
 
@@ -145,41 +153,58 @@ class Host < ActiveRecord::Base
 
   def Host.query_host(host)
     server = nil
-    server_name = nil
-    map_name = nil
-    number_of_players = nil
-    max_players = nil
-    password_needed = nil
+    name = nil
+    map = nil
+    current = nil
+    max = nil
+    password = nil
 
     begin
       server = SourceServer.new(host.ip, host.query_port)
       server.init
-    rescue => e
+
+      if server != nil
+        name = server.server_info[:server_name]
+        map = server.server_info[:map_name]
+        current = server.server_info[:number_of_players]
+        max = server.server_info[:max_players]
+        password = server.server_info[:password_needed]
+
+        host.update_attributes(
+          :name => name,
+          :map => map,
+          :current => current,
+          :max => max,
+          :players => players(current, max, host.users_count),
+          :password => password
+        )
+      end
+
+    rescue SteamCondenser::TimeoutError
       puts "unable to query #{host.ip}:#{host.query_port.to_s}"
-    end
-
-    if server != nil
-      server_name = server.server_info[:server_name]
-      map_name = server.server_info[:map_name]
-      number_of_players = server.server_info[:number_of_players]
-      max_players = server.server_info[:max_players]
-      password_needed = server.server_info[:password_needed]
-
-      host.update_attributes(
-        :name => server_name,
-        :map => map_name,
-        :current => number_of_players,
-        :max => max_players,
-        :password => password_needed
-      )
-    end
-    
+    end  
   end
 
-  def Host.update_network(gameserverip, network)
-    host = Host.where(gameserverip: gameserverip).first
+  def Host.players(current, max, users_count)
+    players = ''
+
+    if max.blank?
+    else
+      if !current.blank? && current > 0
+        players << current.to_s
+      elsif !users_count.blank? && users_count > 0
+        players << users_count
+      end
+      players << "/#{max}"
+    end
+
+    return players
+  end
+
+  def Host.update_network(address, network)
+    host = Host.where(address: address).first
     host.update_attributes(
-      :network           => network
+      :network_id           => network
     )
   end
 
@@ -190,9 +215,9 @@ class Host < ActiveRecord::Base
     groups = Group.where(:enabled => true)
       groups.each do |group|
         begin
-          doc = Nokogiri::XML(open("http://steamcommunity.com/gid/#{group.groupid64.to_s}/memberslistxml/?xml=1"))
+          doc = Nokogiri::XML(open("http://steamcommunity.com/gid/#{group.steamid.to_s}/memberslistxml/?xml=1"))
         rescue => e
-          puts "Nokogiri failed to open XML http://steamcommunity.com/gid/#{group.groupid64.to_s}/memberslistxml/?xml=1"
+          puts "Nokogiri failed to open XML http://steamcommunity.com/gid/#{group.steamid.to_s}/memberslistxml/?xml=1"
         end
 
         if doc != nil
@@ -211,9 +236,11 @@ class Host < ActiveRecord::Base
 
       i = 1
       j = 0
-      s = 0
       u = 0
       x = 0
+
+      servers = []
+      lobbies = []
 
       combined = ''
       string = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{ENV['STEAM_WEB_API_KEY']}&steamids="
@@ -236,11 +263,30 @@ class Host < ActiveRecord::Base
               if player["gameserverip"] != nil || player["lobbysteamid"] != nil
                 user = User.lookup(player["steamid"])
                 if user.banned == false && user.display == true
-                  Game.update(player)
-                  Host.update(player)
-                  s += 1
-                  User.update(player)
+                  game_id = Game.update(player)
+                  host_id = Host.update(player, game_id)
+                  User.update(player, host_id)
                   u += 1
+
+                  if player["gameserverip"] != nil
+                    if !servers.include? player["gameserverip"]
+                      servers.push(player["gameserverip"])
+                    end
+                  end
+
+                  if player["lobbysteamid"] != nil
+                    if !lobbies.include? player["lobbysteamid"]
+                      lobbies.push(player["lobbysteamid"])
+                    end
+                  end
+
+                  if player["gameserverip"] != nil && player["lobbysteamid"] != nil
+                    puts "user: #{player["personaname"]}, server: #{player["gameserverip"]}, lobby: #{player["lobbysteamid"]}"
+                  elsif player["gameserverip"] != nil
+                    puts "user: #{player["personaname"]}, server: #{player["gameserverip"]}"
+                  else
+                    puts "user: #{player["personaname"]}, lobby: #{player["lobbysteamid"]}"
+                  end
                 end
               end 
             end
@@ -254,10 +300,10 @@ class Host < ActiveRecord::Base
 
       if x == 0
         Host.where(:updated => false).update_all(:visible => false)
-        User.where(:updated => false).update_all(:gameserverip => nil)
+        User.where(:updated => false).update_all(:host_id => nil)
       end
 
-      return "Processed #{j} steam ids. Found #{u} users in #{s} hosts."    
+      return "Processed #{j} steam ids. Found #{u} users in #{servers.count} servers and #{lobbies.count} lobbies."    
   end
 
   def Host.find_query_port(player)

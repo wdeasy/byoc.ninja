@@ -5,11 +5,12 @@
     <%= stylesheet_link_tag 'application', media: 'all' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
     <%= csrf_meta_tags %>
+    <link href='https://fonts.googleapis.com/css?family=Bangers|Orbitron' rel='stylesheet' type='text/css'>
     <%= render 'layouts/shim' %>  
   </head>
   <body>
     <script>
-      $(document).ready(function() {
+      $(document).on('ready page:load', function () {
         $('.dropdown-toggle').dropdown();
       });
     </script>

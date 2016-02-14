@@ -68,13 +68,14 @@ p {
 /* header */
 
 #logo {
+  font-family: 'Bangers', cursive;
   float: left;
   margin-right: 10px;
-  font-size: 1.7em;
+  font-size: 2em;
   color: #fff;
   text-transform: uppercase;
   letter-spacing: -1px;
-  padding-top: 9px;
+  padding-top: 7px;
   font-weight: bold;
   &:hover {
     color: #fff;

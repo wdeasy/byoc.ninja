@@ -4,24 +4,24 @@ class UsersController < ApplicationController
   before_action :admin_user, :except => [:edit, :update]
 
   def index  	
-    @users = User.where.not(gameserverip: nil).order("personaname ASC")
-    @users = User.where(banned: true).order("personaname ASC") if params[:banned].present?     
-    @users = User.order("personaname ASC") if params[:all].present?  
+    @users = User.includes(:seat).where.not(host_id: nil).order("name ASC")
+    @users = User.includes(:seat).where(banned: true).order("name ASC") if params[:banned].present?     
+    @users = User.includes(:seat).order("name ASC") if params[:all].present?  
   end
 
   def show
-    @user = User.find_by_steamid(params[:steamid])
+    @user = User.find(params[:id])
   end
 
   def edit
-    @user = User.find_by_steamid(params[:steamid])
+    @user = User.find(params[:id])
     if User.is_member(@user) == false
       flash[:info] = "You aren't a member of the Quakecon™ Steam Group!"
     end   
   end
 
   def update
-  	@user = User.find_by_steamid(params[:steamid])
+  	@user = User.find(params[:id])
     if @user.update_attributes(user_params)
       flash[:success] = "User updated."
       redirect_to users_url
@@ -32,7 +32,7 @@ class UsersController < ApplicationController
 
   private
     def user_params
-      params.require(:user).permit(:display, :banned, :auto_update, :personaname, :profileurl, :seat)
+      params.require(:user).permit(:display, :banned, :auto_update, :name, :url, :seat_id)
     end
 
     # Confirms a logged-in user.
@@ -50,7 +50,7 @@ class UsersController < ApplicationController
 
     def correct_user
       if !current_user.admin?
-        @user = User.find_by_steamid(params[:steamid])
+        @user = User.find(params[:id])
         redirect_to(root_url) unless @user == current_user
       end
     end    

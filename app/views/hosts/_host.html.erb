@@ -1,9 +1,9 @@
 <tr>
-  <td class="text-left longtext" title="<%= host.game.gameextrainfo %>">
-    <% if host.game.gameid.length < 7 %>
-      <%= store_link host.game, host.game.gameextrainfo, {:target => "_blank"} %>
+  <td class="text-left longtext" title="<%= host.game.name %>">
+    <% if host.game.steamid.length < 7 %>
+      <%= link_to host.game.name, host.game.store_link, {:target => "_blank"} %>
     <% else %>
-      <%= host.game.gameextrainfo %>
+      <%= host.game.name %>
     <% end %> 
   </td>
   <td class="text-center longtext">
@@ -13,14 +13,14 @@
     <%= host.name %>
   </td>
   <td class="text-right">
-    <%= players(host).html_safe %>
+    <%= host.players %>
   </td>
   <td class="text-center">
     <div class="dropdown">
     <%= link_to host.users.size, '#', :class => 'dropdown-toggle', :'data-toggle' => 'dropdown' %>
     <ul class="dropdown-menu">
       <% host.users.each do |user| %>
-        <li><%= link_to display_name(user), user.profileurl, :target => '_blank' %></li>
+        <li><%= link_to display_name(user), user.url, :target => '_blank' %></li>
       <% end %>
     </ul>
     </div>
@@ -29,12 +29,6 @@
     <%= host.map %>
   </td>
   <td class="text-right">
-    <% if !host.gameserverip.include? "." %>
-      <%= link_to "Join Lobby", "steam://joinlobby/#{host.game.gameid}/#{host.lobbysteamid}/#{host.users.first.steamid}" %>
-    <% elsif host.lobbysteamid != nil %>
-      <%= link_to host.gameserverip, "steam://joinlobby/#{host.game.gameid}/#{host.lobbysteamid}/#{host.users.first.steamid}" %>
-    <% else %>
-      <%= link_to host.gameserverip, "steam://connect/#{host.gameserverip}" %>
-    <% end %>
+    <%= link_to host.link_name, host.join_link %>
   </td>
 </tr>

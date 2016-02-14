@@ -6,21 +6,20 @@ Rails.application.routes.draw do
   delete    'logout'              => 'sessions#destroy'
   get       'privacy_policy'      => 'static_pages#privacy_policy'
 
-  get       'admin/hosts'       => 'admin#hosts'
+  get       'admin/hosts'         => 'admin#hosts'
   get       'groups/auto'         => 'groups#auto'
   get       'networks/update_all' => 'networks#update_all'
   get       'messages/clear'      => 'messages#clear'
   get       'settings'            => 'users#edit'
   get       'seats'               => 'seats#index'
   get       'seats/update'        => 'seats#update'
-  get       'json'          => 'hosts#json'
-  get       'list'          => 'hosts#list'
+  get       'json'                => 'hosts#json'
 
   resources :contacts, :only      => [:new, :create]
-  resources :games, :param        => :gameid
-  resources :hosts, :param      => :gameserverip
-  resources :users, :param        => :steamid
-  resources :groups, :param       => :groupid64
+  resources :games
+  resources :hosts
+  resources :users
+  resources :groups
   resources :networks
   resources :messages
 

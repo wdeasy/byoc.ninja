@@ -1,13 +1,5 @@
 # README #
 
-This was the first version of the quakecon server browser.  
-I do not plan on updating this any more because I would like to work on v2.  
-In v2 i plan to:
-- clean everything up
-- use the steamcondenser gem instead of GameQ
-- use angular / json to update the server list instead of page refreshes.
-
-
 ### tasks ###
 
 rake update:hosts updates the server list  
@@ -57,23 +49,10 @@ create environment variables
 
 >export STEAM_WEB_API_KEY="steam web api key"  
 >export SECRET_KEY_BASE="passenger secret key base"     
->export GAMEQ_PATH="../GameQ/"  
->export HOSTNAME="localhost"  
->export DATABASE="database name"  
->export USERNAME="database user"  
->export PASSWORD="database pass"   
 >export MAILGUN_URL="mailgun api url"  
 >export MAILGUN_API="mailgun api key"  
 >export MAILGUN_DOMAIN="mailgun domain"  
 >export MAILGUN_EMAIL="mailgun email"  
-
-install php (used by gameq)
-> sudo apt-get install php5 php5-pgsql
-
-clone gameq to the same directory that qcon_steam_browser is in
->cd ~/Development   
->git clone https://github.com/Austinb/GameQ.git ~/Development/GameQ
-
 
 edit db/seeds.rb and add your admin users and groups  
 the group_list array needs group steam id, group steam name and group url  

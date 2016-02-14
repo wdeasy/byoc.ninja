@@ -1,38 +1,34 @@
 class User < ActiveRecord::Base
   require 'open-uri'
 
-  self.primary_key = :steamid
-  belongs_to :host, :foreign_key => :gameserverip, counter_cache: true
-  belongs_to :seats, :foreign_key => :seat
+  belongs_to :host, counter_cache: true
+  belongs_to :seat
 
-  def User.update(player)
+  def User.update(player, host_id)
+
     user = User.find_by_steamid(player["steamid"])
-    if player["gameserverip"].present?
-      gameserverip = player["gameserverip"]
-    elsif player["lobbysteamid"].present?
-      gameserverip = player["lobbysteamid"]
-    end
 
-    if (player["gameserverip"].present? && player["gameserverip"] == user["gameserverip"]) || (player["lobbysteamid"].present? && player["lobbysteamid"] == user["lobbysteamid"])
+    if (player["gameserverip"].present? && player["gameserverip"] == user["address"]) || (player["lobbysteamid"].present? && player["lobbysteamid"] == user["lobby"])
       user.update_attributes(
         :updated => true
       )  
     else
       user.update_attributes(
-        :gameserverip => gameserverip,
+        :host_id => host_id,
         :updated => true
       )  
     end
 
-    if (player["personaname"] != user["personaname"] || player["profileurl"] != user["profileurl"]) && user.auto_update == true
+    if (player["personaname"] != user["name"] || player["profileurl"] != user["url"]) && user.auto_update == true
+
       user.update_attributes(
-        :personaname => player["personaname"],
-        :profileurl => player["profileurl"],
+        :name => player["personaname"],
+        :url => player["profileurl"],
         :avatar => player["avatar"]
       )
     end  
 
-    Host.reset_counters(gameserverip, :users)     
+    Host.reset_counters(host_id, :users)     
   end
 
   def User.lookup(steamid)
@@ -41,7 +37,7 @@ class User < ActiveRecord::Base
 
   def User.is_member(player)
     if player.display == true
-      url = player.profileurl + "?xml=1"
+      url = player.url + "?xml=1"
       begin
         doc = Nokogiri::XML(open(url))
       rescue => e
@@ -54,7 +50,7 @@ class User < ActiveRecord::Base
 
           doc.xpath('//groupID64').each do |gid|
             groups.each do |g|
-              if gid.text == g.groupid64.to_s
+              if gid.text == g.steamid.to_s
                 return true
               end
             end

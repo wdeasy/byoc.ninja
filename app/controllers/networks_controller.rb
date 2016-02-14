@@ -3,7 +3,7 @@ class NetworksController < ApplicationController
   before_action :admin_user
 
   def index
-  	@networks = Network.order("network asc")
+  	@networks = Network.order("name asc")
   end
 
   def new
@@ -50,7 +50,7 @@ class NetworksController < ApplicationController
 
   private
     def network_params
-      params.require(:network).permit(:network, :min, :max)
+      params.require(:network).permit(:name, :cidr)
     end
 
     # Confirms a logged-in user.

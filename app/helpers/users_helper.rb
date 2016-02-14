@@ -10,11 +10,10 @@ module UsersHelper
   end
 
   def display_name(user)
-  	if user.seat.blank?
-  		return user.personaname
+  	if user.seat_id.blank?
+  		return user.name
   	else
-  		seat = Seat.find_by_seat(user.seat)
-  		return "[#{seat.seat}] #{seat.clan} #{seat.handle}"
+      return "[#{user.seat.seat}] #{user.seat.clan} #{user.seat.handle}"
   	end
   end  
 end

@@ -6,14 +6,14 @@ class SessionsController < ApplicationController
 
   def create
     auth = request.env['omniauth.auth']
-    temp = { :nickname => auth.info['nickname'],
+    temp = { :name => auth.info['nickname'],
     				:avatar => auth.extra['raw_info']['avatar'],
-                    :profileurl => auth.extra['raw_info']['profileurl'],
+                    :url => auth.extra['raw_info']['profileurl'],
                     :uid => auth.uid }
     user = User.where(steamid: temp[:uid]).first_or_create
     user.update_attributes(
-   	  :personaname	=> temp[:nickname],
-  	  :profileurl 	=> temp[:profileurl],
+   	  :name	=> temp[:name],
+  	  :url 	=> temp[:url],
   	  :avatar 		=> temp[:avatar]		
   	)
     if user 

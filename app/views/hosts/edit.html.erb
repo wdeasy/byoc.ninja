@@ -17,7 +17,7 @@
 	  <%= f.select :refresh, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
 
 	  <%= f.label :address %>
-	  <%= f.text_field :gameserverip, class: 'form-control', :disabled => true %>
+	  <%= f.text_field :address, class: 'form-control', :disabled => true %>
 
 	  <%= f.label :name %>
 	  <%= f.text_field :name, class: 'form-control' %>
@@ -38,7 +38,7 @@
 	  <%= f.select :tried_query, [['yes',true],['no',false]], {}, {:class => 'form-control'} %>
 
 	  <%= f.submit "Save changes", class: "btn btn-33 btn-primary pull-left" %>
-	  <%= link_to "Go to Game", edit_game_path(@host.gameid), class: "btn btn-33 btn-primary pull-center" %>
+	  <%= link_to "Go to Game", edit_game_path(@host.game_id), class: "btn btn-33 btn-primary pull-center" %>
 	  <%= link_to "Back", admin_hosts_url, class: "btn btn-33 btn-primary pull-right" %>
 	<% end %>
   </div>

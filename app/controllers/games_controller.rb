@@ -3,15 +3,15 @@ class GamesController < ApplicationController
   before_action :admin_user
 
   def index
-  	@games = Game.order("gameextrainfo ASC")
+  	@games = Game.order("name ASC")
   end
 
   def edit
-  	@game = Game.find_by_gameid(params[:gameid])
+  	@game = Game.find(params[:id])
   end
 
   def update
-  	@game = Game.find_by_gameid(params[:gameid])
+  	@game = Game.find(params[:id])
     if @game.update_attributes(game_params)
       flash[:success] = "Game updated."
       redirect_to games_url
@@ -22,7 +22,7 @@ class GamesController < ApplicationController
 
   private
     def game_params
-      params.require(:game).permit(:gameextrainfo)
+      params.require(:game).permit(:name)
     end
 
     # Confirms a logged-in user.

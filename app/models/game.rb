@@ -1,15 +1,14 @@
 class Game < ActiveRecord::Base
   require 'open-uri'
 
-  self.primary_key = :gameid
-  has_many :hosts, :foreign_key => :gameid  
+  has_many :hosts  
 
   def Game.update(player)
-  	Game.where(gameid: player["gameid"]).first_or_create do |game|
+  	game = Game.where(steamid: player["gameid"]).first_or_create do |game|
       name = name_from_gameid(player)
 
-      game.gameextrainfo = name
-      game.gameid = player["gameid"]
+      game.name = name
+      game.steamid = player["gameid"]
 
       if player["gameid"].length < 7
          game.store_link = "http://store.steampowered.com/app/#{player['gameid']}"
@@ -17,6 +16,8 @@ class Game < ActiveRecord::Base
          game.full_img = "http://cdn.akamai.steamstatic.com/steam/apps/#{player['gameid']}/header.jpg"
       end
     end
+
+    return game.id
   end
 
   def self.name_from_gameid(player)

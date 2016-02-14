@@ -3,10 +3,10 @@ class HostsController < ApplicationController
   before_action :admin_user, :except => [:index, :json, :list]
 
   def index
-  	@hosts = Host.includes(:game).where(visible: true).order("games.gameextrainfo ASC, users_count DESC, gameserverip ASC")
+  	@hosts = Host.includes(:game, :users, :seats).where(visible: true).order("games.name ASC, users_count DESC, address ASC")
     @messages = Message.where(show: true).order("updated_at desc")
 
-    if current_user && current_user.seat.blank?
+    if current_user && current_user.seat_id.blank?
       flash[:info] = "Click on your name in the top right corner and go to the settings page to set your BYOC seat!"
     end
     
@@ -18,11 +18,11 @@ class HostsController < ApplicationController
   end
 
   def edit
-  	@host = Host.find_by_slug(params[:gameserverip])
+  	@host = Host.find_by_id(params[:id])
   end
 
   def update
-  	@host = Host.find_by_slug(params[:gameserverip])
+  	@host = Host.find_by_id(params[:id])
     if @host.update_attributes(host_params)
       flash[:success] = "Host updated."
       redirect_to admin_hosts_url
@@ -32,14 +32,8 @@ class HostsController < ApplicationController
   end
 
   def json
-    @hosts = Host.includes(:game).where(visible: true).order("games.gameextrainfo ASC, users_count DESC, gameserverip ASC")
-    #@messages = Message.where(show: true).order("updated_at desc")
-
+    @hosts = Host.includes(:game).where(visible: true).order("games.name ASC, users_count DESC, address ASC")
     render :json => @hosts
-  end
-
-  #test page for json server browser
-  def list
   end
 
   private
