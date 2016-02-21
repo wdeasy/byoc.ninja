@@ -7,7 +7,7 @@ class HostsController < ApplicationController
     @messages = Message.where(show: true).order("updated_at desc")
 
     if current_user && current_user.seat_id.blank?
-      flash[:info] = "Click on your name in the top right corner and go to the settings page to set your BYOC seat!"
+      #flash[:info] = "Click on your name in the top right corner and go to the settings page to set your BYOC seat!"
     end
     
   	respond_to do |format|

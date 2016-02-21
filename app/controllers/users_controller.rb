@@ -16,7 +16,7 @@ class UsersController < ApplicationController
   def edit
     @user = User.find(params[:id])
     if User.is_member(@user) == false
-      flash[:info] = "You aren't a member of the Quakecon™ Steam Group!"
+      #flash[:info] = "You aren't a member of the Quakecon™ Steam Group!"
     end   
   end
 
