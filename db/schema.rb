@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160110222755) do
+ActiveRecord::Schema.define(version: 20160226013345) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -61,7 +61,7 @@ ActiveRecord::Schema.define(version: 20160110222755) do
     t.datetime "last_successful_query",           default: '1970-01-01 00:00:00', null: false
     t.boolean  "tried_query",                     default: false
     t.integer  "lobby",                 limit: 8
-    t.string   "flags"
+    t.text     "flags"
     t.string   "join_link"
     t.string   "link_name"
     t.string   "players"
@@ -97,6 +97,11 @@ ActiveRecord::Schema.define(version: 20160110222755) do
     t.integer  "year"
   end
 
+  create_table "seats_users", id: false, force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "seat_id", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.integer  "steamid",     limit: 8,                 null: false
     t.string   "name"
@@ -110,15 +115,12 @@ ActiveRecord::Schema.define(version: 20160110222755) do
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
     t.integer  "host_id"
-    t.integer  "seat_id"
   end
 
   add_index "users", ["host_id"], name: "index_users_on_host_id", using: :btree
-  add_index "users", ["seat_id"], name: "index_users_on_seat_id", using: :btree
   add_index "users", ["steamid"], name: "index_users_on_steamid", unique: true, using: :btree
 
   add_foreign_key "hosts", "games"
   add_foreign_key "hosts", "networks"
   add_foreign_key "users", "hosts"
-  add_foreign_key "users", "seats"
 end

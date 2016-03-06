@@ -23,7 +23,7 @@
 	  <%= f.text_field :name, class: 'form-control' %>
 
 	  <%= f.label :network %>
-	  <%= f.collection_select :network, Network.select(:network).distinct.order("network ASC"), :network, :network, {:include_blank => true},{:class => 'form-control'} %>
+	  <%= f.collection_select :network_id, Network.all, :id, :name_cidr, {:include_blank => false},{:class => 'form-control'} %>
 
 	  <%= f.label :map %>
 	  <%= f.text_field :map, class: 'form-control' %>

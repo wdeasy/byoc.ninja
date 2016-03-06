@@ -6,11 +6,19 @@ class Host < ActiveRecord::Base
   has_many :users
   has_many :seats, :through => :users
 
+  serialize :flags
+
+  scope :current_seats, -> { includes(:seats).where(seats: { year: Date.today.year}).order("users.seats ASC") } 
+
   def as_json(options={})
    super(:only => [:name,:map,:users_count,:players,:flags,:join_link,:link_name],
           :include => {
-            :users => {:only => [:name, :url]},
-            :game => {:only => [:name, :store_link]}
+            :users => {:only => [:name, :url],
+              :include => { 
+                :seats => {:only => [:seat, :clan, :handle]}
+              }
+            },
+            :game => {:only => [:name, :store_link]}            
           }
     )
   end
@@ -32,36 +40,40 @@ class Host < ActiveRecord::Base
   end
 
   def Host.update(player, game_id)
-    if player["gameserverip"].present?
-      host = Host.where(address: player["gameserverip"]).first_or_create do |h|
-          i, p = player["gameserverip"].split(':')
-          port = p.to_i
+    if player["lobbysteamid"].present? && player["gameserverip"].present?
+      host = Host.where('lobby = ? OR address = ?', player["lobbysteamid"], player["gameserverip"]).first_or_create do |h|
+        i, p = player["gameserverip"].split(':')
+        port = p.to_i
 
-          h.game_id           = game_id
-          h.query_port        = find_query_port(player)
-          h.ip                = i
-          h.port              = port
-          h.network_id           = Network.location(i)
-          h.lobby             = player["lobbysteamid"].present? ? player["lobbysteamid"] : nil
-          h.join_link         = join_link(player)
-          h.link_name         = link_name(player)
+        h.game_id           = game_id
+        h.query_port        = find_query_port(player)
+        h.ip                = i
+        h.port              = port
+        h.network_id        = Network.location(i)
+        h.lobby             = player["lobbysteamid"]
+        h.join_link         = join_link(player)
+        h.link_name         = link_name(player)
       end
-    elsif player["lobbysteamid"].present? && !player["gameserverip"].present?
-      user = User.find_by_steamid(player["steamid"])
-      if user.seat_id.blank?
-        name = player["personaname"]
-      else
-        seat = Seat.find(user.seat_id)
-        name = "[#{seat.seat}] #{seat.handle}"
-      end      
-
+    elsif player["lobbysteamid"].present?
       host = Host.where(lobby: player["lobbysteamid"]).first_or_create do |h|
-          h.game_id           = game_id
-          h.name              = "#{name}'s Lobby"
-          h.lobby             = player["lobbysteamid"]
-          h.network_id        = Network.location('lobby')          
-          h.join_link         = join_link(player)
-          h.link_name         = link_name(player)          
+        h.game_id           = game_id
+        h.lobby             = player["lobbysteamid"]
+        h.network_id        = Network.location('lobby')          
+        h.join_link         = join_link(player)
+        h.link_name         = link_name(player)          
+      end 
+    elsif player["gameserverip"].present?
+      host = Host.where(address: player["gameserverip"]).first_or_create do |h|
+        i, p = player["gameserverip"].split(':')
+        port = p.to_i
+
+        h.game_id           = game_id
+        h.query_port        = find_query_port(player)
+        h.ip                = i
+        h.port              = port
+        h.network_id        = Network.location(i)
+        h.join_link         = join_link(player)
+        h.link_name         = link_name(player)
       end
     end
 
@@ -101,50 +113,50 @@ class Host < ActiveRecord::Base
   end
 
   def Host.flags(player,host)
-    flags = ''
+    flags = {}
 
     #check for quakecon in hostname
     if host.name != nil
       if host.name.downcase.include? "quakecon"
-        if host.name.ends_with? "'s Lobby"
-        else
-          flags << 'Quakecon in Host Name,'
-        end       
+        flags['Quakecon in Host Name'] = true       
       end 
     end
 
     #byoc player in game
     host.users.each do |user|
-      i = 0
-      if user.seat_id.blank?
-      else
-        i = 1
+      user.seats.each do |seat|
+        if seat.year == Date.today.year
+          if flags['BYOC Player in Game']
+          else
+            flags['BYOC Player in Game'] = true  
+          end              
+        end
       end
 
-      if i == 1 or ["quakecon", "qcon"].any? { |q| user.name.downcase.include? q }       
-        if flags.include? "BYOC Player in Game"
+      if ["quakecon", "qcon"].any? { |q| user.name.downcase.include? q }       
+        if flags['BYOC Player in Game']
         else
-          flags << 'BYOC Player in Game,'
+          flags['BYOC Player in Game'] = true  
         end       
       end
     end
 
     #hosted in byoc
     if host.network.name == "byoc"
-      flags << 'Hosted in BYOC,'
+      flags['Hosted in BYOC'] = true  
     end
 
     #password protected
     if host.password == true
-      flags << 'Password Protected,'
+      flags['Password Protected'] = true  
     end
 
     #is the server responding to queries?
     if host.respond == false && host.last_successful_query != Time.at(0)
-      flags << 'Last Query Attempt Failed,'
+      flags['Last Query Attempt Failed'] = true  
     end 
 
-    unless flags == ''
+    unless flags.empty? && host.flags.blank?
       host.update_attributes(
         :flags                 => flags
       )
@@ -191,11 +203,8 @@ class Host < ActiveRecord::Base
     if max.blank?
     else
       if !current.blank? && current > 0
-        players << current.to_s
-      elsif !users_count.blank? && users_count > 0
-        players << users_count
+        players << "#{current.to_s}/#{max}"
       end
-      players << "/#{max}"
     end
 
     return players

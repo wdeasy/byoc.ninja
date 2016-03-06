@@ -22,37 +22,22 @@ class Game < ActiveRecord::Base
 
   def self.name_from_gameid(player)
     name = ''
-
-    page = lookup("http://store.steampowered.com/app/#{player["gameid"]}")
-    if !page.blank?
-      name = page.css('div.apphub_AppName').text
-
-      if name.blank?
-        name = page.css('title').text
-        name.slice!(" on Steam")
-      end                
-    end
-
-    if name.blank? || name == "Welcome to Steam" || name[0,5] == "Save "
-      page = lookup(player["profileurl"])
-      if !page.blank?
-        name = page.css('div.profile_in_game_name').text
-      end
-    end 
-
-    return name
-  end
-
-  def self.lookup(url)
-    page = nil
+    url = 'http://api.steampowered.com/ISteamApps/GetAppList/v0001/'
 
     begin
-      html = open(url) 
-      page = Nokogiri::HTML(html.read)
+      parsed = JSON.parse(open(url).read)
     rescue => e
-      puts "Nokogiri failed to open HTML #{url}"
+      puts "JSON failed to parse #{url}"
     end
 
-    return page
+    if parsed != nil
+      parsed['applist']['apps']['app'].each do |app|
+        if player["gameid"] == app['appid'].to_s
+          name = app['name']
+        end
+      end       
+    end
+   
+    return name
   end
 end

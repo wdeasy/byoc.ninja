@@ -4,9 +4,9 @@ class UsersController < ApplicationController
   before_action :admin_user, :except => [:edit, :update]
 
   def index  	
-    @users = User.includes(:seat).where.not(host_id: nil).order("name ASC")
-    @users = User.includes(:seat).where(banned: true).order("name ASC") if params[:banned].present?     
-    @users = User.includes(:seat).order("name ASC") if params[:all].present?  
+    @users = User.includes(:seats).where.not(host_id: nil).order("name ASC")
+    @users = User.includes(:seats).where(banned: true).order("name ASC") if params[:banned].present?     
+    @users = User.includes(:seats).order("name ASC") if params[:all].present?  
   end
 
   def show
@@ -15,9 +15,10 @@ class UsersController < ApplicationController
 
   def edit
     @user = User.find(params[:id])
+    @seats = Seat.where(:year => Date.today.year).order("seat asc")
     if User.is_member(@user) == false
       #flash[:info] = "You aren't a member of the Quakecon™ Steam Group!"
-    end   
+    end  
   end
 
   def update
@@ -32,7 +33,7 @@ class UsersController < ApplicationController
 
   private
     def user_params
-      params.require(:user).permit(:display, :banned, :auto_update, :name, :url, :seat_id)
+      params.require(:user).permit(:display, :banned, :auto_update, :name, :url, :seat_ids)
     end
 
     # Confirms a logged-in user.

@@ -1,5 +1,5 @@
   <tr class="row">
       <td class="text-left"><%= user.steamid %></td>
-      <td class="text-left"><% if !user.seat_id.blank? %><%= user.seat.seat %><% end %></td>
+      <td class="text-left"><% if !user.seats.blank? %><%= user.seats.first.seat %><% end %></td>
       <td class="text-left longtext"><%= link_to user.name, edit_user_path(user) %></td>
   </tr>

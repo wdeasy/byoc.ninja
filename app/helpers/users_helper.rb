@@ -10,10 +10,14 @@ module UsersHelper
   end
 
   def display_name(user)
-  	if user.seat_id.blank?
-  		return user.name
-  	else
-      return "[#{user.seat.seat}] #{user.seat.clan} #{user.seat.handle}"
-  	end
+    name = user.name
+
+    user.seats.each do |seat|
+      if seat.year == Date.today.year
+        name = "[#{user.seats.first.seat}] #{user.seats.first.clan} #{user.seats.first.handle}"
+      end
+    end    
+
+    return name
   end  
 end

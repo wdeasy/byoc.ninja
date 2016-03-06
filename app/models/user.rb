@@ -2,7 +2,7 @@ class User < ActiveRecord::Base
   require 'open-uri'
 
   belongs_to :host, counter_cache: true
-  belongs_to :seat
+  has_and_belongs_to_many :seats 
 
   def User.update(player, host_id)
 

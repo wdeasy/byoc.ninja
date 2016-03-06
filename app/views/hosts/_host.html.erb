@@ -9,8 +9,12 @@
   <td class="text-center longtext">
     <%= flags(host).html_safe %>
   </td>
-  <td class="text-left longtext" title="<%= host.name %>">
-    <%= host.name %>
+  <td class="text-left longtext" title="<%= host.name %>">    
+    <% if host.name.blank? && !host.lobby.blank? %>
+      <%= host.users.first.name %>'s Lobby
+    <% else %>
+      <%= host.name %>
+    <% end %>
   </td>
   <td class="text-right">
     <%= host.players %>

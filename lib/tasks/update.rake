@@ -15,11 +15,13 @@ namespace :update do
   	finish_time(beginning)
   end
 
-  desc "Update byoc seat information"
-  task :seats => :environment do
-  	beginning = start_time
-  	puts Seat.update_seats
-	 finish_time(beginning) 	
+  desc "Update byoc seat information args[file,year]"
+  task :seats, [:file,:year] => :environment do |t, args|
+    beginning = start_time
+    file = args.file
+    year = args.year    
+  	puts Seat.update_seats(file,year)
+	  finish_time(beginning) 	
   end
 
   def start_time

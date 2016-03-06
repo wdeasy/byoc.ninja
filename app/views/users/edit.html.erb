@@ -20,7 +20,7 @@
 
 	  <% if current_user?(@user) || current_user.admin? %>
 		  <%= f.label :seat %>
-		  <%= f.collection_select :seat_id, Seat.where(:year => Date.today.year).order("seat asc"), :id, :seat_clan_handle, {:include_blank => true},{:class => 'form-control'} %>
+		  <%= f.collection_select :seat_ids, @seats, :id, :seat_clan_handle, {:include_blank => true},{:class => 'form-control'} %>
 		  <%= f.label "Display game information" %>
 		  <%= f.select :display, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
 	  <% end %>

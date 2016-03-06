@@ -1,5 +1,7 @@
 class Seat < ActiveRecord::Base
-  has_many :users
+  has_and_belongs_to_many :users
+
+  #scope :current_year, -> (user) { includes(:users).where(year: Date.today.year, users: {user: user})}
 
   require 'open-uri'
   require 'json'
@@ -19,18 +21,22 @@ class Seat < ActiveRecord::Base
   	"#{seat} -- #{clan} #{handle}"
   end
 
-  def Seat.update_seats
-    #string = "https://registration.quakecon.org/?action=byoc_data&response_type=json"
-    file = File.read('/home/ray/test.txt')
+  def Seat.update_seats(file,year)
+    if file == nil
+      file = "https://registration.quakecon.org/?action=byoc_data&response_type=json"
+    end
 
-    year = Date.today.year
-    #year = '2015'
+    if year == nil
+      year = Date.today.year
+    end
+
+    puts "file: #{file}"
+    puts "year: #{year}"
 
     begin
-      #parsed = JSON.parse(open(string).read)
-      parsed = JSON.parse(file)
+      parsed = JSON.parse(open(file).read)
     rescue => e
-      return "JSON failed to parse #{string}"
+      return "JSON failed to parse #{file}"
     end
 
     seats = parsed["data"]["seats"]
