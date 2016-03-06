@@ -22,7 +22,7 @@ class Game < ActiveRecord::Base
 
   def self.name_from_gameid(player)
     name = ''
-    url = 'http://api.steampowered.com/ISteamApps/GetAppList/v0001/'
+    url = 'http://api.steampowered.com/ISteamApps/GetAppList/v0002/'
 
     begin
       parsed = JSON.parse(open(url).read)
@@ -31,7 +31,7 @@ class Game < ActiveRecord::Base
     end
 
     if parsed != nil
-      parsed['applist']['apps']['app'].each do |app|
+      parsed['applist']['apps'].each do |app|
         if player["gameid"] == app['appid'].to_s
           name = app['name']
         end

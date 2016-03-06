@@ -8,10 +8,8 @@ class Host < ActiveRecord::Base
 
   serialize :flags
 
-  scope :current_seats, -> { includes(:seats).where(seats: { year: Date.today.year}).order("users.seats ASC") } 
-
   def as_json(options={})
-   super(:only => [:name,:map,:users_count,:players,:flags,:join_link,:link_name],
+   super(:only => [:name,:map,:users_count,:address,:lobby,:players,:flags,:join_link],
           :include => {
             :users => {:only => [:name, :url],
               :include => { 
@@ -28,14 +26,6 @@ class Host < ActiveRecord::Base
       "steam://joinlobby/#{player["gameid"]}/#{player["lobbysteamid"]}/#{player["steamid"]}"
     else
       "steam://connect/#{player["gameserverip"]}"
-    end
-  end
-
-  def Host.link_name(player)
-    if player["gameserverip"].present?
-      player["gameserverip"]
-    else
-      "Join Lobby"
     end
   end
 
