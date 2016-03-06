@@ -7,7 +7,6 @@ class EmailValidator < ActiveModel::EachValidator
 end
 
 class Contact
-	require 'mailgun'
 	include ActiveModel::Validations
 	include ActiveModel::Conversion
 	extend ActiveModel::Naming
@@ -26,19 +25,4 @@ class Contact
   def persisted?
   	false
   end
-
-	def Contact.send_mail(contact)
-		mg_client = Mailgun::Client.new ENV["MAILGUN_API"]
-
-		message_params = {:from => contact.email,
-											:to => ENV["MAILGUN_EMAIL"],
-											:subject => "New message from #{contact.name}",
-											:text => contact.message
-										}
-		begin
-			mg_client.send_message ENV["MAILGUN_DOMAIN"], message_params
-		rescue => e
-			return false
-		end		
-	end
 end

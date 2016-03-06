@@ -53,10 +53,10 @@ create environment variables
 >export DATABASE="database name"  
 >export USERNAME="database user"  
 >export PASSWORD="database pass"   
->export MAILGUN_URL="mailgun api url"  
->export MAILGUN_API="mailgun api key"  
->export MAILGUN_DOMAIN="mailgun domain"  
->export MAILGUN_EMAIL="mailgun email"  
+>export SMTP_SERVER="smtp.gmail.com"
+>export EMAIL_DOMAIN="gmail.com"
+>export EMAIL_USERNAME="gmail username"
+>export EMAIL_PASSWORD="gmail password" 
 
 edit db/seeds.rb and add your admin users and groups  
 the group_list array needs group steam id, group steam name and group url  
