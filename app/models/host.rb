@@ -29,6 +29,14 @@ class Host < ActiveRecord::Base
     end
   end
 
+  def Host.link_name(player)
+    if player["gameserverip"].present?
+      player["gameserverip"]
+    else
+      "Join Lobby"
+    end
+  end
+
   def Host.update(player, game_id)
     if player["lobbysteamid"].present? && player["gameserverip"].present?
       host = Host.where('lobby = ? OR address = ?', player["lobbysteamid"], player["gameserverip"]).first_or_create do |h|
@@ -75,7 +83,7 @@ class Host < ActiveRecord::Base
     end
 
     if host.banned == false && host.network.name != 'private'
-      if host["game_id"] == game_id && host.refresh == false
+      if host["game_id"] == host.game.steamid && host.refresh == false
         host.update_attributes(
           :updated => true,
           :visible => true

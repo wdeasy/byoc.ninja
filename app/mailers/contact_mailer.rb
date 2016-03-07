@@ -1,5 +1,5 @@
 class ContactMailer < ActionMailer::Base
-  default from: "byoc.ninja <webmaster@byoc.ninja>"
+  default from: "#{message.name} <#{message.email}>"
   default to: "byoc.ninja <#{ENV["EMAIL_USERNAME"]}>"
 
   def new(message)
