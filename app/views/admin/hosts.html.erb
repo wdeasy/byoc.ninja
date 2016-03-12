@@ -5,20 +5,20 @@
   <table class="table table-striped table-condensed games">
     <thead>
       <tr class="row">
-        <th class="col-md-3 text-left">Game</th>        
-        <th class="col-md-7 text-left">Name</th>
-        <th class="col-md-2 text-left">Address</th>
+        <th class="col-md-2 text-left">Game</th>        
+        <th class="col-md-8 text-center">Name</th>
+        <th class="col-md-2 text-right">Address</th>
       </tr>
     </thead>
     <tbody>
       <% @hosts.each do |host| %>
         <tr class="row">
             <td class="text-left longtext"><%= host.game.name %></td>            
-            <td class="text-left longtext"><%= host.name %></td>
+            <td class="text-center longtext"><%= link_to host.name, edit_host_path(host) %></td>
             <% if host.address.blank? %>
-              <td class="text-left"><%= link_to host.lobby, edit_host_path(host) %></td>
+              <td class="text-right"><%= link_to host.lobby, edit_host_path(host) %></td>
             <% else %>
-              <td class="text-left"><%= link_to host.address, edit_host_path(host) %></td>
+              <td class="text-right"><%= link_to host.address, edit_host_path(host) %></td>
             <% end %>            
         </tr>      
       <% end %>                           

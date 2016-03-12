@@ -9,7 +9,7 @@
       	  	<%= link_to '#', :class => 'dropdown-toggle', :'data-toggle' => 'dropdown' do %>
               <%= display_name(current_user) %>   	  		
       	  	<% end %>
-      	    <ul class='dropdown-menu'>          
+      	    <ul class='dropdown-menu'>
       	      <li><%= link_to "Settings", edit_user_path(current_user) %></li>
               <li class="divider"></li>
       	      <li><%= link_to "Log out", logout_path, method: "delete" %></li>     	      	

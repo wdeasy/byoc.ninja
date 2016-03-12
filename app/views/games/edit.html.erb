@@ -4,7 +4,7 @@
 <% if @game.steamid.length < 7 %>
 	<div class="row">
 	  <div class="col-md-6 col-md-offset-3">  	
-	  	<div class="container center"><%= link_to image_tag(@game.full_img), @game.store_link, {:class => "img-responsive", :target => "_blank"} %></div>
+	  	<div class="container center"><%= link_to image_tag(@game.image), @game.link, {:class => "img-responsive", :target => "_blank"} %></div>
 	  </div>
 	</div>
 	<br />
@@ -21,6 +21,9 @@
 
 	  <%= f.label :name %>
 	  <%= f.text_field :name, class: 'form-control' %>
+
+	  <%= f.label :info %>
+	  <%= f.text_field :info, class: 'form-control', :disabled => true %>
 
 	  <%= f.submit "Save changes", class: "btn btn-50 btn-primary pull-left" %>
 	  <%= link_to "Back", games_url, class: "btn btn-50 btn-primary pull-right" %>

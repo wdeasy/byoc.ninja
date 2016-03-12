@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160226013345) do
+ActiveRecord::Schema.define(version: 20160312000254) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,9 +21,9 @@ ActiveRecord::Schema.define(version: 20160226013345) do
     t.string   "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string   "store_link"
-    t.string   "comm_link"
-    t.string   "full_img"
+    t.string   "link"
+    t.string   "image"
+    t.string   "info"
   end
 
   add_index "games", ["steamid"], name: "index_games_on_steamid", unique: true, using: :btree
@@ -62,8 +62,7 @@ ActiveRecord::Schema.define(version: 20160226013345) do
     t.boolean  "tried_query",                     default: false
     t.integer  "lobby",                 limit: 8
     t.text     "flags"
-    t.string   "join_link"
-    t.string   "link_name"
+    t.string   "link"
     t.string   "players"
     t.integer  "game_id"
     t.integer  "network_id"

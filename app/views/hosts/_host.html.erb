@@ -1,7 +1,7 @@
 <tr>
   <td class="text-left longtext" title="<%= host.game.name %>">
     <% if host.game.steamid.length < 7 %>
-      <%= link_to host.game.name, host.game.store_link, {:target => "_blank"} %>
+      <%= link_to host.game.name, host.game.link, {:target => "_blank"} %>
     <% else %>
       <%= host.game.name %>
     <% end %> 
@@ -33,6 +33,10 @@
     <%= host.map %>
   </td>
   <td class="text-right">
-    <%= link_to host.link_name, host.join_link %>
+  <% if host.address %>
+    <%= link_to host.address, host.link %>
+  <% else %>
+    <%= link_to "Join Lobby", host.link %>
+  <% end %>
   </td>
 </tr>

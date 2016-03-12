@@ -9,31 +9,23 @@ class Host < ActiveRecord::Base
   serialize :flags
 
   def as_json(options={})
-   super(:only => [:name,:map,:users_count,:address,:lobby,:players,:flags,:join_link],
+   super(:only => [:name,:map,:users_count,:address,:lobby,:players,:flags,:link],
           :include => {
             :users => {:only => [:name, :url],
               :include => { 
                 :seats => {:only => [:seat, :clan, :handle]}
               }
             },
-            :game => {:only => [:name, :store_link]}            
+            :game => {:only => [:name, :link]}            
           }
     )
   end
 
-  def Host.join_link(player)
+  def Host.link(player)
     if player["lobbysteamid"].present?
       "steam://joinlobby/#{player["gameid"]}/#{player["lobbysteamid"]}/#{player["steamid"]}"
     else
       "steam://connect/#{player["gameserverip"]}"
-    end
-  end
-
-  def Host.link_name(player)
-    if player["gameserverip"].present?
-      player["gameserverip"]
-    else
-      "Join Lobby"
     end
   end
 
@@ -49,16 +41,14 @@ class Host < ActiveRecord::Base
         h.port              = port
         h.network_id        = Network.location(i)
         h.lobby             = player["lobbysteamid"]
-        h.join_link         = join_link(player)
-        h.link_name         = link_name(player)
+        h.link              = link(player)
       end
     elsif player["lobbysteamid"].present?
       host = Host.where(lobby: player["lobbysteamid"]).first_or_create do |h|
         h.game_id           = game_id
         h.lobby             = player["lobbysteamid"]
         h.network_id        = Network.location('lobby')          
-        h.join_link         = join_link(player)
-        h.link_name         = link_name(player)          
+        h.link              = link(player)        
       end 
     elsif player["gameserverip"].present?
       host = Host.where(address: player["gameserverip"]).first_or_create do |h|
@@ -70,8 +60,7 @@ class Host < ActiveRecord::Base
         h.ip                = i
         h.port              = port
         h.network_id        = Network.location(i)
-        h.join_link         = join_link(player)
-        h.link_name         = link_name(player)
+        h.link              = link(player)        
       end
     end
 
@@ -82,8 +71,16 @@ class Host < ActiveRecord::Base
       )
     end
 
+    if (player["lobbysteamid"] && player["gameserverip"]) && (host.lobby != player["lobbysteamid"] || host.address != player["gameserverip"])
+      host.update_attributes(
+        :lobby              => player["lobbysteamid"], 
+        :address            => player["address"],
+        :link               => link(player)
+      )
+    end
+
     if host.banned == false && host.network.name != 'private'
-      if host["game_id"] == host.game.steamid && host.refresh == false
+      if player["gameid"] == host.game.steamid && host.refresh == false
         host.update_attributes(
           :updated => true,
           :visible => true
@@ -95,8 +92,7 @@ class Host < ActiveRecord::Base
           :refresh                => false,
           :updated                => true,
           :visible                => true,
-          :join_link              => join_link(player),
-          :link_name              => link_name(player)
+          :link                   => link(player)
         )
       end
 
