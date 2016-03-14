@@ -8,13 +8,6 @@ namespace :update do
   	system("touch /tmp/finished")
   end
 
-  desc "Update host networks"
-  task :networks => :environment do
-  	beginning = start_time
-  	puts Network.update_all 
-  	finish_time(beginning)
-  end
-
   desc "Update byoc seat information args[file,year]"
   task :seats, [:file,:year] => :environment do |t, args|
     beginning = start_time

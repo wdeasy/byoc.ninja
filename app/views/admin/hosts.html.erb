@@ -14,12 +14,8 @@
       <% @hosts.each do |host| %>
         <tr class="row">
             <td class="text-left longtext"><%= host.game.name %></td>            
-            <td class="text-center longtext"><%= link_to host.name, edit_host_path(host) %></td>
-            <% if host.address.blank? %>
-              <td class="text-right"><%= link_to host.lobby, edit_host_path(host) %></td>
-            <% else %>
-              <td class="text-right"><%= link_to host.address, edit_host_path(host) %></td>
-            <% end %>            
+            <td class="text-center longtext"><%= link_to (host.name.blank? ? '' : host.name), edit_host_path(host) %></td>
+            <td class="text-right"><%= link_to (host.address.blank? ? host.lobby : host.address), edit_host_path(host) %></td>          
         </tr>      
       <% end %>                           
     </tbody>

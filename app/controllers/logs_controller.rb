@@ -1,18 +1,11 @@
-class SeatsController < ApplicationController
+class LogsController < ApplicationController
   before_action :logged_in_user
   before_action :admin_user
 
-  def index
-	@seats = Seat.order("seat asc")
-	@seats = Seat.order(params[:sort])  if params[:sort].present?
+  def update_hosts
   end
 
-  def update
-    if params[:update].present?
-      @update = Seat.update_seats(nil,nil)
-      flash[:success] = @update
-      redirect_to seats_update_url
-    end
+  def update_seats
   end
 
   private

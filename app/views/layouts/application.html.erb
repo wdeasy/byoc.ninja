@@ -15,9 +15,6 @@
       });
     </script>
     <%= render 'layouts/header' %>
-    <% if logged_in? && current_user.admin? %>
-      <%= render 'layouts/admin' %>
-    <% end %> 
     <div class="container">    
       <div id="flash">
         <% flash.each do |key, value| %>

@@ -34,14 +34,6 @@ class NetworksController < ApplicationController
     end
   end
 
-  def update_all
-    if params[:update].present?
-      @update = Network.update_all
-      flash[:success] = @update
-      redirect_to networks_url
-    end    
-  end
-
   def destroy
     Network.find_by_id(params[:id]).destroy
     flash[:success] = "Network deleted"

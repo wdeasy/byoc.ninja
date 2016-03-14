@@ -13,11 +13,14 @@
 	  <%= f.label :banned %>
 	  <%= f.select :banned, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
 
-	  <%= f.label :refresh %>
-	  <%= f.select :refresh, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
-
 	  <%= f.label :address %>
 	  <%= f.text_field :address, class: 'form-control', :disabled => true %>
+
+	  <%= f.label :lobby %>
+	  <%= f.text_field :lobby, class: 'form-control', :disabled => true %>
+
+	  <%= f.label :steamid %>
+	  <%= f.text_field :steamid, class: 'form-control', :disabled => true %>
 
 	  <%= f.label :name %>
 	  <%= f.text_field :name, class: 'form-control' %>

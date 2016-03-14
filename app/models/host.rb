@@ -31,79 +31,56 @@ class Host < ActiveRecord::Base
 
   def Host.update(player, game_id)
     if player["lobbysteamid"].present? && player["gameserverip"].present?
-      host = Host.where('lobby = ? OR address = ?', player["lobbysteamid"], player["gameserverip"]).first_or_create do |h|
-        i, p = player["gameserverip"].split(':')
-        port = p.to_i
-
-        h.game_id           = game_id
-        h.query_port        = find_query_port(player)
-        h.ip                = i
-        h.port              = port
-        h.network_id        = Network.location(i)
-        h.lobby             = player["lobbysteamid"]
-        h.link              = link(player)
-      end
+      host = Host.where('lobby = ? OR address = ?', player["lobbysteamid"], player["gameserverip"]).first_or_create
     elsif player["lobbysteamid"].present?
-      host = Host.where(lobby: player["lobbysteamid"]).first_or_create do |h|
-        h.game_id           = game_id
-        h.lobby             = player["lobbysteamid"]
-        h.network_id        = Network.location('lobby')          
-        h.link              = link(player)        
-      end 
+      host = Host.where(lobby: player["lobbysteamid"]).first_or_create
     elsif player["gameserverip"].present?
-      host = Host.where(address: player["gameserverip"]).first_or_create do |h|
-        i, p = player["gameserverip"].split(':')
-        port = p.to_i
-
-        h.game_id           = game_id
-        h.query_port        = find_query_port(player)
-        h.ip                = i
-        h.port              = port
-        h.network_id        = Network.location(i)
-        h.link              = link(player)        
-      end
+      host = Host.where(address: player["gameserverip"]).first_or_create
     end
 
-    if host.network.name == 'banned' && host.banned == false
-      host.update_attributes(
-        :banned            => true,
-        :visible           => false
-      )
+    if player["gameserverip"]
+      i, p = player["gameserverip"].split(':')
+      port = p.to_i
+      query_port        = find_query_port(player)
+      network_id        = Network.location(i)
+    else
+      i = nil
+      port = nil
+      query_port = nil
+      network_id = Network.location(nil)
     end
 
-    if (player["lobbysteamid"] && player["gameserverip"]) && (host.lobby != player["lobbysteamid"] || host.address != player["gameserverip"])
-      host.update_attributes(
-        :lobby              => player["lobbysteamid"], 
-        :address            => player["address"],
-        :link               => link(player)
-      )
-    end
+    link        = link(player)
+    lobby       = player["lobbysteamid"] ? player["lobbysteamid"] : nil
+    address     = player["gameserverip"] ? player["gameserverip"] : nil
+    steamid     = player["gameserversteamid"] ? player["gameserversteamid"] : nil
+  
+    host.update_attributes(
+      :game_id    => game_id,
+      :query_port => query_port,
+      :ip         => i,
+      :port       => port,
+      :network_id => network_id,
+      :address    => address,
+      :lobby      => lobby,
+      :link       => link,
+      :steamid    => steamid
+    )
 
-    if host.banned == false && host.network.name != 'private'
-      if player["gameid"] == host.game.steamid && host.refresh == false
-        host.update_attributes(
-          :updated => true,
-          :visible => true
-        )
-      else
-        host.update_attributes(
-          :game_id                => game_id,
-          :query_port             => find_query_port(player),
-          :refresh                => false,
-          :updated                => true,
-          :visible                => true,
-          :link                   => link(player)
-        )
-      end
-
+    if host.banned == false && ['banned','private'].exclude?(host.network.name) && host.auto_update == true && host.port != 0
       if host.query_port != nil
         query_host(host)
       end
 
-      flags(player,host)      
-    end
+      flags(player,host)
 
-    return host.id
+      host.update_attributes(
+        :updated => true,
+        :visible => true
+      )
+    end   
+    
+    return host.id  
   end
 
   def Host.flags(player,host)
@@ -181,17 +158,27 @@ class Host < ActiveRecord::Base
           :map => map,
           :current => current,
           :max => max,
-          :players => players(current, max, host.users_count),
-          :password => password
+          :players => players(current, max),
+          :password => password,
+          :respond => true,
+          :last_successful_query => Time.now
+        )
+      else
+        host.update_attributes(
+          :respond => false
         )
       end
 
     rescue SteamCondenser::TimeoutError
       puts "unable to query #{host.ip}:#{host.query_port.to_s}"
+
+      host.update_attributes(
+        :respond => false
+      )
     end  
   end
 
-  def Host.players(current, max, users_count)
+  def Host.players(current, max)
     players = ''
 
     if max.blank?
@@ -202,13 +189,6 @@ class Host < ActiveRecord::Base
     end
 
     return players
-  end
-
-  def Host.update_network(address, network)
-    host = Host.where(address: address).first
-    host.update_attributes(
-      :network_id           => network
-    )
   end
 
   def Host.update_hosts
@@ -318,20 +298,20 @@ class Host < ActiveRecord::Base
 
       begin
         parsed = JSON.parse(open(string).read)
+
+        if parsed != nil && parsed["response"]["success"] == true
+          parsed["response"]["servers"].each do |server|
+            gameport = server["gameport"]
+            if gameport.to_i == p.to_i
+              ip, po = server["addr"].split(':')
+              query_port = po.to_i
+            end 
+          end
+        else
+          puts parsed["response"]["message"]
+        end
       rescue => e
         puts "JSON failed to parse #{string}"
-      end
-
-      if parsed != nil && parsed["response"]["success"] == true
-        parsed["response"]["servers"].each do |server|
-          gameport = server["gameport"]
-          if gameport.to_i == p.to_i
-            ip, po = server["addr"].split(':')
-            query_port = po.to_i
-          end 
-        end
-      else
-        puts parsed["response"]["message"]
       end
     end
 

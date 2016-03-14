@@ -10,9 +10,12 @@
               <%= display_name(current_user) %>   	  		
       	  	<% end %>
       	    <ul class='dropdown-menu'>
+              <% if logged_in? && current_user.admin? %>
+                <%= render 'layouts/admin' %>
+              <% end %>             
       	      <li><%= link_to "Settings", edit_user_path(current_user) %></li>
               <li class="divider"></li>
-      	      <li><%= link_to "Log out", logout_path, method: "delete" %></li>     	      	
+      	      <li><%= link_to "Log out", logout_path, method: "delete" %></li>
       	    </ul>
       	  </li>
         <% else %>

@@ -7,7 +7,7 @@ class HostsController < ApplicationController
     @messages = Message.where(show: true).order("updated_at desc")
 
     #if current_user && current_user.seat_id.blank?
-      #flash[:info] = "Click on your name in the top right corner and go to the settings page to set your BYOC seat!"
+    #  flash[:info] = "Click on your name in the top right corner and go to the settings page to set your BYOC seat!"
     #end
     
   	respond_to do |format|
@@ -37,7 +37,7 @@ class HostsController < ApplicationController
 
   private
     def host_params
-      params.require(:host).permit(:banned, :auto_update, :name, :map, :query_port, :refresh, :network, :last_successful_query, :tried_query)
+      params.require(:host).permit(:banned, :auto_update, :name, :map, :query_port, :network, :last_successful_query, :tried_query)
     end
 
     # Confirms a logged-in user.

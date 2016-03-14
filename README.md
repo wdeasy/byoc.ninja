@@ -102,17 +102,11 @@ setup vhosts file
 
 >server {  
 >  listen 80;  
->  server_name qconsteambrowser;  
-
->  location /servers {  
->    alias /home/user/Development/qcon_steam_browser/public$1;  
->    passenger_base_uri /servers;  
->    passenger_app_root /home/user/Development/qcon_steam_browser;  
->    passenger_document_root /home/user/Development/qcon_steam_browser/public;  
->    passenger_ruby /home/user/.rvm/wrappers/ruby-2.2.1@qcon_steam_browser/ruby;   
->    passenger_app_env development;   
->    passenger_enabled on;   
->  }  
+>  server_name qconsteambrowser.com www.qconsteambrowser.com;  
+>
+>	 passenger_enabled on;
+>	 rails_env	development;
+>	 root		/home/user/Development/qcon_steam_browser/public;
 >}  
 
 >sudo ln -s /etc/nginx/sites-available/qcon_steam_browser /etc/nginx/sites-enabled/qcon_steam_browser  
@@ -121,14 +115,14 @@ edit /etc/hosts
 >sudo nano /etc/hosts  
 
 add and save  
->127.0.0.1	qconsteambrowser
+>127.0.0.1	qconsteambrowser.com www.qconsteambrowser.com
 
 >sudo service nginx restart  
 >rake assets:clobber  
 >rake assets:precompile  
 
-Once everything is set up, you should be able to navigate to qconsteambrowser/servers.   
-You will see the admin bar once you sign in through steam with the user you put in the seeds.rb file.
+Once everything is set up, you should be able to navigate to http://qconsteambrowser.com   
+You will see the admin options in the drop down menu once you sign in through steam with the user you put in the seeds.rb file.
 
 
 

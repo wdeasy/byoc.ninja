@@ -100,6 +100,7 @@ class Seat < ActiveRecord::Base
            "year" => year
            }
 
+      puts "#{info['seat']} #{info['clan']} #{info['handle']}"
       Seat.update(info)
       j+=1
     end

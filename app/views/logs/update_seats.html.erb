@@ -1,0 +1,8 @@
+<% provide(:title, "Update Seats")  %>
+<div class="jumbotron">
+	<% if File.exist?("log/update_seats.txt") %>
+		<%= simple_format(File.read("log/update_seats.txt")) %>
+	<% else %>
+  	<h3 class="center">File Not Found</h3>
+	<% end %>
+</div>

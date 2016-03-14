@@ -8,7 +8,7 @@ class Network < ActiveRecord::Base
   def Network.location(i)
     network = Network.where(:name => 'wan').first
 
-    if i == 'lobby'
+    if i == nil
       return network.id
     end
 
@@ -28,17 +28,5 @@ class Network < ActiveRecord::Base
     end
 
     return network.id
-  end
-
-
-  def Network.update_all
-    i = 0
-    #Host.all.each do |host|
-    Host.where.not(:ip => nil).each do |host|
-      network = Network.location(host.ip)
-      Host.update_network(host.address, network)
-      i+=1
-    end
-    return "Updated networks for #{i} hosts." 
-  end  
+  end 
 end

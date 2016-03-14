@@ -2,22 +2,34 @@ class Group < ActiveRecord::Base
   require 'open-uri'	
 
   def Group.auto_add(url)
-    html = open(url) 
-    page = Nokogiri::HTML(html.read)
+  		if url.blank?
+  			return "Please enter a URL"
+  		end
 
-    name = page.css('title').text.strip
-    name.slice!("Steam Community :: Group :: ")
+      begin
+        html = open(url) 
+        page = Nokogiri::HTML(html.read)
+      rescue => e
+        return "Unable to load URL #{url}"
+      end
 
-	if id = page.xpath("//div[contains(@class,'joinchat_bg')]")
-	  steamid = id[0]['onclick']
-	  steamid.slice!("window.location='steam://friends/joinchat/")
-	  steamid.slice!("'")
-	end
+      if !page.blank?
+		    name = page.css('title').text.strip
+		    name.slice!("Steam Community :: Group :: ")
 
-	group = Group.where(steamid: steamid).first_or_create
-	group.update_attributes(
-	  :name		=> name,
-	  :url		=> url
-	)
+				if id = page.xpath("//div[contains(@class,'joinchat_bg')]")
+				  steamid = id[0]['onclick']
+				  steamid.slice!("window.location='steam://friends/joinchat/")
+				  steamid.slice!("'")
+				end
+
+				group = Group.where(steamid: steamid).first_or_create
+				group.update_attributes(
+				  :name		=> name,
+				  :url		=> url
+				)
+
+				return "Added #{name}"
+      end
   end 
 end

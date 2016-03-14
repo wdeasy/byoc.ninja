@@ -1,20 +1,12 @@
 <tr>
   <td class="text-left longtext" title="<%= host.game.name %>">
-    <% if host.game.steamid.length < 7 %>
-      <%= link_to host.game.name, host.game.link, {:target => "_blank"} %>
-    <% else %>
-      <%= host.game.name %>
-    <% end %> 
+    <%= (host.game.steamid.length < 7) ? (link_to host.game.name, host.game.link, {:target => "_blank"}) : host.game.name %>
   </td>
   <td class="text-center longtext">
     <%= flags(host).html_safe %>
   </td>
   <td class="text-left longtext" title="<%= host.name %>">    
-    <% if host.name.blank? && !host.lobby.blank? %>
-      <%= host.users.first.name %>'s Lobby
-    <% else %>
-      <%= host.name %>
-    <% end %>
+    <%= (host.name.blank? && !host.lobby.blank?) ? "#{host.users.first.name}'s Lobby" : host.name %>
   </td>
   <td class="text-right">
     <%= host.players %>
@@ -33,10 +25,6 @@
     <%= host.map %>
   </td>
   <td class="text-right">
-  <% if host.address %>
-    <%= link_to host.address, host.link %>
-  <% else %>
-    <%= link_to "Join Lobby", host.link %>
-  <% end %>
+    <%= link_to (host.address ? host.address : "Join Lobby") , host.link %>
   </td>
 </tr>

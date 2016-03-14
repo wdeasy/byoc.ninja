@@ -13,8 +13,13 @@ class GroupsController < ApplicationController
   def auto
     if params[:auto].present?
       @group = Group.auto_add(params[:url])
-      flash[:success] = "Group updated."
-      redirect_to groups_url
+      if @group[0..4] == "Added"        
+        flash[:success] = @group
+        redirect_to groups_url
+      else
+        flash[:danger] = @group
+        redirect_to groups_auto_url
+      end
     end
   end
 

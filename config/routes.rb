@@ -8,12 +8,14 @@ Rails.application.routes.draw do
 
   get       'admin/hosts'         => 'admin#hosts'
   get       'groups/auto'         => 'groups#auto'
-  get       'networks/update_all' => 'networks#update_all'
   get       'messages/clear'      => 'messages#clear'
   get       'settings'            => 'users#edit'
   get       'seats'               => 'seats#index'
   get       'seats/update'        => 'seats#update'
   get       'json'                => 'hosts#json'
+
+  get       'logs/update_hosts'                => 'logs#update_hosts'
+  get       'logs/update_seats'                => 'logs#update_seats'
 
   resources :contacts, :only      => [:new, :create]
   resources :games
