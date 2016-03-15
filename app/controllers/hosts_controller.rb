@@ -37,7 +37,7 @@ class HostsController < ApplicationController
 
   private
     def host_params
-      params.require(:host).permit(:banned, :auto_update, :name, :map, :query_port, :network, :last_successful_query, :tried_query)
+      params.require(:host).permit(:banned, :auto_update, :name, :map, :query_port, :network, :last_successful_query)
     end
 
     # Confirms a logged-in user.

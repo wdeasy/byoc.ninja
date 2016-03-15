@@ -44,18 +44,20 @@ class User < ActiveRecord::Base
         return true
       end
       if doc != nil
-        if doc.at_css("privacyState").text == "public"
-
-          groups = Group.where(:enabled => true)
-
-          doc.xpath('//groupID64').each do |gid|
-            groups.each do |g|
-              if gid.text == g.steamid.to_s
-                return true
+        if doc.at_css("privacyState")
+          if doc.at_css("privacyState").text == "public"
+            groups = Group.where(:enabled => true)
+            doc.xpath('//groupID64').each do |gid|
+              groups.each do |g|
+                if gid.text == g.steamid.to_s
+                  return true
+                end
               end
             end
+            return false 
           end
-          return false 
+        else
+          return true
         end
       end
     end

@@ -1,7 +1,7 @@
 <% provide(:title, "Update Hosts")  %>
 <div class="jumbotron">
-	<% if File.exist?("log/update_hosts.txt") %>
-		<%= simple_format(File.read("log/update_hosts.txt")) %>
+	<% if File.exist?("log/hosts.log") %>
+		<%= simple_format(File.read("log/hosts.log")) %>
 	<% else %>
   	<h3 class="center">File Not Found</h3>
 	<% end %>

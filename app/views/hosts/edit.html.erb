@@ -37,9 +37,6 @@
 	  <%= f.label :last_successful_query %>
 	  <%= f.text_field :last_successful_query, class: 'form-control', :disabled => true  %>
 
-	  <%= f.label :tried_query %>
-	  <%= f.select :tried_query, [['yes',true],['no',false]], {}, {:class => 'form-control'} %>
-
 	  <%= f.submit "Save changes", class: "btn btn-33 btn-primary pull-left" %>
 	  <%= link_to "Go to Game", edit_game_path(@host.game_id), class: "btn btn-33 btn-primary pull-center" %>
 	  <%= link_to "Back", admin_hosts_url, class: "btn btn-33 btn-primary pull-right" %>

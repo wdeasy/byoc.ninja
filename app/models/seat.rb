@@ -5,7 +5,6 @@ class Seat < ActiveRecord::Base
 
   require 'open-uri'
   require 'json'
-  require 'matrix'  
 
   def Seat.update(info)
   	seat = Seat.where(seat: info["seat"], year: info["year"]).first_or_create
@@ -23,7 +22,7 @@ class Seat < ActiveRecord::Base
 
   def Seat.update_seats(file,year)
     if file == nil
-      file = "https://registration.quakecon.org/?action=byoc_data&response_type=json"
+      file = "https://app.seats.io/api/event/3a0fe5eb-64c2-4dc4-88a1-c1d61e25e066/live-2016/objects/statuses"
     end
 
     if year == nil
@@ -39,62 +38,43 @@ class Seat < ActiveRecord::Base
       return "JSON failed to parse #{file}"
     end
 
-    seats = parsed["data"]["seats"]
-    tags = parsed["data"]["tags"]
-
-    b62 = Radix::Base.new(('A'..'Z').to_a + ('a'..'z').to_a + ('0'..'9').to_a)
-    b10 = Radix::Base.new(Radix::BASE::B10)
-
     i = 0
-    j = 0
-    colA = Matrix.build(74,10) {|row, col| i += 1 }
-    colB = Matrix.build(74,22) {|row, col| i += 1 }
-    colC = Matrix.build(64,12) {|row, col| i += 1 }
-    colU = Matrix.build(12,10) {|row, col| i += 1 }
-
     Seat.where(:year => year).update_all(:updated => false)
 
-    seats.each do |seat|
+    parsed.each do |obj|
+      seat = nil
+      clan = nil
+      handle = nil
 
-      seatLoc = ''
+      seat = obj["objectLabelOrUuid"]
+      a, b = seat.split('-')
 
-      seatNum = b10.convert(seat[0], b62).to_i + 1
+      if a == "UAC"
+        col = "UAC"
+        row = ""
+      else
+        col = a[0]
+        a[0] = ''
+        row = "%02d" % a.to_i
+      end
+      num = "%02d" % b.to_i
 
-      if colA.index(seatNum) != nil
-        seatLoc << 'A' + sprintf('%02d',((colA.index(seatNum)[0]) + 1)) + '-' + sprintf('%02d',((colA.index(seatNum)[1]) + 1))
-      elsif colB.index(seatNum) != nil
-        seatLoc << 'B' + sprintf('%02d',((colB.index(seatNum)[0]) + 1)) + '-' + sprintf('%02d',((colB.index(seatNum)[1]) + 1))
-      elsif colC.index(seatNum) != nil
-        seatLoc << 'C' + sprintf('%02d',((colC.index(seatNum)[0]) + 1)) + '-' + sprintf('%02d',((colC.index(seatNum)[1]) + 1))
-      elsif colU.index(seatNum) != nil
-        num = seatNum - 3137
-        table = (num/10).floor + 1
-        row = (num%10).floor + 1
+      seat = "#{col}#{row}-#{num}"
 
-        digit = 13 - table + (10 - row)
-
-        if row == 1
-          digit += 2 * (table - 1)
+      if obj["status"] == "booked"
+        if obj["extraData"]
+          if obj["extraData"]["alias"]
+            handle = obj["extraData"]["alias"]
+          else
+            handle = "Reserved"
+          end
+          if obj["extraData"]["clan"]
+            clan = obj["extraData"]["clan"] 
+          end
         end
-
-        seatLoc << 'UAC-' + sprintf('%02d', digit)
       end
 
-      if seat[1][0] == ":"
-        clan = ''
-      else
-        clanSplit = seat[1].split(":",2)
-        clan = tags[clanSplit[0]]
-      end
-
-      if seat[1][-1,1] == ":"
-        handle = 'Reserved'
-      else
-        handleSplit = seat[1].split(":",2)
-        handle = handleSplit[1]
-      end
-
-      info = { "seat"   => seatLoc,
+      info = { "seat"   => seat,
            "clan"   => clan,
            "handle" => handle,
            "year" => year
@@ -102,11 +82,10 @@ class Seat < ActiveRecord::Base
 
       puts "#{info['seat']} #{info['clan']} #{info['handle']}"
       Seat.update(info)
-      j+=1
+      i+=1
     end
     Seat.where(:updated => false, :year => year).update_all(:handle => nil, :clan => nil)
-    #Users.joins(:seats).where.not(:year => year).update_all(:seat_id => nil)
 
-    return "processed #{j} seats."  
+    return "processed #{i} seats."  
   end
 end

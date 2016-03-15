@@ -52,11 +52,12 @@ create environment variables
 >export HOSTNAME="localhost"  
 >export DATABASE="database name"  
 >export USERNAME="database user"  
->export PASSWORD="database pass"   
->export SMTP_SERVER="smtp.gmail.com"
->export EMAIL_DOMAIN="gmail.com"
->export EMAIL_USERNAME="gmail username"
->export EMAIL_PASSWORD="gmail password" 
+>export PASSWORD="database pass"  
+>export SMTP_SERVER="smtp.gmail.com"  
+>export EMAIL_DOMAIN="gmail.com"  
+>export EMAIL_USERNAME="gmail username"  
+>export EMAIL_PASSWORD="gmail password"  
+>export GA_CODE="google analytics code"   
 
 edit db/seeds.rb and add your admin users and groups  
 the group_list array needs group steam id, group steam name and group url  
@@ -103,10 +104,10 @@ setup vhosts file
 >server {  
 >  listen 80;  
 >  server_name qconsteambrowser.com www.qconsteambrowser.com;  
->
->	 passenger_enabled on;
->	 rails_env	development;
->	 root		/home/user/Development/qcon_steam_browser/public;
+>  
+>	 passenger_enabled on;  
+>	 rails_env	development;  
+>	 root		/home/user/Development/qcon_steam_browser/public;  
 >}  
 
 >sudo ln -s /etc/nginx/sites-available/qcon_steam_browser /etc/nginx/sites-enabled/qcon_steam_browser  

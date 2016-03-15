@@ -16,9 +16,9 @@ class UsersController < ApplicationController
   def edit
     @user = User.find(params[:id])
     @seats = Seat.where(:year => Date.today.year).order("seat asc")
-    if User.is_member(@user) == false
-      flash[:info] = "You aren't a member of the Quakecon™ Steam Group. Click <a href=\"steam://url/GroupSteamIDPage/103582791432330298\">here</a> to join!".html_safe
-    end  
+#    if User.is_member(@user) == false
+#      flash[:info] = "You aren't a member of the Quakecon™ Steam Group. Click <a href=\"steam://url/GroupSteamIDPage/103582791432330298\">here</a> to join!".html_safe
+#    end  
   end
 
   def update
