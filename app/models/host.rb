@@ -212,6 +212,14 @@ class Host < ActiveRecord::Base
         end
       end
 
+      linked_users = User.where('id IN (SELECT user_id from seats_users)')
+
+      linked_users.each do |linked_user|
+        if !steamids.include? linked_user.steamid
+          steamids << linked_user.steamid
+        end 
+      end
+
       return "no steam ids to process." if steamids.empty?
 
         Host.update_all(:updated => false)

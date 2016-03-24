@@ -28,7 +28,7 @@
 			<%= label_tag "2) Paste your Steam profile URL here:" %>		  
 		  <%= text_field_tag(:url, nil, :class => 'form-control') %>
 
-		  <%= label_tag "3) Paste this code in your Steam profile URL summary section:" %>
+		  <%= label_tag "3) Paste this code anywhere in the summary of your Steam Profile:" %>
 		  <%= text_field_tag(:seat, nil, :readonly => true, :class => 'form-control') %>
 
 		  <%= label_tag "4) Click this button:" %>
@@ -39,9 +39,12 @@
 		  Link your seat to help other people find games being played in the BYOC!<br/>
 		  Your seat and handle will display instead of your steam name.<br />
 		  <br />
-		  Steam profile urls have to be in the following format:<br/>
+		  Steam profile urls have to be in the either of the following formats:<br/>
 			http://steamcommunity.com/id/name<br />
 			http://steamcommunity.com/profiles/#############<br>
+			<br />
+			The seat code can go anywhere in the summary section of your steam profile.<br/>
+			After your seat is linked you can remove the seat code from your summary.<br/>
 			<br />
 			Don't worry if the name next to the seat is incorrect.<br />
 			Seat information is updated hourly and will be fixed on the next update.</h5>
