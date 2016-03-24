@@ -23,7 +23,7 @@
 		  <%= hidden_field :link, "true" %>
 
 		  <%= label_tag "1) Select your seat:" %>
-		  <%= collection_select :user, :seat_id, @seats, :id, :seat_clan_handle, {:include_blank => true},{:class => 'form-control'} %>
+		  <%= collection_select :user, :seat_id, @seats, :id, :seat_clan_handle, {:include_blank => true},{:class => 'form-control', :style => "width:500px"} %>
 
 			<%= label_tag "2) Paste your Steam profile URL here:" %>		  
 		  <%= text_field_tag(:url, nil, :class => 'form-control') %>
@@ -35,21 +35,17 @@
 		  <%= submit_tag("Click me!", class: "btn btn-primary") %>
 
 
-		  <p><p /><h5>
-		  Linking your seat will help other people find games being played in the BYOC.<br/>
-		  <br>
-		  Steam profile urls have to be in the following format:<br>
-http://steamcommunity.com/id/name<br>
-http://steamcommunity.com/profiles/#############<br>
-<br>
-Don't worry if the name next to the seat is incorrect. Seat informatin is updated hourly and the correct name will be displayed after the next update.</h5>
+		  <br /><br /><h5>
+		  Link your seat to help other people find games being played in the BYOC!<br/>
+		  Your seat and handle will display instead of your steam name.<br />
+		  <br />
+		  Steam profile urls have to be in the following format:<br/>
+			http://steamcommunity.com/id/name<br />
+			http://steamcommunity.com/profiles/#############<br>
+			<br />
+			Don't worry if the name next to the seat is incorrect.<br />
+			Seat information is updated hourly and will be fixed on the next update.</h5>
 		<% end %>
 	  </div>
 	</div>
 </div>
-
-Steam profile urls have to be in the following format:
-http://steamcommunity.com/id/name
-http://steamcommunity.com/profiles/#############
-
-Don't worry if the name next to the seat is incorrect. Seat informatin is updated hourly and the correct name will be displayed after the next update.

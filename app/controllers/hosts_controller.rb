@@ -9,6 +9,8 @@ class HostsController < ApplicationController
     #if current_user && current_user.seat_id.blank?
     #  flash[:info] = "Click on your name in the top right corner and go to the settings page to set your BYOC seat!"
     #end
+
+    #flash[:success] = "Click <a href=https://byoc.ninja/seat>here</a> to link your Steam Account to set your BYOC seat!".html_safe
     
   	respond_to do |format|
       format.html
