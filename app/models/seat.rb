@@ -17,7 +17,14 @@ class Seat < ActiveRecord::Base
   end
 
   def seat_clan_handle
-  	"#{seat} -- #{clan} #{handle}"
+    name = "#{seat} -- #{clan} #{handle}"
+    if name.size > 60
+      name = name[0..60]
+      name << "..."
+      return name
+    else
+  	 "#{seat} -- #{clan} #{handle}"
+    end
   end
 
   def Seat.update_seats(file,year)
