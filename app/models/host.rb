@@ -42,12 +42,12 @@ class Host < ActiveRecord::Base
       i, p = player["gameserverip"].split(':')
       port = p.to_i
       query_port        = find_query_port(player)
-      network_id        = Network.location(i)
+      network        = Network.location(i)
     else
       i = nil
       port = nil
       query_port = nil
-      network_id = Network.location(nil)
+      network = Network.location(nil)
     end
 
     link        = link(player)
@@ -60,7 +60,7 @@ class Host < ActiveRecord::Base
       :query_port => query_port,
       :ip         => i,
       :port       => port,
-      :network_id => network_id,
+      :network_id => network.id,
       :address    => address,
       :lobby      => lobby,
       :link       => link,

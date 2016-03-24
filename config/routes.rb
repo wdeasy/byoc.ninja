@@ -17,6 +17,8 @@ Rails.application.routes.draw do
   get       'logs/update_hosts'                => 'logs#update_hosts'
   get       'logs/update_seats'                => 'logs#update_seats'
 
+  get        'seat'               => 'users#seat'
+
   resources :contacts, :only      => [:new, :create]
   resources :games
   resources :hosts

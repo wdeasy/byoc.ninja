@@ -9,10 +9,9 @@ class Network < ActiveRecord::Base
     network = Network.where(:name => 'wan').first
 
     if i == nil
-      return network.id
+      return network
     end
 
-    #Network.all.each do |r|
     Network.where.not(:name => 'wan').each do |r|
       if !r.cidr.blank?
         cidr = NetAddr::CIDR.create(r.cidr)
@@ -21,12 +20,12 @@ class Network < ActiveRecord::Base
           network = r
 
           if network == "banned"
-            return network.id
+            return network
           end
         end
       end
     end
 
-    return network.id
+    return network
   end 
 end

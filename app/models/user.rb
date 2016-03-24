@@ -8,59 +8,103 @@ class User < ActiveRecord::Base
 
     user = User.find_by_steamid(player["steamid"])
 
-    if (player["gameserverip"].present? && player["gameserverip"] == user["address"]) || (player["lobbysteamid"].present? && player["lobbysteamid"] == user["lobby"])
+    if user.auto_update == true
       user.update_attributes(
+        :name => player["personaname"],
+        :url => player["profileurl"],
+        :avatar => player["avatar"],
+        :host_id => host_id,
         :updated => true
-      )  
+      )
     else
       user.update_attributes(
         :host_id => host_id,
         :updated => true
       )  
-    end
-
-    if (player["personaname"] != user["name"] || player["profileurl"] != user["url"]) && user.auto_update == true
-
-      user.update_attributes(
-        :name => player["personaname"],
-        :url => player["profileurl"],
-        :avatar => player["avatar"]
-      )
     end  
 
     Host.reset_counters(host_id, :users)     
   end
 
-  def User.lookup(steamid)
-    user = User.where(steamid: steamid).first_or_create
-  end
+  def User.url_cleanup(url)
+    if url.include? "steamcommunity.com"
+      url.slice!(0..(url.index('steamcommunity.com')-1))
+      url.prepend("http://")
 
-  def User.is_member(player)
-    if player.display == true
-      url = player.url + "?xml=1"
-      begin
-        doc = Nokogiri::XML(open(url))
-      rescue => e
-        return true
-      end
-      if doc != nil
-        if doc.at_css("privacyState")
-          if doc.at_css("privacyState").text == "public"
-            groups = Group.where(:enabled => true)
-            doc.xpath('//groupID64').each do |gid|
-              groups.each do |g|
-                if gid.text == g.steamid.to_s
-                  return true
-                end
-              end
-            end
-            return false 
-          end
-        else
-          return true
-        end
+      if url.last != "/"
+        url << "/"
       end
     end
-    return true
+    return url
+  end
+
+  def User.steamid_from_url(url)
+    begin
+      html = open("#{url}?xml=1") 
+      doc = Nokogiri::XML(html)
+
+      return doc.at_css("steamID64").text
+    rescue => e
+      return nil
+    end
+  end
+
+  def User.search_summary_for_seat(steamid, seat)
+    begin
+      url = "http://steamcommunity.com/profiles/#{steamid}/"
+      html = open(url) 
+      doc = Nokogiri::HTML(html)
+
+      if doc.css('div.profile_summary')
+        if doc.css('div.profile_summary').text.include? seat
+          return "Match"
+        else
+          return "Could not find #{seat} in your steam profile summary."
+        end
+      else
+        return "Please set your steam profile to public while linking your seat."
+      end
+    rescue => e
+      return "Unable to read your steam profile. Please try again."
+    end
+  end
+
+  def User.update_seat(seat_id, url)
+    if seat_id == ""
+      return "Please select a seat."
+    elsif url == ""
+      return "Please enter your profile URL"
+    end
+
+    url = User.url_cleanup(url)
+
+    unless url.start_with?('http://steamcommunity.com/id/','http://steamcommunity.com/profiles/')
+      return "Please enter a valid profile URL"
+    end
+
+    steamid = User.steamid_from_url(url)
+
+    if (steamid != nil)
+
+      s = seat_id.to_i
+      seat = Seat.where(:id => s).first.seat
+
+      response = search_summary_for_seat(steamid, seat)
+      if response == "Match"
+        user = User.lookup(steamid) 
+        user.update_attributes(
+          :seat_ids => seat_id
+        )
+        return "You're linked to #{seat}!"
+      else
+        return response
+      end
+    else 
+      return "Could not parse steamid from URL. Please check the url and try again."
+    end
+  end
+
+  def User.lookup(steamid)
+    user = User.where(steamid: steamid).first_or_create
   end
 end

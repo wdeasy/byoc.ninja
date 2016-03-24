@@ -1,0 +1,55 @@
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		$("#user_seat_id option").filter(function() {
+			return $(this).val() == $("#seat").val();		
+		}).attr('selected', true);
+
+		$("#user_seat_id").on("change", function() {
+			$("#seat").val($(this).find("option:selected").text().substring(0,6));
+		});
+	});
+
+</script>
+
+<% provide(:title, "Seat Link")  %>
+<div class="jumbotron">
+<h3 class="center">Link your seat to your steam account!</h3>
+<br />
+<p></p>
+	<div class="row">
+	  <div class="col-md-6 col-md-offset-3">
+		<%= form_tag(seat_path, method: "get") do %>
+		  <%= hidden_field :link, "true" %>
+
+		  <%= label_tag "1) Select your seat:" %>
+		  <%= collection_select :user, :seat_id, @seats, :id, :seat_clan_handle, {:include_blank => true},{:class => 'form-control'} %>
+
+			<%= label_tag "2) Paste your Steam profile URL here:" %>		  
+		  <%= text_field_tag(:url, nil, :class => 'form-control') %>
+
+		  <%= label_tag "3) Paste this code in your Steam profile URL summary section:" %>
+		  <%= text_field_tag(:seat, nil, :readonly => true, :class => 'form-control') %>
+
+		  <%= label_tag "4) Click this button:" %>
+		  <%= submit_tag("Click me!", class: "btn btn-primary") %>
+
+
+		  <p><p /><h5>
+		  Linking your seat will help other people find games being played in the BYOC.<br/>
+		  <br>
+		  Steam profile urls have to be in the following format:<br>
+http://steamcommunity.com/id/name<br>
+http://steamcommunity.com/profiles/#############<br>
+<br>
+Don't worry if the name next to the seat is incorrect. Seat informatin is updated hourly and the correct name will be displayed after the next update.</h5>
+		<% end %>
+	  </div>
+	</div>
+</div>
+
+Steam profile urls have to be in the following format:
+http://steamcommunity.com/id/name
+http://steamcommunity.com/profiles/#############
+
+Don't worry if the name next to the seat is incorrect. Seat informatin is updated hourly and the correct name will be displayed after the next update.

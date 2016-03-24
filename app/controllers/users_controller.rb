@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
-  before_action :logged_in_user
+  before_action :logged_in_user, :except => [:seat]
   before_action :correct_user, :only => [:edit, :update]
-  before_action :admin_user, :except => [:edit, :update]
+  before_action :admin_user, :except => [:edit, :update, :seat]
 
   def index  	
     @users = User.includes(:seats).where.not(host_id: nil).order("name ASC")
@@ -16,9 +16,6 @@ class UsersController < ApplicationController
   def edit
     @user = User.find(params[:id])
     @seats = Seat.where(:year => Date.today.year).order("seat asc")
-#    if User.is_member(@user) == false
-#      flash[:info] = "You aren't a member of the Quakecon™ Steam Group. Click <a href=\"steam://url/GroupSteamIDPage/103582791432330298\">here</a> to join!".html_safe
-#    end  
   end
 
   def update
@@ -28,6 +25,20 @@ class UsersController < ApplicationController
       redirect_to users_url
     else
       render 'edit'
+    end
+  end
+
+  def seat
+    @seats = Seat.where(:year => Date.today.year).order("seat asc")
+    if params[:link].present?
+      @user = User.update_seat(params[:user][:seat_id],params[:url])
+      if @user[0..12] == "You're linked"
+        flash["success"] = @user
+        redirect_to root_url
+      else
+        flash["danger"] = @user
+        redirect_to seat_url
+      end
     end
   end
 

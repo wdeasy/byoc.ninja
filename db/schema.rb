@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160314233525) do
+ActiveRecord::Schema.define(version: 20160320191035) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -64,7 +64,8 @@ ActiveRecord::Schema.define(version: 20160314233525) do
     t.string   "players"
     t.integer  "game_id"
     t.integer  "network_id"
-    t.string   "steamid"
+    t.string   "source"
+    t.integer  "steamid",               limit: 8
   end
 
   add_index "hosts", ["game_id"], name: "index_hosts_on_game_id", using: :btree

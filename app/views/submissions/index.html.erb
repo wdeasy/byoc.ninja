@@ -1,0 +1,23 @@
+<% provide(:title, "Submissions")  %>
+<div class="jumbotron">
+  <h3 class="center">Submissions</h3>
+  <table class="table table-striped table-condensed games">
+    <thead>
+      <tr class="row">
+        <th class="col-md-2 text-center">Seat</th>
+        <th class="col-md-2 text-center">URL</th>
+        <th class="col-md-2 text-center">Name</th>
+        <th class="col-md-2 text-center">IP</th>
+        <th class="col-md-2 text-center">Count</th>
+        <th class="col-md-2 text-center">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @submissions.empty? %>
+        <tr class="row"><td colspan="6" class="col-md-offset-2 text-center">No Submissions Found.</td></tr>
+      <% else %>
+        <%= render @submissions %>
+      <% end %>            
+    </tbody>
+  </table>
+</div>
