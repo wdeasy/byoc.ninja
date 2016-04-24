@@ -276,37 +276,40 @@ class Host < ActiveRecord::Base
           parsed["response"]["players"].each do |player|
             if player["gameserverip"] != nil || player["lobbysteamid"] != nil
               user = User.lookup(player["steamid"])
-              if user.banned == false && user.display == true                
+              if user.banned == false && user.display == true
+
                 if player["gameid"].length > 7
                   #gameids over length 7 are mods
                   game_id = Mod.update(player)
                 else
                   game_id = Game.update(player["gameid"],player["gameextrainfo"])                  
                 end
-                               
-                host_id = Host.update(player, game_id)
-                User.update(player, host_id)
-                u += 1
+                
+                if game_id != nil
+                  host_id = Host.update(player, game_id)
+                  User.update(player, host_id)
+                  u += 1
 
-                if player["gameserverip"] != nil
-                  if !servers.include? player["gameserverip"]
-                    servers.push(player["gameserverip"])
+                  if player["gameserverip"] != nil
+                    if !servers.include? player["gameserverip"]
+                      servers.push(player["gameserverip"])
+                    end
                   end
-                end
 
-                if player["lobbysteamid"] != nil
-                  if !lobbies.include? player["lobbysteamid"]
-                    lobbies.push(player["lobbysteamid"])
+                  if player["lobbysteamid"] != nil
+                    if !lobbies.include? player["lobbysteamid"]
+                      lobbies.push(player["lobbysteamid"])
+                    end
                   end
-                end
 
-                if player["gameserverip"] != nil && player["lobbysteamid"] != nil
-                  puts "user: #{player["personaname"]}, server: #{player["gameserverip"]}, lobby: #{player["lobbysteamid"]}"
-                elsif player["gameserverip"] != nil
-                  puts "user: #{player["personaname"]}, server: #{player["gameserverip"]}"
-                else
-                  puts "user: #{player["personaname"]}, lobby: #{player["lobbysteamid"]}"
-                end
+                  if player["gameserverip"] != nil && player["lobbysteamid"] != nil
+                    puts "user: #{player["personaname"]}, server: #{player["gameserverip"]}, lobby: #{player["lobbysteamid"]}"
+                  elsif player["gameserverip"] != nil
+                    puts "user: #{player["personaname"]}, server: #{player["gameserverip"]}"
+                  else
+                    puts "user: #{player["personaname"]}, lobby: #{player["lobbysteamid"]}"
+                  end
+                end               
               end
             end 
           end
