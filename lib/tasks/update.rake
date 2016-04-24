@@ -17,6 +17,13 @@ namespace :update do
 	  finish_time(beginning) 	
   end
 
+  desc "Search byoc ip range for hosts"
+  task :byoc => :environment do
+    beginning = start_time
+    Host.update_byoc
+    finish_time(beginning)
+  end
+
   def start_time
   	beginning = Time.now
   	puts beginning.to_formatted_s(:db)

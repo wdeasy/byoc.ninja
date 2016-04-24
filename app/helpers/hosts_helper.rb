@@ -8,11 +8,11 @@ module HostsHelper
 			end
 
 			if host.flags['BYOC Player in Game']
-				html << '<span class="glyphicon glyphicon-ok" title="BYOC Player in Game"></span>'
+				html << '<span class="glyphicon glyphicon-user" title="BYOC Player in Game"></span>'
 			end
 
 			if host.flags['Hosted in BYOC']
-				html << '<span class="glyphicon glyphicon-ok" title="Hosted in BYOC"></span>'
+				html << '<span class="glyphicon glyphicon-home" title="Hosted in BYOC"></span>'
 			end
 
 			if host.flags['Password Protected']
@@ -25,5 +25,5 @@ module HostsHelper
 		end
 
 		return html		
-	end	
+	end		
 end

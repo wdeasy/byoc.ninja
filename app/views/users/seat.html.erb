@@ -23,7 +23,7 @@
 		  <%= hidden_field :link, "true" %>
 
 		  <%= label_tag "1) Select your seat:" %>
-		  <%= collection_select :user, :seat_id, @seats, :id, :seat_clan_handle, {:include_blank => true},{:class => 'form-control'} %>
+		  <%= collection_select :user, :seat_id, @seats, :id, :seat_clan_handle, {:include_blank => true},{:class => 'form-control longtext'} %>
 
 			<%= label_tag "2) Paste your Steam profile URL here:" %>		  
 		  <%= text_field_tag(:url, nil, :class => 'form-control') %>
@@ -45,6 +45,8 @@
 			<br />
 			The seat code can go anywhere in the summary section of your steam profile.<br/>
 			After your seat is linked you can remove the seat code from your summary.<br/>
+			<br />
+			Your steam profile needs to be set to public before your seat can be linked.<br />
 			<br />
 			Don't worry if the name next to the seat is incorrect.<br />
 			Seat information is updated hourly and will be fixed on the next update.</h5>

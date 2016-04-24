@@ -13,14 +13,17 @@
 	  <%= f.label :banned %>
 	  <%= f.select :banned, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
 
+	  <%= f.label :pin %>
+	  <%= f.select :pin, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+
 	  <%= f.label :address %>
-	  <%= f.text_field :address, class: 'form-control', :disabled => true %>
+	  <%= f.text_field :address, class: 'form-control', :readonly => true %>
 
 	  <%= f.label :lobby %>
-	  <%= f.text_field :lobby, class: 'form-control', :disabled => true %>
+	  <%= f.text_field :lobby, class: 'form-control', :readonly => true %>
 
 	  <%= f.label :steamid %>
-	  <%= f.text_field :steamid, class: 'form-control', :disabled => true %>
+	  <%= f.text_field :steamid, class: 'form-control', :readonly => true %>
 
 	  <%= f.label :name %>
 	  <%= f.text_field :name, class: 'form-control' %>
@@ -35,7 +38,7 @@
 	  <%= f.text_field :query_port, class: 'form-control' %>
 
 	  <%= f.label :last_successful_query %>
-	  <%= f.text_field :last_successful_query, class: 'form-control', :disabled => true  %>
+	  <%= f.text_field :last_successful_query, class: 'form-control', :readonly => true  %>
 
 	  <%= f.submit "Save changes", class: "btn btn-33 btn-primary pull-left" %>
 	  <%= link_to "Go to Game", edit_game_path(@host.game_id), class: "btn btn-33 btn-primary pull-center" %>

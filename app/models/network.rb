@@ -16,7 +16,7 @@ class Network < ActiveRecord::Base
       if !r.cidr.blank?
         cidr = NetAddr::CIDR.create(r.cidr)
 
-        if cidr.contains?(i)
+        if cidr.matches?(i)  
           network = r
 
           if network == "banned"

@@ -19,7 +19,9 @@
       	    </ul>
       	  </li>
         <% else %>
+        <ul class="nav navbar-nav navbar-right">
           <%= link_to image_tag("sits_small.png", alt: "Sign in through Steam", :class => "steam-img"), '/auth/steam' %>
+        </ul>   
       	<% end %>
       </ul>
     </nav>

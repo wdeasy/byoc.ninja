@@ -3,9 +3,9 @@
 ### tasks ###
 
 rake update:hosts updates the server list  
-rake update:networks updates hosts network info (for updating existing hosts when a new network is added)  
 rake update:seats updates seat information from quakecon.org  
 rake cleanup:hosts removes old hosts from the database  
+rake cleanup:pins removes pins from unreachable hosts
 
 ### Here are the quick and dirty instructions to get this up and running: ###
 

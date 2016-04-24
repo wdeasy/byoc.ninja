@@ -1,19 +1,12 @@
-<% provide(:title, "Games List")  %>
+<% provide(:title, "Games")  %>
 <div class="jumbotron">
-  <h3 class="center">Games</h3>
-  <table class="table table-striped table-condensed games">
-    <thead>
-      <tr class="row">
-        <th class="col-md-6 text-right">ID</th>
-        <th class="col-md-6 text-left">Name</th>
-      </tr>
-    </thead>
-    <tbody>      
+	<h3 class="text-center">Games</h3>
+	<h5 class="text-center">This is a list of the games seen so far.<br/> Games are automatically added as they are seen.<br/></h5>
+  <div class="container">      
       <% if @games.empty? %>
-        <tr class="row"><td colspan="3" class="col-md-offset-2 text-center">No Games Found.</td></tr>
+        <div class="row"><div class="text-center">No Games Found.</div></div>
       <% else %>
         <%= render @games %>
       <% end %>              
-    </tbody>
-  </table>
+  </div>
 </div>

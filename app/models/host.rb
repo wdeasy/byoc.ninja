@@ -1,5 +1,8 @@
 class Host < ActiveRecord::Base
   require 'open-uri'
+  require 'socket'
+  require 'timeout'
+  require 'json'
 
   belongs_to :game
   belongs_to :network
@@ -39,22 +42,24 @@ class Host < ActiveRecord::Base
     end
 
     if player["gameserverip"]
-      i, p = player["gameserverip"].split(':')
-      port = p.to_i
-      query_port        = find_query_port(player)
-      network        = Network.location(i)
+      i, p        = player["gameserverip"].split(':')
+      port        = p.to_i
+      info        = Host.get_server_info(player["gameserverip"])
+      query_port  = info["query_port"]
+      network     = Network.location(i)
     else
-      i = nil
-      port = nil
-      query_port = nil
-      network = Network.location(nil)
+      i           = nil
+      port        = nil
+      query_port  = nil
+      network     = Network.location(nil)
     end
 
-    link        = link(player)
+    link        = link(player)    
     lobby       = player["lobbysteamid"] ? player["lobbysteamid"] : nil
     address     = player["gameserverip"] ? player["gameserverip"] : nil
     steamid     = player["gameserversteamid"] ? player["gameserversteamid"] : nil
-  
+    query_port  = (host.query_port != nil && query_port == nil) ? host.query_port : query_port
+
     host.update_attributes(
       :game_id    => game_id,
       :query_port => query_port,
@@ -64,17 +69,17 @@ class Host < ActiveRecord::Base
       :address    => address,
       :lobby      => lobby,
       :link       => link,
-      :steamid    => steamid
+      :steamid    => steamid,
+      :source     => "update:hosts"
     )
 
-    if host.banned == false && ['banned','private'].exclude?(host.network.name) && host.auto_update == true && host.port != 0
+    if host.banned == false && ['banned','private'].exclude?(host.network.name) && host.port != 0
       if host.query_port != nil
-        query_host(host)
+        update_server_info(host)
       end
 
-      flags(player,host)
-
       host.update_attributes(
+        :flags => flags(host),
         :updated => true,
         :visible => true
       )
@@ -83,13 +88,14 @@ class Host < ActiveRecord::Base
     return host.id  
   end
 
-  def Host.flags(player,host)
+  def Host.flags(host)
     flags = {}
 
     #check for quakecon in hostname
     if host.name != nil
       if host.name.downcase.include? "quakecon"
-        flags['Quakecon in Host Name'] = true       
+        flags['Quakecon in Host Name'] = true
+        Host.pin(host)       
       end 
     end
 
@@ -114,7 +120,8 @@ class Host < ActiveRecord::Base
 
     #hosted in byoc
     if host.network.name == "byoc"
-      flags['Hosted in BYOC'] = true  
+      flags['Hosted in BYOC'] = true
+      Host.pin(host)  
     end
 
     #password protected
@@ -128,54 +135,54 @@ class Host < ActiveRecord::Base
     end 
 
     unless flags.empty? && host.flags.blank?
-      host.update_attributes(
-        :flags                 => flags
-      )
+      return flags
+    else
+      return nil
     end
   end
 
-  def Host.query_host(host)
-    server = nil
-    name = nil
-    map = nil
-    current = nil
-    max = nil
-    password = nil
-
+  def Host.query_host(ip, query_port)
     begin
-      server = SourceServer.new(host.ip, host.query_port)
+      server = SourceServer.new(ip, query_port)
       server.init
 
       if server != nil
-        name = server.server_info[:server_name]
-        map = server.server_info[:map_name]
-        current = server.server_info[:number_of_players]
-        max = server.server_info[:max_players]
-        password = server.server_info[:password_needed]
-
-        host.update_attributes(
-          :name => name,
-          :map => map,
-          :current => current,
-          :max => max,
-          :players => players(current, max),
-          :password => password,
-          :respond => true,
-          :last_successful_query => Time.now
-        )
+        return server
       else
-        host.update_attributes(
-          :respond => false
-        )
+        return nil
       end
 
     rescue SteamCondenser::TimeoutError
-      puts "unable to query #{host.ip}:#{host.query_port.to_s}"
+      puts "unable to query #{ip}:#{query_port}"      
+      return nil
+    end     
+  end
 
+  def Host.update_server_info(host)
+    server = Host.query_host(host.ip, host.query_port)
+
+    if server != nil
+      name = (server.server_info[:server_name] && host.auto_update == true) ? server.server_info[:server_name] :  host.name
+      map = (server.server_info[:map_name] && host.auto_update == true) ? server.server_info[:map_name] : host.name
+      current = server.server_info[:number_of_players] ? server.server_info[:number_of_players] : host.current
+      max = server.server_info[:max_players] ? server.server_info[:max_players] : host.max
+      password = server.server_info[:password_needed] ? server.server_info[:password_needed] : host.password
+
+      host.update_attributes(
+        :name => name,
+        :map => map,
+        :current => current,
+        :max => max,
+        :players => players(current, max),
+        :password => password,
+        :respond => true,
+        :last_successful_query => Time.now
+      )
+    else
       host.update_attributes(
         :respond => false
       )
-    end  
+    end
   end
 
   def Host.players(current, max)
@@ -191,128 +198,156 @@ class Host < ActiveRecord::Base
     return players
   end
 
-  def Host.update_hosts
+  def self.gather_steamids
     steamids = []
+
+    puts "Gathering steamids"
 
     #iterate through groups to gather steam ids
     groups = Group.where(:enabled => true)
-      groups.each do |group|
-        begin
-          doc = Nokogiri::XML(open("http://steamcommunity.com/gid/#{group.steamid.to_s}/memberslistxml/?xml=1"))
-        rescue => e
-          puts "Nokogiri failed to open XML http://steamcommunity.com/gid/#{group.steamid.to_s}/memberslistxml/?xml=1"
-        end
-
-        if doc != nil
-          doc.xpath('//steamID64').each do |steamid|
-            if !steamids.include? steamid.text
-              steamids << steamid.text
-            end 
-          end     
-        end
+    g = 0
+    groups.each do |group|
+      begin
+        doc = Nokogiri::XML(open("http://steamcommunity.com/gid/#{group.steamid.to_s}/memberslistxml/?xml=1"))
+      rescue => e
+        puts "Nokogiri failed to open XML http://steamcommunity.com/gid/#{group.steamid.to_s}/memberslistxml/?xml=1"
       end
 
-      linked_users = User.where('id IN (SELECT user_id from seats_users)')
-
-      linked_users.each do |linked_user|
-        if !steamids.include? linked_user.steamid
-          steamids << linked_user.steamid
-        end 
+      if doc != nil
+        doc.xpath('//steamID64').each do |steamid|
+          if !steamids.include? steamid.text
+            steamids << steamid.text
+            g += 1
+          end 
+        end     
       end
+    end
 
-      return "no steam ids to process." if steamids.empty?
+    puts "#{g} steamids from groups"
 
-        Host.update_all(:updated => false)
-        User.update_all(:updated => false)
+    l = 0
+    linked_users = User.where('id IN (SELECT user_id from seats_users)')
 
-      i = 1
-      j = 0
-      u = 0
-      x = 0
+    linked_users.each do |linked_user|
+      if !steamids.include? linked_user.steamid.to_s
+        steamids << linked_user.steamid.to_s
+        l += 1
+      end 
+    end
 
-      servers = []
-      lobbies = []
+    puts "#{l} steamids from linked seats"
 
-      combined = ''
-      string = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{ENV['STEAM_WEB_API_KEY']}&steamids="
-
-      #iterate through steam ids to find hosts
-      steamids.each do |steamid|
-        combined << steamid.to_s + ','
-        
-        #GetPlayerSummaries has a max of 100 steam ids
-        if i == 100 || steamid == steamids.last
-          begin
-            parsed = JSON.parse(open(string + combined).read)
-          rescue => e
-            puts "JSON failed to parse #{string + combined}"
-            x = 1
-          end
-
-          if parsed != nil
-            parsed["response"]["players"].each do |player|
-              if player["gameserverip"] != nil || player["lobbysteamid"] != nil
-                user = User.lookup(player["steamid"])
-                if user.banned == false && user.display == true
-                  game_id = Game.update(player)
-                  host_id = Host.update(player, game_id)
-                  User.update(player, host_id)
-                  u += 1
-
-                  if player["gameserverip"] != nil
-                    if !servers.include? player["gameserverip"]
-                      servers.push(player["gameserverip"])
-                    end
-                  end
-
-                  if player["lobbysteamid"] != nil
-                    if !lobbies.include? player["lobbysteamid"]
-                      lobbies.push(player["lobbysteamid"])
-                    end
-                  end
-
-                  if player["gameserverip"] != nil && player["lobbysteamid"] != nil
-                    puts "user: #{player["personaname"]}, server: #{player["gameserverip"]}, lobby: #{player["lobbysteamid"]}"
-                  elsif player["gameserverip"] != nil
-                    puts "user: #{player["personaname"]}, server: #{player["gameserverip"]}"
-                  else
-                    puts "user: #{player["personaname"]}, lobby: #{player["lobbysteamid"]}"
-                  end
-                end
-              end 
-            end
-          end
-          i = 0
-          combined = ''
-        end
-        i += 1
-        j += 1    
-      end
-
-      if x == 0
-        Host.where(:updated => false).update_all(:visible => false)
-        User.where(:updated => false).update_all(:host_id => nil)
-      end
-
-      return "Processed #{j} steam ids. Found #{u} users in #{servers.count} servers and #{lobbies.count} lobbies."    
+    return steamids
   end
 
-  def Host.find_query_port(player)
-    query_port = nil
+  def Host.update_hosts
+    steamids = gather_steamids
 
-    if player["gameserverip"] != nil
-      i, p = player["gameserverip"].split(':')
+    return "no steam ids to process." if steamids.empty?
+
+    Host.update_all(:updated => false)
+    User.update_all(:updated => false)
+
+    i = 1
+    j = 0
+    u = 0
+    x = 0
+
+    servers = []
+    lobbies = []
+
+    combined = ''
+    string = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{ENV['STEAM_WEB_API_KEY']}&steamids="
+
+    #iterate through steam ids to find hosts
+    steamids.each do |steamid|
+      combined << steamid.to_s + ','
+      
+      #GetPlayerSummaries has a max of 100 steam ids
+      if i == 100 || steamid == steamids.last
+        begin
+          parsed = JSON.parse(open(string + combined).read)
+        rescue => e
+          puts "JSON failed to parse #{string + combined}"
+          x = 1
+        end
+
+        if parsed != nil
+          parsed["response"]["players"].each do |player|
+            if player["gameserverip"] != nil || player["lobbysteamid"] != nil
+              user = User.lookup(player["steamid"])
+              if user.banned == false && user.display == true                
+                if player["gameid"].length > 7
+                  #gameids over length 7 are mods
+                  game_id = Mod.update(player)
+                else
+                  game_id = Game.update(player["gameid"],player["gameextrainfo"])                  
+                end
+                               
+                host_id = Host.update(player, game_id)
+                User.update(player, host_id)
+                u += 1
+
+                if player["gameserverip"] != nil
+                  if !servers.include? player["gameserverip"]
+                    servers.push(player["gameserverip"])
+                  end
+                end
+
+                if player["lobbysteamid"] != nil
+                  if !lobbies.include? player["lobbysteamid"]
+                    lobbies.push(player["lobbysteamid"])
+                  end
+                end
+
+                if player["gameserverip"] != nil && player["lobbysteamid"] != nil
+                  puts "user: #{player["personaname"]}, server: #{player["gameserverip"]}, lobby: #{player["lobbysteamid"]}"
+                elsif player["gameserverip"] != nil
+                  puts "user: #{player["personaname"]}, server: #{player["gameserverip"]}"
+                else
+                  puts "user: #{player["personaname"]}, lobby: #{player["lobbysteamid"]}"
+                end
+              end
+            end 
+          end
+        end
+        i = 0
+        combined = ''
+      end
+      i += 1
+      j += 1    
+    end
+
+    Host.update_pins
+
+    if x == 0
+      Host.where(:updated => false).update_all(:visible => false)
+      User.where(:updated => false).update_all(:host_id => nil)
+    end
+
+    return "Processed #{j} steam ids. Found #{u} users in #{servers.count} servers and #{lobbies.count} lobbies."    
+  end
+
+  def self.get_server_info(address)
+    info = {}
+
+    if address != nil
+      i, p = address.split(':')
       string = "http://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{i}&format=json"
 
       begin
         parsed = JSON.parse(open(string).read)
 
         if parsed != nil && parsed["response"]["success"] == true
+          info["respond"] = false
           parsed["response"]["servers"].each do |server|
             gameport = server["gameport"]
             if gameport.to_i == p.to_i
               ip, po = server["addr"].split(':')
-              query_port = po.to_i
+              info["query_port"] = po.to_i
+              info["gamedir"] = server["gamedir"]
+              info["appid"] = server["appid"]
+              info["respond"] = true
             end 
           end
         else
@@ -323,6 +358,114 @@ class Host < ActiveRecord::Base
       end
     end
 
-    return query_port    
+    return info  
+  end
+
+  def Host.update_byoc
+    Network.where(:name => 'byoc').each do |range|
+      if !range.cidr.blank?
+        puts "searching range #{range.cidr}"
+        cidr = NetAddr::CIDR.create(range.cidr)
+        i = 0  
+
+        until i == cidr.size do
+          ip = cidr[i].ip
+          api = "http://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{ip}&format=json"
+
+          begin
+            parsed = JSON.parse(open(api).read)
+
+            if parsed != nil && parsed["response"]["success"] == true              
+              parsed["response"]["servers"].each do |server|
+                if server["addr"] && server["appid"] && server["gameport"]                  
+                  x, p = server["addr"].split(':')
+                  port = server["gameport"].to_i
+                  query_port = p.to_i
+                  address = "#{ip}:#{port}"
+                  
+                  game_id = Game.update(server["appid"])
+                  host = Host.where(address: address).first_or_create
+
+                  host.update_attributes(
+                    :game_id    => game_id,
+                    :query_port => query_port.to_i,
+                    :ip         => ip,
+                    :port       => port,
+                    :address    => address,
+                    :pin        => true,
+                    :source     => "update:byoc"
+                  )
+                  puts "Found a #{host.game.name} host at #{address}."                
+                end
+              end
+            end
+          rescue => e
+            puts "JSON failed to parse #{api}"
+          end
+
+          i += 1
+          sleep(1.second)
+        end
+      end
+    end
+  end
+
+  def Host.update_pins
+    #pins are hosts that are allowed to stay up even when member count is zero.
+    hosts = Host.where(:pin => true, :updated => false)
+    puts "Checking #{hosts.count} pins."
+
+    hosts.each do |host|
+      if port_open(host.ip, host.port)
+        player = {}
+        player["gameserverip"] = host.address
+
+        Host.update(player, host.game_id)
+      end
+    end
+  end
+
+  def Host.pin(host)
+    if host.pin == false
+      host.update_attributes(
+        :pin => true
+      )
+    end
+  end
+
+  def Host.unpin(host)
+    if host.pin == true
+      host.update_attributes(
+        :pin => false
+      )
+    end
+  end
+
+  def Host.cleanup_pins
+    hosts = Host.where(:pin => true)
+    puts "Cleaning up #{hosts.count} pins."
+
+    i = 0
+    hosts.each do |host|
+      if port_open(host.ip, host.port) == false
+        Host.unpin(host)
+        i += 1
+      end
+    end
+
+    puts "Removed #{i} pins."
+  end
+
+  def self.port_open(ip, port, seconds=1)
+    Timeout::timeout(seconds) do
+      begin
+        TCPSocket.new(ip, port).close
+        true
+      rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+        false
+      end
+    end
+  rescue Timeout::Error
+    false
   end
 end

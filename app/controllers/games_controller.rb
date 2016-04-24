@@ -1,6 +1,6 @@
 class GamesController < ApplicationController
-  before_action :logged_in_user
-  before_action :admin_user
+  before_action :logged_in_user, :except => [:index]
+  before_action :admin_user, :except => [:index]
 
   def index
   	@games = Game.order("name ASC")
@@ -22,7 +22,7 @@ class GamesController < ApplicationController
 
   private
     def game_params
-      params.require(:game).permit(:name)
+      params.require(:game).permit(:name, :joinable)
     end
 
     # Confirms a logged-in user.

@@ -2,17 +2,10 @@ class HostsController < ApplicationController
   before_action :logged_in_user, :except => [:index, :json]
   before_action :admin_user, :except => [:index, :json]
 
-  def index
-  	@hosts = Host.includes(:game, :users, :seats).where(visible: true).where("users_count > ?", 0).order("games.name ASC, users_count DESC, address ASC")
-    @messages = Message.where(show: true).order("updated_at desc")
-
-    #if current_user && current_user.seat_id.blank?
-    #  flash[:info] = "Click on your name in the top right corner and go to the settings page to set your BYOC seat!"
-    #end
-
-    #flash[:success] = "Click <a href=https://byoc.ninja/seat>here</a> to link your Steam Account to set your BYOC seat!".html_safe
+  def index    
+  	@hosts = Host.includes(:game, :users, :seats).where(visible: true).where("games.joinable = true").order("games.name ASC, users_count DESC, address ASC")
     
-  	respond_to do |format|
+    respond_to do |format|
       format.html
       format.js
     end
@@ -33,13 +26,13 @@ class HostsController < ApplicationController
   end
 
   def json
-    @hosts = Host.includes(:game, :users, :seats).where( visible: true ).where( "users_count > ?", 0 ).order("games.name ASC, users_count DESC, address ASC")
+    @hosts = Host.includes(:game, :users, :seats).where(visible: true).where("games.joinable = true").order("games.name ASC, users_count DESC, address ASC")
     render :json => @hosts
   end
 
   private
     def host_params
-      params.require(:host).permit(:banned, :auto_update, :name, :map, :query_port, :network, :last_successful_query)
+      params.require(:host).permit(:banned, :auto_update, :name, :map, :query_port, :network, :last_successful_query, :pin)
     end
 
     # Confirms a logged-in user.

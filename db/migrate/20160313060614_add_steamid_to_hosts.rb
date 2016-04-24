@@ -6,6 +6,6 @@ class AddSteamidToHosts < ActiveRecord::Migration
 
   def down
   	remove_column :hosts, :steamid
-  	add_column :rhosts, :refresh, :boolean, :default => false
+  	add_column :hosts, :refresh, :boolean, :default => false
   end
 end

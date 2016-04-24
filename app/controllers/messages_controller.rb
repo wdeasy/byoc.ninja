@@ -1,6 +1,15 @@
 class MessagesController < ApplicationController
-  before_action :logged_in_user
-  before_action :admin_user
+  before_action :logged_in_user, :except => [:hide]
+  before_action :admin_user, :except => [:hide]
+
+  def hide
+    ids = [params[:id], *cookies.signed[:hidden_message_ids]]
+    cookies.permanent.signed[:hidden_message_ids] = ids
+    respond_to do |format|
+      format.html { redirect_to :back }
+      format.js
+    end
+  end
 
   def index
   	@messages = Message.order("updated_at desc")

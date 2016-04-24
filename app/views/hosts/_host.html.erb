@@ -1,25 +1,29 @@
 <tr>
   <td class="text-left longtext" title="<%= host.game.name %>">
-    <%= (host.game.steamid.length < 7) ? (link_to host.game.name, host.game.link, {:target => "_blank"}) : host.game.name %>
+    <%= host.game.link ? (link_to host.game.name, host.game.link, {:target => "_blank"}) : host.game.name %>
   </td>
   <td class="text-center longtext">
     <%= flags(host).html_safe %>
   </td>
   <td class="text-left longtext" title="<%= host.name %>">    
-    <%= (host.name.blank? && !host.lobby.blank?) ? "#{host.users.first.name}'s Lobby" : host.name %>
+    <%= (host.name.blank? && host.lobby) ? "#{display_name(host.users.first)}'s Lobby" : host.name %>
   </td>
   <td class="text-right">
     <%= host.players %>
   </td>
   <td class="text-center">
-    <div class="dropdown">
-    <%= link_to host.users.size, '#', :class => 'dropdown-toggle', :'data-toggle' => 'dropdown' %>
-    <ul class="dropdown-menu">
-      <% host.users.each do |user| %>
-        <li><%= link_to display_name(user), user.url, :target => '_blank' %></li>
-      <% end %>
-    </ul>
-    </div>
+    <% if host.users.size > 0 %>
+      <div class="dropdown">
+      <%= link_to host.users.size, '#', :class => 'dropdown-toggle', :'data-toggle' => 'dropdown' %>
+      <ul class="dropdown-menu">
+        <% host.users.each do |user| %>
+          <li><%= link_to display_name(user), user.url, :target => '_blank' %></li>
+        <% end %>
+      </ul>
+      </div>
+    <% else %>
+      <%= host.users.size %>
+    <% end %>
   </td>
   <td class="text-left longtext" title="<%= host.map %>">
     <%= host.map %>

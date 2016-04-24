@@ -1,6 +1,9 @@
 class Message < ActiveRecord::Base
-  def Message.display
-    m = select("message, message_type").where(show: true).last
+
+  def self.current(hidden_ids = nil)
+    result = where(:show => true)
+    result = result.where("id not in (?)", hidden_ids) if hidden_ids.present?
+    result
   end
 
   def Message.clear_all

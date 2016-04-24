@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   match     'auth/failure', :to   => 'sessions#failure', via: [:get, :post]
   delete    'logout'              => 'sessions#destroy'
   get       'privacy_policy'      => 'static_pages#privacy_policy'
+  get       'how_it_works'        => 'static_pages#about'
 
   get       'admin/hosts'         => 'admin#hosts'
   get       'groups/auto'         => 'groups#auto'
@@ -18,6 +19,7 @@ Rails.application.routes.draw do
   get       'logs/update_seats'                => 'logs#update_seats'
 
   get        'seat'               => 'users#seat'
+  match      'messages/:id/hide', to: 'messages#hide', as: 'hide_message', via: [:get, :post]
 
   resources :contacts, :only      => [:new, :create]
   resources :games

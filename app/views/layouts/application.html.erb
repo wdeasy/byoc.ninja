@@ -18,7 +18,12 @@
     <div class="container">    
       <div id="flash">
         <% flash.each do |key, value| %>
-          <div class="alert alert-<%= key %>"><%= value %></div>
+          <div class="alert alert-<%= key %>">
+            <%= value %>
+            <%= link_to "#", remote: true, :class => "close alert-link", "data-dismiss": "alert" do %>
+              <span class="glyphicon glyphicon-remove"></span>
+            <% end %>
+          </div>
         <% end %>    
       </div>               
       <%= yield %>

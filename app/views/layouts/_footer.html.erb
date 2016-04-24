@@ -2,24 +2,16 @@
   <div class="col-sm-12">
   <small>
   <div class="pull-left">
-    &nbsp;Current games being played in the  <%= link_to "Quakecon™ Steam Group", "http://steamcommunity.com/groups/Quakecon-PeaceLoveRockets", :target => '_blank' %>.
-    Click <%= link_to "here", "steam://url/GroupSteamIDPage/103582791432330298" %> to join!
-    <br />
-    &nbsp;Useful links: <a href="http://pixel5.us/quakecon/byoc" target="_blank">BYOC Map</a> | 
-                  <a href="http://community.quakecon.org" target="_blank">Community Site</a> | 
-                  <a href="http://www.qconforums.com" target="_blank">QconForums</a> |                
-                  <a href="http://reddit.com/r/quakecon" target="_blank">/r/Quakecon</a> |     
-                  <a href="http://chat.mibbit.com/?server=irc.web.gamesurge.net&channel=%23quakecon" target="_blank">#quakecon</a>
-
-  </div>
+    <%= link_to "How it works", how_it_works_path %> |
+    <%= link_to 'Link your seat', seat_path %> |
+    <%= link_to "Games", games_path %> |
+    Source available on <%= link_to "GitHub", "https://github.com/wdeasy/qcon_steam_browser", :target => "_blank" %>
+</div>
   <div class="pull-right">
     This site is not affiliated with Valve or Steam. |
     <%= link_to "Powered by Steam", "http://steampowered.com" %> | 
     <%= link_to "Privacy Policy", privacy_policy_path %> | 
-    <%= link_to "Contact", new_contact_path %>
-    <br />
-    <div align="right">Source available on <a href="https://github.com/wdeasy/qcon_steam_browser" target="_blank">GitHub</a>&nbsp;</div>
-                
+    <%= link_to "Contact", new_contact_path %>                
   </div>
   </small>
   </div>

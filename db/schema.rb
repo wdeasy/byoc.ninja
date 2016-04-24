@@ -11,22 +11,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160320191035) do
+ActiveRecord::Schema.define(version: 20160325225217) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "games", force: :cascade do |t|
-    t.string   "steamid",    null: false
+    t.integer  "appid",                     null: false
     t.string   "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
     t.string   "link"
     t.string   "image"
     t.string   "info"
+    t.boolean  "joinable",   default: true
   end
 
-  add_index "games", ["steamid"], name: "index_games_on_steamid", unique: true, using: :btree
+  add_index "games", ["appid"], name: "index_games_on_appid", unique: true, using: :btree
 
   create_table "groups", force: :cascade do |t|
     t.integer  "steamid",    limit: 8,                null: false
@@ -66,6 +67,7 @@ ActiveRecord::Schema.define(version: 20160320191035) do
     t.integer  "network_id"
     t.string   "source"
     t.integer  "steamid",               limit: 8
+    t.boolean  "pin",                             default: false
   end
 
   add_index "hosts", ["game_id"], name: "index_hosts_on_game_id", using: :btree
@@ -77,6 +79,16 @@ ActiveRecord::Schema.define(version: 20160320191035) do
     t.boolean  "show",         default: true
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
+  end
+
+  create_table "mods", force: :cascade do |t|
+    t.string   "steamid"
+    t.string   "name"
+    t.integer  "game_id"
+    t.string   "info"
+    t.string   "dir"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "networks", force: :cascade do |t|

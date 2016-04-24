@@ -68,7 +68,7 @@ p {
 /* header */
 
 #logo {
-  font-family: 'Bangers', cursive;
+  font-family: 'Bangers', Impact, Charcoal, sans-serif;
   float: left;
   margin-right: 10px;
   font-size: 2em;
@@ -247,3 +247,11 @@ input {
 .dropdown-submenu>a:after{display:block;content:" ";float:right;width:0;height:0;border-color:transparent;border-style:solid;border-width:5px 0 5px 5px;border-left-color:#cccccc;margin-top:5px;margin-right:-10px;}
 .dropdown-submenu:hover>a:after{border-left-color:#ffffff;}
 .dropdown-submenu.pull-left{float:none;}.dropdown-submenu.pull-left>.dropdown-menu{left:-100%;margin-left:10px;-webkit-border-radius:6px 0 6px 6px;-moz-border-radius:6px 0 6px 6px;border-radius:6px 0 6px 6px;}
+
+#header {
+  font-size: 1.7em;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  font-weight: bold;
+}

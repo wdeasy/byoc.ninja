@@ -1,4 +1,16 @@
-  <tr class="row">
-      <td class="text-right longtext"><%= game.steamid %></td>
-      <td class="text-left longtext"><%= link_to game.name, edit_game_path(game) %></td>
-  </tr>
+  <div class="row">
+  <div class="col-md-3"></div>
+    	<div class="col-md-6">
+      <div class="row">
+        <% if logged_in? && current_user.admin? %>
+          [<%= link_to "edit", edit_game_path(game)%>]
+        <% end %>      
+	      <% if game.link %>
+	      	<%= link_to game.name, game.link %>
+	      <% else %>
+	      	<% game.name %>
+	      <% end %>
+        </div>
+    	</div>
+    <div class="col-md-3"></div>    
+  </div>

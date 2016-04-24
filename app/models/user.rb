@@ -28,7 +28,10 @@ class User < ActiveRecord::Base
 
   def User.url_cleanup(url)
     if url.include? "steamcommunity.com"
-      url.slice!(0..(url.index('steamcommunity.com')-1))
+      unless url.start_with? "steamcommunity.com"
+        url.slice!(0..(url.index('steamcommunity.com')-1))
+      end
+
       url.prepend("http://")
 
       if url.last != "/"
@@ -62,7 +65,7 @@ class User < ActiveRecord::Base
           return "Could not find #{seat} in your steam profile summary."
         end
       else
-        return "Please set your steam profile to public while linking your seat."
+        return "Please set your steam profile to public to link your seat."
       end
     rescue => e
       return "Unable to read your steam profile. Please try again."

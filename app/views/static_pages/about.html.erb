@@ -1,0 +1,33 @@
+<% provide(:title, "How it works")  %>
+<div class="jumbotron">
+	<h3 class="text-center">HOW IT WORKS</h3>
+	    <br />
+	<ul>
+		<li>byoc.ninja uses the <%= link_to "Steam Web API", "https://developer.valvesoftware.com/wiki/Steam_Web_API", :target => '_blank' %> to search for games being played by at Quakecon.</li>
+    <br />
+		<li>Every minute, a task searches through a pool of Quakecon steam ids.</li>
+    <br />
+		<li>You can add yourself to the pool by joining the <%= link_to "Quakecon™ Steam Group", "http://steamcommunity.com/groups/Quakecon-PeaceLoveRockets", :target => '_blank' %> or <%= link_to "linking your BYOC seat", seat_path %>.</li>
+    <br />
+    <li>Games that use the Steam Web API are automatically added as they are seen.</li>
+    <br />
+		<li>When a server IP or lobby is found in a public profile, it is listed on the front page.</li>
+    <br />
+		<li>Players with linked seats will be listed with their BYOC info instead of their steam name.</li>
+    <br />
+		<li>Each server has a count of Quakecon members found in the game.</li>
+    <br />
+		<li>Servers are tagged when they meet certain conditions:
+		<p />
+		<ul>
+			<span class="glyphicon glyphicon-user" title="BYOC Player in Game"></span> BYOC Player in Game<br />
+      <br />
+			<span class="glyphicon glyphicon-home" title="Hosted in BYOC"></span> Hosted in the BYOC<br />
+      <br />
+			<span class="glyphicon glyphicon-ok" title="Quakecon in Host Name"></span> Quakecon in Host Name<br />
+      <br />
+		</ul>
+		</li>
+		<li>Servers found in the BYOC or with quakecon in their name stay listed as long as they are up.</li>
+	</ul>
+</div>

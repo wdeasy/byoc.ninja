@@ -14,10 +14,10 @@ module UsersHelper
 
     user.seats.each do |seat|
       if seat.year == Date.today.year
-        name = "[#{user.seats.first.seat}] #{user.seats.first.clan} #{user.seats.first.handle}"
+        name = "[#{user.seats.first.seat}] #{user.seats.first.handle}"
       end
     end    
 
-    return name
+    return name[0..25]
   end  
 end
