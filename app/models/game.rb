@@ -40,4 +40,49 @@ class Game < ActiveRecord::Base
 
     return name
   end
+
+  def Game.appid_from_name(name)
+    appid = nil
+    url = 'http://api.steampowered.com/ISteamApps/GetAppList/v0002/'
+
+    begin
+      parsed = JSON.parse(open(url).read)
+
+      if parsed != nil
+        parsed['applist']['apps'].each do |app|
+          if name.downcase == app['name'].downcase
+            appid = app['appid']
+          end
+        end       
+      end
+    rescue => e
+      puts "JSON failed to parse #{url}"
+    end
+
+    return appid
+  end
+
+  def Game.name_from_profile(player)
+    name = nil
+    page = lookup(player["profileurl"])
+
+    if !page.blank?
+      name = page.css('div.profile_in_game_name').text
+    end
+
+    return name
+  end
+
+  def self.lookup(url)
+    page = nil
+
+    begin
+      html = open(url) 
+      page = Nokogiri::HTML(html.read)
+    rescue => e
+      puts "Nokogiri failed to open HTML #{url}"
+    end
+
+    return page
+  end  
 end

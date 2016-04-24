@@ -93,7 +93,8 @@ class Host < ActiveRecord::Base
 
     #check for quakecon in hostname
     if host.name != nil
-      if host.name.downcase.include? "quakecon"
+      #if host.name.downcase.include? "quakecon"
+      if ["quakecon", "qcon"].any? { |q| host.name.downcase.include? q }   
         flags['Quakecon in Host Name'] = true
         Host.pin(host)       
       end 

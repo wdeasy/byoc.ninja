@@ -11,7 +11,15 @@ class Mod < ActiveRecord::Base
         mod.dir = info["gamedir"]
         mod.info = player["gameextrainfo"]
         game_id = Game.update(appid, player["gameextrainfo"])
-        mod.game_id = game_id                
+        mod.game_id = game_id
+      else
+        name = Game.name_from_profile(player)
+        appid = Game.appid_from_name(name)
+        mod.info = player["gameextrainfo"]
+        if appid != nil
+          game_id = Game.update(appid, player["gameextrainfo"])
+          mod.game_id = game_id           
+        end
       end
     end
 
