@@ -10,6 +10,9 @@
 	      <% else %>
 	      	<% game.name %>
 	      <% end %>
+        <% if game.joinable == false%>
+          [unable to join]
+        <% end %>
         </div>
     	</div>
     <div class="col-md-3"></div>    

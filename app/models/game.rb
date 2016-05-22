@@ -10,6 +10,7 @@ class Game < ActiveRecord::Base
 
       game.name = name
       game.info = info
+      game.source = "auto"
 
       if name.exclude? "Source SDK"
          game.link = "http://store.steampowered.com/app/#{appid}"

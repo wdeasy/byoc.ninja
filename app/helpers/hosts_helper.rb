@@ -22,6 +22,11 @@ module HostsHelper
 			if host.flags['Last Query Attempt Failed']
 				html << '<span class="glyphicon glyphicon-remove" title="Last Query Attempt Failed"></span>'
 			end
+
+			if host.flags['Manually Added']
+				html << '<span class="glyphicon glyphicon-pencil" title="Manually Added"></span>'
+			end
+
 		end
 
 		return html		

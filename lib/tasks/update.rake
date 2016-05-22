@@ -24,6 +24,14 @@ namespace :update do
     finish_time(beginning)
   end
 
+  desc "Update pins"
+  task :pins => :environment do
+    beginning = start_time
+    Host.update_pins
+    finish_time(beginning)
+  end
+
+
   def start_time
   	beginning = Time.now
   	puts beginning.to_formatted_s(:db)

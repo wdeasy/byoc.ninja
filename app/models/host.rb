@@ -9,6 +9,8 @@ class Host < ActiveRecord::Base
   has_many :users
   has_many :seats, :through => :users
 
+  attr_accessor :game_name
+
   serialize :flags
 
   def as_json(options={})
@@ -70,7 +72,7 @@ class Host < ActiveRecord::Base
       :lobby      => lobby,
       :link       => link,
       :steamid    => steamid,
-      :source     => "update:hosts"
+      :source     => "auto"
     )
 
     if host.banned == false && ['banned','private'].exclude?(host.network.name) && host.port != 0
@@ -135,6 +137,11 @@ class Host < ActiveRecord::Base
       flags['Last Query Attempt Failed'] = true  
     end 
 
+    #server was manually added
+    if host.source == "manual"
+      flags['Manually Added'] = true
+    end
+
     unless flags.empty? && host.flags.blank?
       return flags
     else
@@ -153,7 +160,7 @@ class Host < ActiveRecord::Base
         return nil
       end
 
-    rescue SteamCondenser::TimeoutError
+    rescue SteamCondenser::TimeoutError, Errno::ECONNREFUSED
       puts "unable to query #{ip}:#{query_port}"      
       return nil
     end     
@@ -322,10 +329,8 @@ class Host < ActiveRecord::Base
       j += 1    
     end
 
-    Host.update_pins
-
     if x == 0
-      Host.where(:updated => false).update_all(:visible => false)
+      Host.where(:updated => false).where(:pin => false).update_all(:visible => false)
       User.where(:updated => false).update_all(:host_id => nil)
     end
 
@@ -397,7 +402,7 @@ class Host < ActiveRecord::Base
                     :port       => port,
                     :address    => address,
                     :pin        => true,
-                    :source     => "update:byoc"
+                    :source     => "scan"
                   )
                   puts "Found a #{host.game.name} host at #{address}."                
                 end
@@ -446,12 +451,12 @@ class Host < ActiveRecord::Base
   end
 
   def Host.cleanup_pins
-    hosts = Host.where(:pin => true)
+    hosts = Host.where(:pin => true, :source => 'auto')
     puts "Cleaning up #{hosts.count} pins."
 
     i = 0
     hosts.each do |host|
-      if port_open(host.ip, host.port) == false
+      if (host.port == nil || port_open(host.ip, host.port) == false)
         Host.unpin(host)
         i += 1
       end
@@ -465,11 +470,27 @@ class Host < ActiveRecord::Base
       begin
         TCPSocket.new(ip, port).close
         true
-      rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+      rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::ENETUNREACH
         false
       end
     end
   rescue Timeout::Error
     false
+  end
+
+  def self.manual_add(host)
+    host.game_id     = Game.where(name: host.game_name).first_or_create.id
+
+    i, p             = host.address.split(':')
+    host.ip          = i
+    host.port        = p.to_i
+    host.network_id  = Network.location(i).id
+    host.pin         = true
+    host.visible     = true
+    host.updated     = true
+    host.source      = "manual"    
+    host.flags       = flags(host)
+
+    return host
   end
 end

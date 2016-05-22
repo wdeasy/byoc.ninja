@@ -11,13 +11,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160325225217) do
+ActiveRecord::Schema.define(version: 20160430203548) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "games", force: :cascade do |t|
-    t.integer  "appid",                     null: false
+    t.integer  "appid"
     t.string   "name"
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(version: 20160325225217) do
     t.string   "image"
     t.string   "info"
     t.boolean  "joinable",   default: true
+    t.string   "source"
   end
 
   add_index "games", ["appid"], name: "index_games_on_appid", unique: true, using: :btree

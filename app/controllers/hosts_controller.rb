@@ -3,11 +3,27 @@ class HostsController < ApplicationController
   before_action :admin_user, :except => [:index, :json]
 
   def index    
-  	@hosts = Host.includes(:game, :users, :seats).where(visible: true).where("games.joinable = true").order("games.name ASC, users_count DESC, address ASC")
+  	@hosts = Host.includes(:game, :users, :seats).where(visible: true).where("games.joinable = true").order("games.name ASC, users_count DESC, hosts.current IS NULL, hosts.current DESC, hosts.name DESC")
     
     respond_to do |format|
       format.html
       format.js
+    end
+  end
+
+  def new
+    @host = Host.new
+  end
+
+  def create
+    @host = Host.new(add_params)
+    @host = Host.manual_add(@host)
+
+    if @host.save
+      flash[:success] = "Host added."
+      redirect_to hosts_url
+    else
+      render 'new'
     end
   end
 
@@ -26,13 +42,17 @@ class HostsController < ApplicationController
   end
 
   def json
-    @hosts = Host.includes(:game, :users, :seats).where(visible: true).where("games.joinable = true").order("games.name ASC, users_count DESC, address ASC")
+    @hosts = Host.includes(:game, :users, :seats).where(visible: true).where("games.joinable = true").order("games.name ASC, users_count DESC, hosts.current IS NULL, hosts.current DESC, hosts.name DESC")
     render :json => @hosts
   end
 
   private
+    def add_params
+      params.require(:host).permit(:network_id, :address, :flags, :source, :game_name, :name, :pin)
+    end
+
     def host_params
-      params.require(:host).permit(:banned, :auto_update, :name, :map, :query_port, :network, :last_successful_query, :pin)
+      params.require(:host).permit(:banned, :auto_update, :name, :map, :query_port, :network_id, :last_successful_query, :pin)
     end
 
     # Confirms a logged-in user.

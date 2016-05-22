@@ -15,6 +15,8 @@
 	      <li><%= link_to "Current", admin_hosts_url %></li>              
 	      <li><%= link_to "All", admin_hosts_url(:all => true) %></li>
 	      <li><%= link_to "Banned", admin_hosts_url(:banned => true) %></li>
+        <li><%= link_to "Manually Added", admin_hosts_url(:manual => true) %></li>        
+        <li><%= link_to "Add", new_host_url %></li>        
     </ul>
   </li>
 

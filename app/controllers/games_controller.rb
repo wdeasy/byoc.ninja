@@ -3,7 +3,7 @@ class GamesController < ApplicationController
   before_action :admin_user, :except => [:index]
 
   def index
-  	@games = Game.order("name ASC")
+  	@games = Game.where(:source => 'auto').order("name ASC")
   end
 
   def edit

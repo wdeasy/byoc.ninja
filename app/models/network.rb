@@ -8,7 +8,7 @@ class Network < ActiveRecord::Base
   def Network.location(i)
     network = Network.where(:name => 'wan').first
 
-    if i == nil
+    if i == nil || i.scan(/./).count != 3
       return network
     end
 
