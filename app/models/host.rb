@@ -479,9 +479,18 @@ class Host < ActiveRecord::Base
 
     i = 0
     hosts.each do |host|
-      if (host.port == nil || port_open(host.ip, host.port) == false)
-        Host.unpin(host)
-        i += 1
+      if host.source != "manual"
+        if host.address == nil
+          Host.unpin(host)
+          i += 1
+        else
+          info = Host.get_server_info(host.address)
+
+          if host.port == nil || info["query_port"] == nil
+            Host.unpin(host)
+            i += 1
+          end
+        end
       end
     end
 
@@ -501,3 +510,6 @@ class Host < ActiveRecord::Base
     false
   end
 end
+
+
+
