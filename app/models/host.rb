@@ -474,7 +474,7 @@ class Host < ActiveRecord::Base
   end
 
   def Host.cleanup_pins
-    hosts = Host.where(:pin => true, :source => 'auto')
+    hosts = Host.where(:pin => true)
     puts "Cleaning up #{hosts.count} pins."
 
     i = 0
@@ -510,6 +510,3 @@ class Host < ActiveRecord::Base
     false
   end
 end
-
-
-
