@@ -1,12 +1,12 @@
 <tr>
   <td class="text-left longtext" title="<%= host.game.name %>">
-    <%= host.game.link ? (link_to host.game.name, host.game.link, {:target => "_blank"}) : host.game.name %>
+    <%= host.game.link.blank? ? host.game.name : (link_to host.game.name, host.game.link, {:target => "_blank"}) %>
   </td>
   <td class="text-center longtext">
     <%= flags(host).html_safe %>
   </td>
-  <td class="text-left longtext" title="<%= (host.name.blank? && host.lobby) ? "#{decolor_name(display_name(host.users.first))}'s Lobby" : decolor_name(host.name) %>">    
-    <%= (host.name.blank? && host.lobby) ? color_name("#{display_name(host.users.first)}'s Lobby") : color_name(host.name) %>
+  <td class="text-left longtext" title="<%= (host.name.blank? && host.lobby) ? "#{display_name(host.users.first)}'s Lobby" : host.name %>">    
+    <%= (host.name.blank? && host.lobby) ? "#{display_name(host.users.first)}'s Lobby" : host.name %>
   </td>
   <td class="text-right">
     <%= host.players %>
@@ -17,16 +17,18 @@
       <%= link_to host.users.size, '#', :class => 'dropdown-toggle', :'data-toggle' => 'dropdown' %>
       <ul class="dropdown-menu">
         <% host.users.each do |user| %>
-          <li><%= link_to color_name(display_name(user)), user.url, :target => '_blank' %></li>
+          <li><%= link_to display_name(user), user.url, :target => '_blank' %></li>
         <% end %>
       </ul>
       </div>
+    <% elsif host.users.size < 1 && !host.players.blank? %>
+      0
     <% end %>
   </td>
   <td class="text-left longtext" title="<%= host.map %>">
     <%= host.map %>
   </td>
   <td class="text-right">
-    <%= host.source == "auto" ? (link_to (host.address ? host.address : "Join Lobby") , host.link) : host.address %>
+    <%= host.game.appid? ? (link_to (host.address ? host.address : "Join Lobby") , host.link) : host.address %>
   </td>
 </tr>

@@ -8,13 +8,16 @@
 		  <%= render 'shared/error_messages', object: f.object %>
 
 		  <%= f.label :game %>
-		  <%= f.text_field :game_name, class: 'form-control' %>
+		  <%= f.collection_select :game_id, Game.all, :id, :name, {:include_blank => false},{:class => 'form-control'} %>
 
 		  <%= f.label :name %>
 		  <%= f.text_field :name, class: 'form-control' %>
 
 		  <%= f.label :address %>
 		  <%= f.text_field :address, class: 'form-control' %>
+
+		  <%= f.label :network %>
+		  <%= f.collection_select :network_id, Network.all, :id, :name_cidr, {:include_blank => false},{:class => 'form-control'} %>
 
 		  <%= f.submit "Save changes", class: "btn btn-50 btn-primary pull-left" %>
 		  <%= link_to "Back", messages_url, class: "btn btn-50 btn-primary pull-right" %>

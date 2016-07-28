@@ -16,6 +16,9 @@
 	  <%= f.label :pin %>
 	  <%= f.select :pin, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
 
+	  <%= f.label :source %>
+	  <%= f.select :source, [['auto','auto'],['manual','manual']], {},{:class => 'form-control'} %>
+
 	  <%= f.label :address %>
 	  <%= f.text_field :address, class: 'form-control', :readonly => true %>
 

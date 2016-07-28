@@ -9,8 +9,6 @@ class Host < ActiveRecord::Base
   has_many :users
   has_many :seats, :through => :users
 
-  attr_accessor :game_name
-
   serialize :flags
 
   def as_json(options={})
@@ -45,15 +43,22 @@ class Host < ActiveRecord::Base
 
     if player["gameserverip"]
       i, p        = player["gameserverip"].split(':')
+      valid_ip    = Network.valid_ip(i)
       port        = p.to_i
-      info        = Host.get_server_info(player["gameserverip"])
-      query_port  = info["query_port"]
-      network     = Network.location(i)
+      if valid_ip == true
+        info        = Host.get_server_info(player["gameserverip"])
+        network     = Network.location(i)
+        query_port  = info["query_port"]
+      else
+        query_port  = nil
+        network     = Network.location(nil)
+      end
     else
       i           = nil
       port        = nil
       query_port  = nil
       network     = Network.location(nil)
+      valid_ip    = true      
     end
 
     link        = link(player)    
@@ -71,20 +76,25 @@ class Host < ActiveRecord::Base
       :address    => address,
       :lobby      => lobby,
       :link       => link,
-      :steamid    => steamid,
-      :source     => "auto"
+      :steamid    => steamid
     )
 
     if host.banned == false && ['banned','private'].exclude?(host.network.name) && host.port != 0
-      if host.query_port != nil
-        update_server_info(host)
-      end
+      if host.respond == false && host.last_successful_query != Time.at(0) && host.last_successful_query < (Time.now - 1.hour) && host.source != 'manual'
+      else
+        if host.lobby == nil && valid_ip == false
+        else
+          if host.query_port != nil && valid_ip == true
+            update_server_info(host)
+          end
 
-      host.update_attributes(
-        :flags => flags(host),
-        :updated => true,
-        :visible => true
-      )
+          host.update_attributes(
+            :flags => flags(host),
+            :updated => true,
+            :visible => true
+          )
+        end
+      end
     end   
     
     return host.id  
@@ -134,7 +144,7 @@ class Host < ActiveRecord::Base
 
     #is the server responding to queries?
     if host.respond == false && host.last_successful_query != Time.at(0)
-      flags['Last Query Attempt Failed'] = true  
+      flags['Last Query Attempt Failed'] = true
     end 
 
     #server was manually added
@@ -167,40 +177,45 @@ class Host < ActiveRecord::Base
   end
 
   def Host.update_server_info(host)
-    server = Host.query_host(host.ip, host.query_port)
+    if host.last_successful_query == Time.at(0) || host.last_successful_query < (Time.now - 1.minute)
+      server = Host.query_host(host.ip, host.query_port)
 
-    if server != nil
-      name = (server.server_info[:server_name] && host.auto_update == true) ? server.server_info[:server_name] :  host.name
-      map = (server.server_info[:map_name] && host.auto_update == true) ? server.server_info[:map_name] : host.name
-      current = server.server_info[:number_of_players] ? server.server_info[:number_of_players] : host.current
-      max = server.server_info[:max_players] ? server.server_info[:max_players] : host.max
-      password = server.server_info[:password_needed] ? server.server_info[:password_needed] : host.password
+      if server != nil
+        name = (server.server_info[:server_name] && host.auto_update == true) ? server.server_info[:server_name] :  host.name
+        map = (server.server_info[:map_name] && host.auto_update == true) ? server.server_info[:map_name] : host.name
+        current = server.server_info[:number_of_players] ? server.server_info[:number_of_players] : host.current
+        max = server.server_info[:max_players] ? server.server_info[:max_players] : host.max
+        password = server.server_info[:password_needed] ? server.server_info[:password_needed] : host.password
 
-      host.update_attributes(
-        :name => name,
-        :map => map,
-        :current => current,
-        :max => max,
-        :players => players(current, max),
-        :password => password,
-        :respond => true,
-        :last_successful_query => Time.now
-      )
-    else
-      host.update_attributes(
-        :respond => false
-      )
+        host.update_attributes(
+          :name => User.decolor_name(name),
+          :map => map,
+          :current => current,
+          :max => max,
+          :players => players(current, max),
+          :password => password,
+          :respond => true,
+          :last_successful_query => Time.now
+        )
+
+        if host.game.queryable == false
+          host.game.update_attributes(
+            :queryable => true
+          )      
+        end
+      else
+        host.update_attributes(
+          :respond => false
+        )
+      end      
     end
   end
 
   def Host.players(current, max)
     players = ''
 
-    if max.blank?
-    else
-      if !current.blank? && current > 0
-        players << "#{current.to_s}/#{max}"
-      end
+    if !current.blank? && !max.blank?
+      players << "#{current.to_s}/#{max}"
     end
 
     return players
@@ -329,8 +344,10 @@ class Host < ActiveRecord::Base
       j += 1    
     end
 
+    Host.update_pins
+    
     if x == 0
-      Host.where(:updated => false).where(:pin => false).update_all(:visible => false)
+      Host.where(:updated => false).update_all(:visible => false)
       User.where(:updated => false).update_all(:host_id => nil)
     end
 
@@ -392,7 +409,7 @@ class Host < ActiveRecord::Base
                   query_port = p.to_i
                   address = "#{ip}:#{port}"
                   
-                  game_id = Game.update(server["appid"])
+                  game_id = Game.update(server["appid"],server["gamedir"])
                   host = Host.where(address: address).first_or_create
 
                   host.update_attributes(
@@ -425,17 +442,22 @@ class Host < ActiveRecord::Base
     puts "Checking #{hosts.count} pins."
 
     hosts.each do |host|
-      if port_open(host.ip, host.port)
+      if host.address != nil || host.source = 'manual'
         player = {}
         player["gameserverip"] = host.address
 
         Host.update(player, host.game_id)
+      end
+
+      if (host.address == nil || (host.respond == false && host.last_successful_query < (Time.now - 1.hour) && host.last_successful_query != Time.at(0))) && host.source != 'manual'
+        Host.unpin(host)
       end
     end
   end
 
   def Host.pin(host)
     if host.pin == false
+      puts "Pinning #{host.ip}:#{host.query_port}" 
       host.update_attributes(
         :pin => true
       )
@@ -444,6 +466,7 @@ class Host < ActiveRecord::Base
 
   def Host.unpin(host)
     if host.pin == true
+      puts "Unpinning #{host.ip}:#{host.query_port}"
       host.update_attributes(
         :pin => false
       )
@@ -476,21 +499,5 @@ class Host < ActiveRecord::Base
     end
   rescue Timeout::Error
     false
-  end
-
-  def self.manual_add(host)
-    host.game_id     = Game.where(name: host.game_name).first_or_create.id
-
-    i, p             = host.address.split(':')
-    host.ip          = i
-    host.port        = p.to_i
-    host.network_id  = Network.location(i).id
-    host.pin         = true
-    host.visible     = true
-    host.updated     = true
-    host.source      = "manual"    
-    host.flags       = flags(host)
-
-    return host
   end
 end

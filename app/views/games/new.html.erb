@@ -1,0 +1,23 @@
+<% provide(:title, "New Game")  %>
+<div class="jumbotron">
+<h3 class="center">Add Game</h3>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+	<%= form_for(@game) do |f| %>
+	  <%= render 'shared/error_messages', object: f.object %>
+
+	  <%= f.label :appid %>
+	  <%= f.text_field :appid, class: 'form-control' %>
+
+	  <%= f.label :name %>
+	  <%= f.text_field :name, class: 'form-control' %>
+
+	  <%= f.label :link %>
+	  <%= f.text_field :link, class: 'form-control' %>
+
+	  <%= f.submit "Save changes", class: "btn btn-50 btn-primary pull-left" %>
+	  <%= link_to "Back", groups_url, class: "btn btn-50 btn-primary pull-right" %>
+	<% end %>
+  </div>
+</div>
+</div>

@@ -85,5 +85,5 @@ class Game < ActiveRecord::Base
     end
 
     return page
-  end  
+  end
 end

@@ -17,7 +17,13 @@ class HostsController < ApplicationController
 
   def create
     @host = Host.new(add_params)
-    @host = Host.manual_add(@host)
+    @host.pin = true
+    @host.visible = true
+    @host.updated = true
+    @host.source = 'manual'
+    flags = {}
+    flags['Manually Added'] = true
+    @host.flags = flags
 
     if @host.save
       flash[:success] = "Host added."
@@ -48,11 +54,11 @@ class HostsController < ApplicationController
 
   private
     def add_params
-      params.require(:host).permit(:network_id, :address, :flags, :source, :game_name, :name, :pin)
+      params.require(:host).permit(:game_id, :network_id, :address, :source, :name, :pin, :visible, :updated, :flags)
     end
 
     def host_params
-      params.require(:host).permit(:banned, :auto_update, :name, :map, :query_port, :network_id, :last_successful_query, :pin)
+      params.require(:host).permit(:banned, :auto_update, :name, :map, :query_port, :network_id, :last_successful_query, :pin, :source)
     end
 
     # Confirms a logged-in user.

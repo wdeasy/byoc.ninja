@@ -5,10 +5,24 @@ class Network < ActiveRecord::Base
     "#{name} -- #{cidr}"
   end
 
+  def Network.valid_ip(i)
+    if i == nil
+      return false
+    end
+
+    begin
+      cidr = NetAddr::CIDR.create("#{i}/24")
+      return true
+    rescue NetAddr::ValidationError
+      puts "#{i} is not a valid ip."
+      return false
+    end
+  end
+
   def Network.location(i)
     network = Network.where(:name => 'wan').first
 
-    if i == nil || i.scan(/./).count != 3
+    if i == nil
       return network
     end
 

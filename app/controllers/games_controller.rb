@@ -4,6 +4,8 @@ class GamesController < ApplicationController
 
   def index
   	@games = Game.where(:source => 'auto').order("name ASC")
+    @games = Game.where(:source => 'manual').order("name ASC") if params[:manual].present?
+    @games = Game.all.order("name ASC") if params[:all].present?
   end
 
   def edit
@@ -20,7 +22,33 @@ class GamesController < ApplicationController
     end
   end
 
+  def new
+    @game = Game.new
+  end
+
+  def create
+    @game = Game.new(add_params)
+    @game.source = 'manual'
+
+    if @game.save
+      flash[:success] = "Game added."
+      redirect_to games_url
+    else
+      render 'new'
+    end
+  end
+
+  def destroy
+    Game.find_by_id(params[:id]).destroy
+    flash[:success] = "Game deleted"
+    redirect_to games_url
+  end
+
   private
+    def add_params
+      params.require(:game).permit(:appid, :name, :link, :source)
+    end
+
     def game_params
       params.require(:game).permit(:name, :joinable)
     end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160430203548) do
+ActiveRecord::Schema.define(version: 20160724184926) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,13 +19,14 @@ ActiveRecord::Schema.define(version: 20160430203548) do
   create_table "games", force: :cascade do |t|
     t.integer  "appid"
     t.string   "name"
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
     t.string   "link"
     t.string   "image"
     t.string   "info"
     t.boolean  "joinable",   default: true
     t.string   "source"
+    t.boolean  "queryable",  default: false, null: false
   end
 
   add_index "games", ["appid"], name: "index_games_on_appid", unique: true, using: :btree
@@ -66,7 +67,7 @@ ActiveRecord::Schema.define(version: 20160430203548) do
     t.string   "players"
     t.integer  "game_id"
     t.integer  "network_id"
-    t.string   "source"
+    t.string   "source",                          default: "auto",                null: false
     t.integer  "steamid",               limit: 8
     t.boolean  "pin",                             default: false
   end
