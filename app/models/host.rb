@@ -49,7 +49,7 @@ class Host < ActiveRecord::Base
         case
         when host.query_port == nil,       
             host.game_id != nil && (host.game_id != host.game.id),
-            host.last_successful_query != Time.at(0) && host.last_successful_query < (Time.now - 1.hour)
+            host.last_successful_query < 1.hour.ago 
           info        = Host.get_server_info(player["gameserverip"])
           query_port  = info["query_port"]
         else
@@ -87,14 +87,16 @@ class Host < ActiveRecord::Base
     )
 
     case
-    when host.banned == true,
-        ['banned','private'].include?(host.network.name),
-        host.port == 0,
-        host.last_successful_query != Time.at(0) && host.last_successful_query < (Time.now - 1.hour) && host.source != 'manual',
-        host.lobby == nil && valid_ip == false
-      puts "This host does not qualify to be visible."
+    when host.banned == true
+      puts "host is banned"
+    when ['banned','private'].include?(host.network.name)
+      puts "network is #{host.network.name}"
+    when host.port == 0
+      puts "host port is 0"
+    when host.lobby == nil && valid_ip == false
+      puts "host address is invalid"
     else
-      if host.query_port != nil && valid_ip == true
+      if host.ip != nil && host.query_port != nil && valid_ip == true
         update_server_info(host)
       end
 
@@ -185,7 +187,7 @@ class Host < ActiveRecord::Base
   end
 
   def Host.update_server_info(host)
-    if host.last_successful_query == Time.at(0) || host.last_successful_query < (Time.now - 1.minute)
+    if host.last_successful_query < 1.minute.ago
       server = Host.query_host(host.ip, host.query_port)
 
       if server != nil
@@ -215,7 +217,9 @@ class Host < ActiveRecord::Base
         host.update_attributes(
           :respond => false
         )
-      end      
+      end
+    else
+      puts "host was queried less than a minute ago"      
     end
   end
 
@@ -317,6 +321,14 @@ class Host < ActiveRecord::Base
                 end
                 
                 if game_id != nil
+                  if player["gameserverip"] != nil && player["lobbysteamid"] != nil
+                    puts "user: #{player["personaname"]}, server: #{player["gameserverip"]}, lobby: #{player["lobbysteamid"]}"
+                  elsif player["gameserverip"] != nil
+                    puts "user: #{player["personaname"]}, server: #{player["gameserverip"]}"
+                  else
+                    puts "user: #{player["personaname"]}, lobby: #{player["lobbysteamid"]}"
+                  end
+
                   host_id = Host.update(player, game_id)
                   User.update(player, host_id)
                   u += 1
@@ -331,14 +343,6 @@ class Host < ActiveRecord::Base
                     if !lobbies.include? player["lobbysteamid"]
                       lobbies.push(player["lobbysteamid"])
                     end
-                  end
-
-                  if player["gameserverip"] != nil && player["lobbysteamid"] != nil
-                    puts "user: #{player["personaname"]}, server: #{player["gameserverip"]}, lobby: #{player["lobbysteamid"]}"
-                  elsif player["gameserverip"] != nil
-                    puts "user: #{player["personaname"]}, server: #{player["gameserverip"]}"
-                  else
-                    puts "user: #{player["personaname"]}, lobby: #{player["lobbysteamid"]}"
                   end
                 end               
               end
