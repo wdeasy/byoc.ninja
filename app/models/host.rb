@@ -219,7 +219,7 @@ class Host < ActiveRecord::Base
         )
       end
     else
-      puts "host was queried less than a minute ago"      
+      puts "host was queried less than a minute ago. Last query: #{host.last_successful_query} One minute ago: #{1.minute.ago}"      
     end
   end
 
@@ -462,7 +462,7 @@ class Host < ActiveRecord::Base
         Host.update(player, host.game_id)
       end
 
-      if (host.address == nil || (host.respond == false && host.last_successful_query < (Time.now - 1.hour) && host.last_successful_query != Time.at(0))) && host.source != 'manual'
+      if (host.address == nil || (host.respond == false && host.last_successful_query < 1.hour.ago)) && host.source != 'manual'
         Host.unpin(host)
       end
     end
