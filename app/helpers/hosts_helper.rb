@@ -24,7 +24,7 @@ module HostsHelper
 			end
 
 			if host.flags['Manually Added']
-				html << '<span class="glyphicon glyphicon-pencil" title="Manually Added"></span>'
+				html << '<span class="glyphicon glyphicon-pushpin" title="Pinned"></span>'
 			end
 
 		end

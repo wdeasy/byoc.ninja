@@ -131,9 +131,6 @@ class Host < ActiveRecord::Base
       if ["quakecon", "qcon"].any? { |q| host.name.downcase.include? q }   
         flags['Quakecon in Host Name'] = true
         Host.pin(host)
-      elsif host.flags != nil && host.flags['Quakecon in Host Name'] == true      
-        flags['Quakecon in Host Name'] = false
-        Host.unpin(host)        
       end 
     end
 
@@ -159,7 +156,7 @@ class Host < ActiveRecord::Base
     #hosted in byoc
     if host.network.name == "byoc"
       flags['Hosted in BYOC'] = true
-      Host.pin(host)  
+      Host.pin(host)
     end
 
     #password protected
@@ -468,14 +465,30 @@ class Host < ActiveRecord::Base
 
     hosts.each do |host|
       puts "#{host.address}"
-      if host.address != nil || host.source = 'manual'
+      visible = false
+
+      if host.source == 'manual'
+        visible = true
+      else
+        case
+        when host.address == nil
+          puts "host address is nil"
+        when host.respond == false && host.last_successful_query < 1.hour.ago
+          puts "host hasn't responded in an hour"
+        when host.flags == nil,
+            host.flags['Hosted in BYOC'] == nil && host.flags['Quakecon in Host Name'] == nil
+          puts "host is no longer flagged"
+        else
+          visible = true
+        end        
+      end
+
+      if visible == true
         player = {}
         player["gameserverip"] = host.address
 
         Host.update(player, host.game_id)
-      end
-
-      if (host.address == nil || (host.respond == false && host.last_successful_query < 1.hour.ago)) && host.source != 'manual'
+      else
         Host.unpin(host)
       end
     end
