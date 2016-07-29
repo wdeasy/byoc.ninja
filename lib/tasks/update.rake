@@ -2,10 +2,10 @@ namespace :update do
 
   desc "Queries host information from steam groups"
   task :hosts => :environment do
-  	beginning = start_time
-  	puts Host.update_hosts
-  	finish_time(beginning)
-  	system("touch /tmp/finished")
+    beginning = start_time
+    puts Host.update_hosts
+    finish_time(beginning)
+    system("touch /tmp/finished")
   end
 
   desc "Update byoc seat information args[file,year]"
@@ -13,8 +13,8 @@ namespace :update do
     beginning = start_time
     file = args.file
     year = args.year    
-  	puts Seat.update_seats(file,year)
-	  finish_time(beginning) 	
+    puts Seat.update_seats(file,year)
+    finish_time(beginning) 	
   end
 
   desc "Search byoc ip range for hosts"
@@ -22,6 +22,7 @@ namespace :update do
     beginning = start_time
     Host.update_byoc
     finish_time(beginning)
+    system("touch /tmp/byoc")
   end
 
   desc "Update pins"
@@ -30,7 +31,6 @@ namespace :update do
     Host.update_pins
     finish_time(beginning)
   end
-
 
   def start_time
   	beginning = Time.now

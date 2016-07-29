@@ -46,9 +46,16 @@ class Host < ActiveRecord::Base
       valid_ip    = Network.valid_ip(i)
       port        = p.to_i
       if valid_ip == true
-        info        = Host.get_server_info(player["gameserverip"])
-        network     = Network.location(i)
-        query_port  = info["query_port"]
+        case
+        when host.query_port == nil,       
+            host.game_id != nil && (host.game_id != host.game.id),
+            host.last_successful_query != Time.at(0) && host.last_successful_query < (Time.now - 1.hour)
+          info        = Host.get_server_info(player["gameserverip"])
+          query_port  = info["query_port"]
+        else
+          query_port  = host.query_port
+        end
+        network     = Network.location(i)        
       else
         query_port  = nil
         network     = Network.location(nil)
@@ -79,23 +86,24 @@ class Host < ActiveRecord::Base
       :steamid    => steamid
     )
 
-    if host.banned == false && ['banned','private'].exclude?(host.network.name) && host.port != 0
-      if host.respond == false && host.last_successful_query != Time.at(0) && host.last_successful_query < (Time.now - 1.hour) && host.source != 'manual'
-      else
-        if host.lobby == nil && valid_ip == false
-        else
-          if host.query_port != nil && valid_ip == true
-            update_server_info(host)
-          end
-
-          host.update_attributes(
-            :flags => flags(host),
-            :updated => true,
-            :visible => true
-          )
-        end
+    case
+    when host.banned == true,
+        ['banned','private'].include?(host.network.name),
+        host.port == 0,
+        host.last_successful_query != Time.at(0) && host.last_successful_query < (Time.now - 1.hour) && host.source != 'manual',
+        host.lobby == nil && valid_ip == false
+      puts "This host does not qualify to be visible."
+    else
+      if host.query_port != nil && valid_ip == true
+        update_server_info(host)
       end
-    end   
+
+      host.update_attributes(
+        :flags => flags(host),
+        :updated => true,
+        :visible => true
+      )      
+    end
     
     return host.id  
   end
@@ -442,6 +450,7 @@ class Host < ActiveRecord::Base
     puts "Checking #{hosts.count} pins."
 
     hosts.each do |host|
+      puts "#{host.address}"
       if host.address != nil || host.source = 'manual'
         player = {}
         player["gameserverip"] = host.address

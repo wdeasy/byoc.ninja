@@ -29,6 +29,11 @@ class UsersController < ApplicationController
   end
 
   def seat
+    if cookies.signed[:hidden_message_ids].blank? || cookies.signed[:hidden_message_ids].include?("1")
+      ids = [1, *cookies.signed[:hidden_message_ids]]
+      cookies.permanent.signed[:hidden_message_ids] = ids 
+    end
+
     @seats = Seat.where(:year => Date.today.year).order("seat asc")
     if params[:link].present?
       @user = User.update_seat(params[:user][:seat_id],params[:url])
