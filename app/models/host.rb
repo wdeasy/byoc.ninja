@@ -219,7 +219,7 @@ class Host < ActiveRecord::Base
         )
       end
     else
-      puts "host was queried less than a minute ago. Last query: #{host.last_successful_query} One minute ago: #{1.minute.ago}"      
+      puts "host was queried less than a minute ago"      
     end
   end
 
