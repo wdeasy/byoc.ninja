@@ -48,7 +48,7 @@ class Host < ActiveRecord::Base
       if valid_ip == true
         case
         when host.query_port == nil,       
-            host.game_id != nil && (host.game_id != host.game.id),
+            host.game_id != nil && host.game_id != host.game.id,
             host.last_successful_query < 1.hour.ago 
           info        = Host.get_server_info(player["gameserverip"])
           query_port  = info["query_port"]
@@ -86,16 +86,28 @@ class Host < ActiveRecord::Base
       :steamid    => steamid
     )
 
-    case
-    when host.banned == true
-      puts "host is banned"
-    when ['banned','private'].include?(host.network.name)
-      puts "network is #{host.network.name}"
-    when host.port == 0
-      puts "host port is 0"
-    when host.lobby == nil && valid_ip == false
-      puts "host address is invalid"
+    visible = false
+
+    if host.source == 'manual'
+      visible = true
     else
+      case
+      when host.banned == true
+        puts "host is banned"
+      when ['banned','private'].include?(host.network.name)
+        puts "network is #{host.network.name}"
+      when host.port == 0
+        puts "host port is 0"
+      when host.lobby == nil && valid_ip == false
+        puts "host address is invalid"
+      when host.respond == false && host.last_successful_query < 1.hour.ago && host.users_count < 2
+        puts "host is not responding"
+      else
+        visible = true
+      end
+    end
+
+    if visible == true
       if host.ip != nil && host.query_port != nil && valid_ip == true
         update_server_info(host)
       end
@@ -104,9 +116,9 @@ class Host < ActiveRecord::Base
         :flags => flags(host),
         :updated => true,
         :visible => true
-      )      
+      ) 
     end
-    
+
     return host.id  
   end
 
@@ -118,7 +130,10 @@ class Host < ActiveRecord::Base
       #if host.name.downcase.include? "quakecon"
       if ["quakecon", "qcon"].any? { |q| host.name.downcase.include? q }   
         flags['Quakecon in Host Name'] = true
-        Host.pin(host)       
+        Host.pin(host)
+      elsif host.flags != nil && host.flags['Quakecon in Host Name'] == true      
+        flags['Quakecon in Host Name'] = false
+        Host.unpin(host)        
       end 
     end
 
@@ -137,7 +152,7 @@ class Host < ActiveRecord::Base
         if flags['BYOC Player in Game']
         else
           flags['BYOC Player in Game'] = true  
-        end       
+        end
       end
     end
 
@@ -153,7 +168,7 @@ class Host < ActiveRecord::Base
     end
 
     #is the server responding to queries?
-    if host.respond == false && host.last_successful_query != Time.at(0)
+    if host.respond == false
       flags['Last Query Attempt Failed'] = true
     end 
 
@@ -213,13 +228,11 @@ class Host < ActiveRecord::Base
             :queryable => true
           )      
         end
-      else
+      elsif host.last_successful_query != Time.at(0)
         host.update_attributes(
           :respond => false
         )
       end
-    else
-      puts "host was queried less than a minute ago"      
     end
   end
 
@@ -431,7 +444,7 @@ class Host < ActiveRecord::Base
                     :port       => port,
                     :address    => address,
                     :pin        => true,
-                    :source     => "scan"
+                    :source     => "byoc"
                   )
                   puts "Found a #{host.game.name} host at #{address}."                
                 end
