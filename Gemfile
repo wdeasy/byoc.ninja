@@ -31,7 +31,7 @@ group :development do
 end
 
 group :production, :test do
-  gem 'rails_12factor', '0.0.2'
+  #gem 'rails_12factor', '0.0.2'
   gem 'whenever', :require => false
 end
 

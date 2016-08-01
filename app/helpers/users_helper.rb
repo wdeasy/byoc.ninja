@@ -14,12 +14,15 @@ module UsersHelper
 
     user.seats.each do |seat|
       if seat.year == Date.today.year
-        name = "[#{user.seats.first.seat}] #{user.seats.first.handle}"
+        name = "[#{user.seats.first.seat}]"
+        if !user.seats.first.handle.blank?
+          name << " #{user.seats.first.handle}"
+        end
       end
     end    
 
     length = name.scan(/\^[1-8]/).count*2+25
-    return name[0..length]
+    return decolor_name(name[0..length])
   end
 
   def color_name(name)
@@ -44,20 +47,5 @@ module UsersHelper
     end
 
     return sanitize name, :tags => %w(font), :attributes => %w(color)
-  end
-
-  def decolor_name(name)
-    if name
-      name.gsub!("^1","") 
-      name.gsub!("^2","")
-      name.gsub!("^3","")
-      name.gsub!("^4","")
-      name.gsub!("^5","")
-      name.gsub!("^6","")
-      name.gsub!("^7","")
-      name.gsub!("^8","") 
-    end
-
-    return name
-  end  
+  end 
 end

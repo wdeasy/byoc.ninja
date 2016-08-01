@@ -10,7 +10,7 @@ class User < ActiveRecord::Base
 
     if user.auto_update == true
       user.update_attributes(
-        :name => decolor_name(player["personaname"]),
+        :name => player["personaname"],
         :url => player["profileurl"],
         :avatar => player["avatar"],
         :host_id => host_id,
@@ -25,21 +25,6 @@ class User < ActiveRecord::Base
 
     Host.reset_counters(host_id, :users)     
   end
-
-  def User.decolor_name(name)
-    if name
-      name.gsub!("^1","") 
-      name.gsub!("^2","")
-      name.gsub!("^3","")
-      name.gsub!("^4","")
-      name.gsub!("^5","")
-      name.gsub!("^6","")
-      name.gsub!("^7","")
-      name.gsub!("^8","") 
-    end
-
-    return name
-  end 
 
   def User.url_cleanup(url)
     if url.include? "steamcommunity.com"

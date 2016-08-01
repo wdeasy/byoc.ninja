@@ -30,5 +30,44 @@ module HostsHelper
 		end
 
 		return html		
-	end		
+	end
+
+	def link(host)
+		if host.game.link?
+			link_to decolor_name(host.game.name), host.game.link, {:target => "_blank"}
+		else
+			decolor_name(host.game.name)
+		end
+	end
+
+	def name(host)
+		if host.name.blank? && host.lobby
+			"#{display_name(host.users.first)}'s Lobby"
+		else
+			decolor_name(host.name)
+	  end
+	end
+
+  def join(host)
+    if host.game.appid
+    	link_to (host.address ? host.address : "Join Lobby") , host.link
+    else
+      host.address
+    end
+  end
+
+  def decolor_name(name)
+    if name
+      name.gsub!("^1","") 
+      name.gsub!("^2","")
+      name.gsub!("^3","")
+      name.gsub!("^4","")
+      name.gsub!("^5","")
+      name.gsub!("^6","")
+      name.gsub!("^7","")
+      name.gsub!("^8","") 
+    end
+
+    return strip_tags(name)
+  end   
 end

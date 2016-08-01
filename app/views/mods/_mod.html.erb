@@ -1,0 +1,11 @@
+  <tr class="row">
+      <td class="text-left"><%= link_to mod.id, edit_mod_path(mod) %></td>      
+      <td class="text-center longtext">
+      <% if mod.name%>
+        <%= link_to mod.name, edit_mod_path(mod) %>
+      <% else %>
+        need a name
+      <% end %>
+      </td>
+      <td class="text-right"><%= link_to mod.info, edit_mod_path(mod) %></td>
+  </tr>

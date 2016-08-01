@@ -209,16 +209,16 @@ class Host < ActiveRecord::Base
         max = server.server_info[:max_players] ? server.server_info[:max_players] : host.max
         password = server.server_info[:password_needed] ? server.server_info[:password_needed] : host.password
 
-        host.update_attributes(
-          :name => User.decolor_name(name),
-          :map => map,
-          :current => current,
-          :max => max,
-          :players => players(current, max),
-          :password => password,
-          :respond => true,
-          :last_successful_query => Time.now
-        )
+          host.update_attributes(
+            :name => valid_name(name),
+            :map => valid_name(map),
+            :current => current,
+            :max => max,
+            :players => players(current, max),
+            :password => password,
+            :respond => true,
+            :last_successful_query => Time.now
+          )
 
         if host.game.queryable == false
           host.game.update_attributes(
@@ -548,4 +548,11 @@ class Host < ActiveRecord::Base
   rescue Timeout::Error
     false
   end
+
+  def Host.valid_name(name)
+    if !name.valid_encoding?
+      name = name.encode("UTF-16be", :invalid=>:replace, :replace=>"").encode('UTF-8')
+    end
+    return name
+  end  
 end

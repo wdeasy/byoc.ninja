@@ -7,8 +7,8 @@
         <% end %>      
 	      <% if game.link %>
 	      	<%= link_to game.name, game.link %>
-	      <% else %>
-	      	<% game.name %>
+        <% else %>
+	      	<%= game.name %>
 	      <% end %>
         <% if game.joinable == false%>
           [unable to join]

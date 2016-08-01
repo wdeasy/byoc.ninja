@@ -4,7 +4,7 @@ class GamesController < ApplicationController
 
   def index
   	@games = Game.where(:source => 'auto').order("name ASC")
-    @games = Game.where(:source => 'manual').order("name ASC") if params[:manual].present?
+    @games = Game.order("name ASC") if params[:manual].present?
     @games = Game.all.order("name ASC") if params[:all].present?
   end
 

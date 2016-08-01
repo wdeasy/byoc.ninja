@@ -8,7 +8,7 @@
 		  <%= render 'shared/error_messages', object: f.object %>
 
 		  <%= f.label :game %>
-		  <%= f.collection_select :game_id, Game.all, :id, :name, {:include_blank => false},{:class => 'form-control'} %>
+		  <%= f.collection_select :game_id, Game.all.order('name ASC'), :id, :name, {:include_blank => false},{:class => 'form-control'} %>
 
 		  <%= f.label :name %>
 		  <%= f.text_field :name, class: 'form-control' %>
