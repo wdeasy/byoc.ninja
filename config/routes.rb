@@ -13,10 +13,15 @@ Rails.application.routes.draw do
   get       'settings'            => 'users#edit'
   get       'seats'               => 'seats#index'
   get       'seats/update'        => 'seats#update'
-  get       'json'                => 'hosts#json'
 
-  get       'logs/update_hosts'                => 'logs#update_hosts'
-  get       'logs/update_seats'                => 'logs#update_seats'
+  #take this one out in a future update
+  get       'json'                => 'hosts#json'
+  
+  get       'api/hosts'           => 'hosts#json'
+  get       'api/seats'           => 'seats#json'
+
+  get       'logs/update_hosts'   => 'logs#update_hosts'
+  get       'logs/update_seats'   => 'logs#update_seats'
 
   get        'seat'               => 'users#seat'
   match      'messages/:id/hide', to: 'messages#hide', as: 'hide_message', via: [:get, :post]

@@ -1,10 +1,29 @@
 class Seat < ActiveRecord::Base
   has_and_belongs_to_many :users
+  has_many :hosts, :through => :users
+  has_many :games, :through => :hosts
 
   #scope :current_year, -> (user) { includes(:users).where(year: Date.today.year, users: {user: user})}
 
   require 'open-uri'
   require 'json'
+
+  def as_json(options={})
+   super(:only => [:seat, :clan, :handle],
+      :include => {
+        :users => {:only => [:url],
+          :include => { 
+            :host => {:only => [:link],
+              :include => {
+                :game => {:only => [:name]
+                }
+              }
+            }
+          }
+        }          
+      }
+    )
+  end
 
   def Seat.update(info)
   	seat = Seat.where(seat: info["seat"], year: info["year"]).first_or_create
