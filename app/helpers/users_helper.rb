@@ -21,8 +21,12 @@ module UsersHelper
       end
     end    
 
-    length = name.scan(/\^[1-8]/).count*2+25
-    return decolor_name(name[0..length])
+    if name.blank?
+      return user.steamid
+    else
+      length = name.scan(/\^[1-8]/).count*2+25
+      return decolor_name(name[0..length])
+    end
   end
 
   def color_name(name)
