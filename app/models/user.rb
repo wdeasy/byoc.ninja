@@ -23,7 +23,9 @@ class User < ActiveRecord::Base
       )  
     end  
 
-    Host.reset_counters(host_id, :users)     
+    if host_id != nil
+      Host.reset_counters(host_id, :users)
+    end     
   end
 
   def User.url_cleanup(url)
@@ -98,6 +100,7 @@ class User < ActiveRecord::Base
         user.update_attributes(
           :seat_ids => seat_id
         )
+        User.fill(steamid)
         return "You're linked to #{seat}!"
       else
         return response
@@ -109,5 +112,21 @@ class User < ActiveRecord::Base
 
   def User.lookup(steamid)
     user = User.where(steamid: steamid).first_or_create
+  end
+
+  def User.fill(steamid)
+    string = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{ENV['STEAM_WEB_API_KEY']}&steamids=#{steamid}"
+
+    begin
+      parsed = JSON.parse(open(string).read)
+    rescue => e
+      puts "JSON failed to parse #{string}"
+    end
+
+    if parsed != nil
+      parsed["response"]["players"].each do |player|
+        User.update(player, nil)
+      end
+    end
   end
 end

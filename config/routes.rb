@@ -13,9 +13,6 @@ Rails.application.routes.draw do
   get       'settings'            => 'users#edit'
   get       'seats'               => 'seats#index'
   get       'seats/update'        => 'seats#update'
-
-  #take this one out in a future update
-  get       'json'                => 'hosts#json'
   
   get       'api/hosts'           => 'hosts#json'
   get       'api/seats'           => 'seats#json'
