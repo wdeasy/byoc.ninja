@@ -3,7 +3,7 @@ class GamesController < ApplicationController
   before_action :admin_user, :except => [:index]
 
   def index
-  	@games = Game.where(:source => 'auto').order("name ASC")
+  	@games = Game.where(:source => 'auto', :supported => true).order("name ASC")
     @games = Game.where(:source => 'manual').order("name ASC") if params[:manual].present?
     @games = Game.all.order("name ASC") if params[:all].present?
   end
@@ -46,11 +46,11 @@ class GamesController < ApplicationController
 
   private
     def add_params
-      params.require(:game).permit(:appid, :name, :link, :source)
+      params.require(:game).permit(:appid, :name, :link, :source, :supported)
     end
 
     def game_params
-      params.require(:game).permit(:name, :joinable)
+      params.require(:game).permit(:name, :joinable, :supported)
     end
 
     # Confirms a logged-in user.

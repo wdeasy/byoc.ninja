@@ -297,6 +297,7 @@ class Host < ActiveRecord::Base
     j = 0
     u = 0
     x = 0
+    n = 0
 
     servers = []
     lobbies = []
@@ -325,22 +326,26 @@ class Host < ActiveRecord::Base
 
                 if player["gameid"].length > 7
                   #gameids over length 7 are mods
-                  game_id = Mod.update(player)
+                  game_id = Mod.update(player, true)
                 else
-                  game_id = Game.update(player["gameid"],player["gameextrainfo"])                  
+                  game_id = Game.update(player["gameid"],player["gameextrainfo"], true)                  
                 end
                 
                 if game_id != nil
                   if player["gameserverip"] != nil && player["lobbysteamid"] != nil
-                    puts "user: #{player["personaname"]}, server: #{player["gameserverip"]}, lobby: #{player["lobbysteamid"]}"
+                    puts "user: #{player["personaname"]}, #{player["gameextrainfo"]}"
+                    puts "-> server: #{player["gameserverip"]}"
+                    puts "-> server: #{player["lobbysteamid"]}"
                   elsif player["gameserverip"] != nil
-                    puts "user: #{player["personaname"]}, server: #{player["gameserverip"]}"
+                    puts "user: #{player["personaname"]}, #{player["gameextrainfo"]}"
+                    puts "-> server: #{player["gameserverip"]}"
                   else
-                    puts "user: #{player["personaname"]}, lobby: #{player["lobbysteamid"]}"
+                    puts "user: #{player["personaname"]}, #{player["gameextrainfo"]}"
+                    puts "-> server: #{player["lobbysteamid"]}" 
                   end
 
                   host_id = Host.update(player, game_id)
-                  User.update(player, host_id)
+                  User.update(player, host_id, game_id)
                   u += 1
 
                   if player["gameserverip"] != nil
@@ -355,6 +360,22 @@ class Host < ActiveRecord::Base
                     end
                   end
                 end               
+              end 
+            elsif player["gameid"] != nil
+              user = User.lookup(player["steamid"])
+              if user != nil && user.banned == false && user.display == true
+                if player["gameid"].length > 7
+                  #gameids over length 7 are mods
+                  game_id = Mod.update(player, false)
+                else
+                  game_id = Game.update(player["gameid"],player["gameextrainfo"], false)                  
+                end
+                
+                if game_id != nil
+                  puts "user: #{player["personaname"]}, #{player["gameextrainfo"]}"                  
+                  User.update(player, nil, game_id)
+                  n += 1
+                end
               end
             end 
           end
@@ -371,9 +392,10 @@ class Host < ActiveRecord::Base
     if x == 0
       Host.where(:updated => false).update_all(:visible => false)
       User.where(:updated => false).update_all(:host_id => nil)
+      User.where(:updated => false).update_all(:game_id => nil)      
     end
 
-    return "Processed #{j} steam ids. Found #{u} users in #{servers.count} servers and #{lobbies.count} lobbies."    
+    return "Processed #{j} steam ids. \nFound #{u} users in #{servers.count} servers and #{lobbies.count} lobbies. \nFound #{n} users in non-joinable games."    
   end
 
   def self.get_server_info(address)
@@ -431,7 +453,7 @@ class Host < ActiveRecord::Base
                   query_port = p.to_i
                   address = "#{ip}:#{port}"
                   
-                  game_id = Game.update(server["appid"],server["gamedir"])
+                  game_id = Game.update(server["appid"],server["gamedir"], true)
                   host = Host.where(address: address).first_or_create
 
                   host.update_attributes(

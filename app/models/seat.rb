@@ -13,12 +13,8 @@ class Seat < ActiveRecord::Base
       :include => {
         :users => {:only => [:url],
           :include => { 
-            :host => {:only => [:link],
-              :include => {
-                :game => {:only => [:name]
-                }
-              }
-            }
+            :host => {:only => [:link]},
+            :game => {:only => [:name]}
           }
         }          
       }

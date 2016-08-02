@@ -2,20 +2,28 @@ class Game < ActiveRecord::Base
   require 'open-uri'
 
   has_many :hosts
-  has_many :mods  
+  has_many :mods
+  has_many :users  
 
-  def Game.update(appid, info)
+  def Game.update(appid, info, supported)
     game = Game.where(appid: appid).first_or_create do |game|
       name = name_from_appid(appid)
 
       game.name = name
       game.info = info
       game.source = "auto"
+      game.supported = supported
 
       if name.exclude? "Source SDK"
          game.link = "http://store.steampowered.com/app/#{appid}"
          game.image = "http://cdn.akamai.steamstatic.com/steam/apps/#{appid}/header.jpg"
       end
+    end
+
+    if supported == true && game.supported == false
+      game.update_attributes(
+        :supported => true
+      )
     end
 
     return game.id
