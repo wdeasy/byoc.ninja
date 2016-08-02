@@ -114,7 +114,6 @@ class User < ActiveRecord::Base
 
   def User.lookup(steamid)
     user = User.where(steamid: steamid).first_or_create
-    #user = User.joins("LEFT JOIN seats_users ON user.id = seats_users.user_id").joins("LEFT JOIN seats ON seat.id = seats_users.seat_id").where(steamid: steamid).first_or_create
   end
 
   def User.fill(steamid)
