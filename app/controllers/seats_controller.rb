@@ -16,7 +16,6 @@ class SeatsController < ApplicationController
   end
 
   def json
-    #@seats = Host.includes(:game, :users, :seats).where(visible: true).where("games.joinable = true").order("games.name ASC, users_count DESC, hosts.current IS NULL, hosts.current DESC, hosts.name DESC")
     @seats = Seat.joins(:seats_users, :users).joins("LEFT JOIN hosts ON hosts.id = users.host_id").joins("LEFT JOIN games ON games.id = hosts.game_id").order("seats.seat ASC")   
     render :json => @seats
   end
