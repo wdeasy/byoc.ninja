@@ -93,15 +93,15 @@ class Host < ActiveRecord::Base
     else
       case
       when host.banned == true
-        puts "host is banned"
+        puts "Host is banned"
       when ['banned','private'].include?(host.network.name)
-        puts "network is #{host.network.name}"
+        puts "Network is #{host.network.name}"
       when host.port == 0
-        puts "host port is 0"
+        puts "Host port is 0"
       when host.lobby == nil && valid_ip == false
-        puts "host address is invalid"
+        puts "Host address is invalid"
       when host.respond == false && host.last_successful_query < 1.hour.ago && host.users_count < 2
-        puts "host is not responding"
+        puts "Host is not responding"
       else
         visible = true
       end
@@ -193,7 +193,7 @@ class Host < ActiveRecord::Base
       end
 
     rescue SteamCondenser::TimeoutError, Errno::ECONNREFUSED
-      puts "unable to query #{ip}:#{query_port}"      
+      puts "Unable to query #{ip}:#{query_port}"      
       return nil
     end     
   end
@@ -280,7 +280,7 @@ class Host < ActiveRecord::Base
       end 
     end
 
-    puts "#{l} steamids from linked seats"
+    puts "#{l} steamids from linked seats not in groups, #{linked_users.count} total"
 
     return steamids
   end
@@ -288,7 +288,7 @@ class Host < ActiveRecord::Base
   def Host.update_hosts
     steamids = gather_steamids
 
-    return "no steam ids to process." if steamids.empty?
+    return "No steam ids to process" if steamids.empty?
 
     Host.update_all(:updated => false)
     User.update_all(:updated => false)
@@ -340,14 +340,14 @@ class Host < ActiveRecord::Base
                   end
                 end
 
-                puts "user: #{player["personaname"]}, #{player["gameextrainfo"]}"
+                puts "User: #{player["personaname"]}, #{player["gameextrainfo"]}"
                 if player["gameserverip"] != nil && player["lobbysteamid"] != nil                    
-                  puts "-> server: #{player["gameserverip"]}"
-                  puts "-> server: #{player["lobbysteamid"]}"
+                  puts "-> Server: #{player["gameserverip"]}"
+                  puts "-> Lobby: #{player["lobbysteamid"]}"
                 elsif player["gameserverip"] != nil
-                  puts "-> server: #{player["gameserverip"]}"
+                  puts "-> Server: #{player["gameserverip"]}"
                 elsif player["lobbysteamid"] != nil
-                  puts "-> server: #{player["lobbysteamid"]}"
+                  puts "-> Lobby: #{player["lobbysteamid"]}"
                 end
 
                 if player["gameserverip"] != nil || player["lobbysteamid"] != nil
@@ -389,10 +389,10 @@ class Host < ActiveRecord::Base
       User.where(:updated => false).update_all(:game_id => nil)      
     end
 
-    puts "Processed #{j} steam ids."
-    puts "Found #{u+n} users in games."
-    puts "Found #{u} users in #{servers.count} servers and #{lobbies.count} lobbies."
-    puts "Found #{n} users in non-joinable games."   
+    puts "Processed #{j} steam ids"
+    puts "Found #{u+n} users in games"
+    puts "Found #{u} users in #{servers.count} servers and #{lobbies.count} lobbies"
+    puts "Found #{n} users in non-joinable games"   
   end
 
   def self.get_server_info(address)
@@ -431,7 +431,7 @@ class Host < ActiveRecord::Base
   def Host.update_byoc
     Network.where(:name => 'byoc').each do |range|
       if !range.cidr.blank?
-        puts "searching range #{range.cidr}"
+        puts "Searching range #{range.cidr}"
         cidr = NetAddr::CIDR.create(range.cidr)
         i = 0  
 
@@ -462,7 +462,7 @@ class Host < ActiveRecord::Base
                     :pin        => true,
                     :source     => "byoc"
                   )
-                  puts "Found a #{host.game.name} host at #{address}."                
+                  puts "Found a #{host.game.name} host at #{address}"                
                 end
               end
             end
@@ -480,7 +480,7 @@ class Host < ActiveRecord::Base
   def Host.update_pins
     #pins are hosts that are allowed to stay up even when member count is zero.
     hosts = Host.where(:pin => true, :updated => false)
-    puts "Checking #{hosts.count} pins."
+    puts "Checking #{hosts.count} pins"
 
     hosts.each do |host|
       puts "#{host.address}"
@@ -491,12 +491,12 @@ class Host < ActiveRecord::Base
       else
         case
         when host.address == nil
-          puts "host address is nil"
+          puts "Host address is nil"
         when host.respond == false && host.last_successful_query < 1.hour.ago
-          puts "host hasn't responded in an hour"
+          puts "Host hasn't responded in an hour"
         when host.flags == nil,
             host.flags['Hosted in BYOC'] == nil && host.flags['Quakecon in Host Name'] == nil
-          puts "host is no longer flagged"
+          puts "Host is no longer flagged"
         else
           visible = true
         end        
@@ -533,7 +533,7 @@ class Host < ActiveRecord::Base
 
   def Host.cleanup_pins
     hosts = Host.where(:pin => true)
-    puts "Cleaning up #{hosts.count} pins."
+    puts "Cleaning up #{hosts.count} pins"
 
     i = 0
     hosts.each do |host|
@@ -552,7 +552,7 @@ class Host < ActiveRecord::Base
       end
     end
 
-    puts "Removed #{i} pins."
+    puts "Removed #{i} pins"
   end
 
   def self.port_open(ip, port, seconds=1)
