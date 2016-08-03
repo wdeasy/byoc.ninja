@@ -34,14 +34,16 @@ module UsersHelper
     if name
       carets = name.scan(/\^[1-8]/).count
       if carets > 0
+        name.gsub!("^^0","<font color=\"black\">")
+        name.gsub!("^0","<font color=\"black\">")         
         name.gsub!("^1","<font color=\"red\">") 
         name.gsub!("^2","<font color=\"green\">")
         name.gsub!("^3","<font color=\"yellow\">")
         name.gsub!("^4","<font color=\"blue\">")
         name.gsub!("^5","<font color=\"lightblue\">")
         name.gsub!("^6","<font color=\"magent\">")
-        name.gsub!("^7","<font color=\"black\">")
-        name.gsub!("^8","<font color=\"black\">")
+        name.gsub!("^7","<font color=\"white\">")
+        name.gsub!("^8","<font color=\"orange\">")
 
         for i in 0..carets
           pos = (name.rindex("'s Lobby") ? name.rindex("'s Lobby") : -1)

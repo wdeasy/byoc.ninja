@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160724184926) do
+ActiveRecord::Schema.define(version: 20160802060650) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(version: 20160724184926) do
     t.boolean  "joinable",   default: true
     t.string   "source"
     t.boolean  "queryable",  default: false, null: false
+    t.boolean  "supported",  default: true,  null: false
   end
 
   add_index "games", ["appid"], name: "index_games_on_appid", unique: true, using: :btree
@@ -128,6 +129,7 @@ ActiveRecord::Schema.define(version: 20160724184926) do
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
     t.integer  "host_id"
+    t.integer  "game_id"
   end
 
   add_index "users", ["host_id"], name: "index_users_on_host_id", using: :btree

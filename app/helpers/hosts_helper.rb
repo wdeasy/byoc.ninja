@@ -49,7 +49,7 @@ module HostsHelper
 	end
 
   def join(host)
-    if host.game.appid
+    if host.game.supported == true
     	link_to (host.address ? host.address : "Join Lobby") , host.link
     else
       host.address
@@ -58,6 +58,8 @@ module HostsHelper
 
   def decolor_name(name)
     if name
+      name.gsub!("^^0","")
+      name.gsub!("^0","") 
       name.gsub!("^1","") 
       name.gsub!("^2","")
       name.gsub!("^3","")

@@ -2,9 +2,10 @@ class User < ActiveRecord::Base
   require 'open-uri'
 
   belongs_to :host, counter_cache: true
-  has_and_belongs_to_many :seats 
+  has_and_belongs_to_many :seats
+  belongs_to :game 
 
-  def User.update(player, host_id)
+  def User.update(player, host_id, game_id)
 
     user = User.find_by_steamid(player["steamid"])
 
@@ -14,6 +15,7 @@ class User < ActiveRecord::Base
         :url => player["profileurl"],
         :avatar => player["avatar"],
         :host_id => host_id,
+        :game_id => game_id,
         :updated => true
       )
     else
@@ -125,7 +127,7 @@ class User < ActiveRecord::Base
 
     if parsed != nil
       parsed["response"]["players"].each do |player|
-        User.update(player, nil)
+        User.update(player, nil, nil)
       end
     end
   end

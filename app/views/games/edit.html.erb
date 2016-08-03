@@ -31,6 +31,9 @@
 	  <%= f.label :queryable %>
 	  <%= f.select :queryable, [['yes',true],['no',false]], {},{:class => 'form-control', :readonly => true, :disabled => true} %>
 
+	  <%= f.label :supported %>
+	  <%= f.select :supported, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+
 	  <%= f.submit "Save changes", class: "btn btn-33 btn-primary pull-left" %>
 	  <%= link_to "Delete", @game, method: :delete, data: { confirm: "You sure?" }, class: "btn btn-33 btn-primary" %>	  
 	  <%= link_to "Back", games_url, class: "btn btn-33 btn-primary pull-right" %>
