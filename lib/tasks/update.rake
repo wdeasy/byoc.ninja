@@ -3,7 +3,7 @@ namespace :update do
   desc "Queries host information from steam groups"
   task :hosts => :environment do
     beginning = start_time
-    puts Host.update_hosts
+    Host.update_hosts
     finish_time(beginning)
     system("touch /tmp/finished")
   end
@@ -13,7 +13,7 @@ namespace :update do
     beginning = start_time
     file = args.file
     year = args.year    
-    puts Seat.update_seats(file,year)
+    Seat.update_seats(file,year)
     finish_time(beginning) 	
   end
 

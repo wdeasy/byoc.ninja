@@ -44,8 +44,8 @@ class Seat < ActiveRecord::Base
       year = Date.today.year
     end
 
-    puts "file: #{file}"
-    puts "year: #{year}"
+    puts "File: #{file}"
+    puts "Year: #{year}"
 
     begin
       parsed = JSON.parse(open(file).read)
@@ -95,12 +95,22 @@ class Seat < ActiveRecord::Base
            "year" => year
            }
 
-      puts "#{info['seat']} #{info['clan']} #{info['handle']}"
+      #puts "#{info['seat']} #{info['clan']} #{info['handle']}"
+
+      line = "#{info['seat']}"
+      if info['clan']
+        line << " #{info['clan']}"
+      end
+      if info['handle']
+        line << " #{info['handle']}"
+      end
+      puts line
+
       Seat.update(info)
       i+=1
     end
     Seat.where(:updated => false, :year => year).update_all(:handle => nil, :clan => nil)
 
-    return "processed #{i} seats."  
+    puts "Processed #{i} seats"  
   end
 end
