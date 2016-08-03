@@ -320,63 +320,57 @@ class Host < ActiveRecord::Base
 
         if parsed != nil
           parsed["response"]["players"].each do |player|
-            if player["gameserverip"] != nil || player["lobbysteamid"] != nil
+            if player["gameid"] != nil
               user = User.lookup(player["steamid"])
               if user.banned == false && user.display == true
 
-                if player["gameid"].length > 7
-                  #gameids over length 7 are mods
-                  game_id = Mod.update(player, true)
-                else
-                  game_id = Game.update(player["gameid"],player["gameextrainfo"], true)                  
-                end
-                
-                if game_id != nil
-                  if player["gameserverip"] != nil && player["lobbysteamid"] != nil
-                    puts "user: #{player["personaname"]}, #{player["gameextrainfo"]}"
-                    puts "-> server: #{player["gameserverip"]}"
-                    puts "-> server: #{player["lobbysteamid"]}"
-                  elsif player["gameserverip"] != nil
-                    puts "user: #{player["personaname"]}, #{player["gameextrainfo"]}"
-                    puts "-> server: #{player["gameserverip"]}"
+                if player["gameserverip"] != nil || player["lobbysteamid"] != nil
+                  if player["gameid"].length > 7
+                    #gameids over length 7 are mods
+                    game_id = Mod.update(player, true)
                   else
-                    puts "user: #{player["personaname"]}, #{player["gameextrainfo"]}"
-                    puts "-> server: #{player["lobbysteamid"]}" 
+                    game_id = Game.update(player["gameid"],player["gameextrainfo"], true)                  
                   end
+                else
+                  if player["gameid"].length > 7
+                    #gameids over length 7 are mods
+                    game_id = Mod.update(player, false)
+                  else
+                    game_id = Game.update(player["gameid"],player["gameextrainfo"], false)                  
+                  end
+                end
 
+                puts "user: #{player["personaname"]}, #{player["gameextrainfo"]}"
+                if player["gameserverip"] != nil && player["lobbysteamid"] != nil                    
+                  puts "-> server: #{player["gameserverip"]}"
+                  puts "-> server: #{player["lobbysteamid"]}"
+                elsif player["gameserverip"] != nil
+                  puts "-> server: #{player["gameserverip"]}"
+                elsif player["lobbysteamid"] != nil
+                  puts "-> server: #{player["lobbysteamid"]}"
+                end
+
+                if player["gameserverip"] != nil || player["lobbysteamid"] != nil
                   host_id = Host.update(player, game_id)
                   User.update(player, host_id, game_id)
-                  u += 1
-
-                  if player["gameserverip"] != nil
-                    if !servers.include? player["gameserverip"]
-                      servers.push(player["gameserverip"])
-                    end
-                  end
-
-                  if player["lobbysteamid"] != nil
-                    if !lobbies.include? player["lobbysteamid"]
-                      lobbies.push(player["lobbysteamid"])
-                    end
-                  end
-                end               
-              end 
-            elsif player["gameid"] != nil
-              user = User.lookup(player["steamid"])
-              if user != nil && user.banned == false && user.display == true
-                if player["gameid"].length > 7
-                  #gameids over length 7 are mods
-                  game_id = Mod.update(player, false)
+                  u += 1                  
                 else
-                  game_id = Game.update(player["gameid"],player["gameextrainfo"], false)                  
-                end
-                
-                if game_id != nil
-                  puts "user: #{player["personaname"]}, #{player["gameextrainfo"]}"                  
                   User.update(player, nil, game_id)
                   n += 1
                 end
-              end
+                
+                if player["gameserverip"] != nil
+                  if !servers.include? player["gameserverip"]
+                    servers.push(player["gameserverip"])
+                  end
+                end
+
+                if player["lobbysteamid"] != nil
+                  if !lobbies.include? player["lobbysteamid"]
+                    lobbies.push(player["lobbysteamid"])
+                  end
+                end          
+              end 
             end 
           end
         end
@@ -395,7 +389,10 @@ class Host < ActiveRecord::Base
       User.where(:updated => false).update_all(:game_id => nil)      
     end
 
-    return "Processed #{j} steam ids. \nFound #{u} users in #{servers.count} servers and #{lobbies.count} lobbies. \nFound #{n} users in non-joinable games."    
+    puts "Processed #{j} steam ids."
+    puts "Found #{u+n} users in games."
+    puts "Found #{u} users in #{servers.count} servers and #{lobbies.count} lobbies."
+    puts "Found #{n} users in non-joinable games."   
   end
 
   def self.get_server_info(address)
