@@ -34,7 +34,6 @@ module UsersHelper
     if name
       carets = name.scan(/\^[1-8]/).count
       if carets > 0
-        name.gsub!("^^0","<font color=\"black\">")
         name.gsub!("^0","<font color=\"black\">")         
         name.gsub!("^1","<font color=\"red\">") 
         name.gsub!("^2","<font color=\"green\">")
