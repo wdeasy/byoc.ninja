@@ -504,8 +504,8 @@ class Host < ActiveRecord::Base
         when host.flags == nil,
             host.flags['Hosted in BYOC'] == nil && host.flags['Quakecon in Host Name'] == nil
           puts "Host is no longer flagged"
-        when hosts.network.name == "byoc" && host.last_successful_query == Time.at(0)
-          puts "Host has 0 users and has never been queried."
+        when host.last_successful_query == Time.at(0)
+          puts "Host has no users and has never been queried."
         else
           visible = true
         end        
