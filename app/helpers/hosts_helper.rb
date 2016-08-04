@@ -58,7 +58,6 @@ module HostsHelper
 
   def decolor_name(name)
     if name
-      name.gsub!("^^0","")
       name.gsub!("^0","") 
       name.gsub!("^1","") 
       name.gsub!("^2","")

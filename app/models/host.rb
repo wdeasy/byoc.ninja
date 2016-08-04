@@ -101,9 +101,7 @@ class Host < ActiveRecord::Base
       when host.lobby == nil && valid_ip == false
         puts "Host address is invalid"
       when host.respond == false && host.last_successful_query < 1.hour.ago && host.users_count < 2
-        puts "Host is not responding"
-      when host.last_successful_query == Time.at(0) && host.game.queryable == true
-        puts "Host probably isnt joinable"        
+        puts "Host is not responding"     
       else
         visible = true
       end
@@ -498,9 +496,7 @@ class Host < ActiveRecord::Base
           puts "Host hasn't responded in an hour"
         when host.flags == nil,
             host.flags['Hosted in BYOC'] == nil && host.flags['Quakecon in Host Name'] == nil
-          puts "Host is no longer flagged"
-        when host.last_successful_query == Time.at(0) && host.game.queryable == true
-          puts "Host probably isnt joinable"           
+          puts "Host is no longer flagged"       
         else
           visible = true
         end        
