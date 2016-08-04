@@ -9,6 +9,9 @@ rake cleanup:pins removes pins from unreachable hosts
 
 ### Here are the quick and dirty instructions to get this up and running: ###
 
+install git
+> sudo apt-get install git
+
 clone this repo. in this example i have it cloned in ~/Development/qcon_steam_browser
 
 > git clone https://github.com/wdeasy/qcon_steam_browser.git ~/Development/qcon_steam_browser
@@ -24,6 +27,7 @@ create the qconservers role in postgres
 >psql  
 >create role usergoeshere with createdb login password 'passgoeshere';  
 >\q
+>exit
 
 edit postgres config to allow md5 auth for local
 > sudo nano /etc/postgresql/9.X/main/pg_hba.conf
@@ -41,14 +45,15 @@ to
 create default gemset and bundle install
 > cd ~/Development/qcon_steam_browser  
 > rvm gemset create qcon_steam_browser  
-> rvm use ruby-2.2.1@qcon_steam_browser --default  
+> rvm use ruby-2.X.X@qcon_steam_browser --default
+> gem install bundler  
 > bundle install
 
 create environment variables
 >sudo nano ~/.profile
 
 >export STEAM_WEB_API_KEY="steam web api key"  
->export SECRET_KEY_BASE="passenger secret key base"
+>export SECRET_KEY_BASE="passenger secret key base"  
 >export HOSTNAME="localhost"  
 >export DATABASE="database name"  
 >export USERNAME="database user"  
@@ -58,6 +63,9 @@ create environment variables
 >export EMAIL_USERNAME="gmail username"  
 >export EMAIL_PASSWORD="gmail password"  
 >export GA_CODE="google analytics code"   
+
+source the file to enable the new environment variables  
+>source ~/.profile
 
 edit db/seeds.rb and add your admin users and groups  
 the group_list array needs group steam id, group steam name and group url  
