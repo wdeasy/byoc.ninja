@@ -52,8 +52,10 @@ class Host < ActiveRecord::Base
             host.last_successful_query < 1.hour.ago 
           info        = Host.get_server_info(player["gameserverip"])
           query_port  = info["query_port"]
+          lan         = info["lan"]
         else
           query_port  = host.query_port
+          lan         = nil
         end
         network     = Network.location(i)        
       else
@@ -73,6 +75,7 @@ class Host < ActiveRecord::Base
     address     = player["gameserverip"] ? player["gameserverip"] : nil
     steamid     = player["gameserversteamid"] ? player["gameserversteamid"] : nil
     query_port  = (host.query_port != nil && query_port == nil) ? host.query_port : query_port
+    lan         = (host.lan != nil && lan == nil) ? host.lan : lan
 
     host.update_attributes(
       :game_id    => game_id,
@@ -83,7 +86,8 @@ class Host < ActiveRecord::Base
       :address    => address,
       :lobby      => lobby,
       :link       => link,
-      :steamid    => steamid
+      :steamid    => steamid,
+      :lan        => lan
     )
 
     visible = false
@@ -101,7 +105,9 @@ class Host < ActiveRecord::Base
       when host.lobby == nil && valid_ip == false
         puts "Host address is invalid"
       when host.respond == false && host.last_successful_query < 1.hour.ago && host.users_count < 2
-        puts "Host is not responding"     
+        puts "Host is not responding"       
+      when host.lan == true && host.network.name != "byoc"  
+        puts "Host is a lan game outside of quakecon"
       else
         visible = true
       end
@@ -414,6 +420,7 @@ class Host < ActiveRecord::Base
               info["query_port"] = po.to_i
               info["gamedir"] = server["gamedir"]
               info["appid"] = server["appid"]
+              info["lan"] = server["lan"]
               info["respond"] = true
             end 
           end
@@ -496,7 +503,9 @@ class Host < ActiveRecord::Base
           puts "Host hasn't responded in an hour"
         when host.flags == nil,
             host.flags['Hosted in BYOC'] == nil && host.flags['Quakecon in Host Name'] == nil
-          puts "Host is no longer flagged"       
+          puts "Host is no longer flagged"
+        when hosts.network.name == "byoc" && host.last_successful_query == Time.at(0)
+          puts "Host has 0 users and has never been queried."
         else
           visible = true
         end        
