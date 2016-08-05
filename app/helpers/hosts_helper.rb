@@ -40,13 +40,17 @@ module HostsHelper
 		end
 	end
 
-	def name(host)
-		if host.name.blank? && host.lobby
-			"#{display_name(host.users.first)}'s Lobby"
-		else
-			decolor_name(host.name)
+  def name(host)
+	if host.name.blank? && host.lobby
+	  if host.users_count > 0
+	    "#{display_name(host.users.first)}'s Lobby"
+	  else
+	    "#{host.game.name} Lobby"
 	  end
+	else
+      decolor_name(host.name)
 	end
+  end
 
   def join(host)
     if host.game.supported == true
