@@ -499,13 +499,11 @@ class Host < ActiveRecord::Base
         case
         when host.address == nil
           puts "Host address is nil"
-        when host.respond == false && host.last_successful_query < 1.hour.ago
+        when host.last_successful_query < 1.hour.ago
           puts "Host hasn't responded in an hour"
         when host.flags == nil,
             host.flags['Hosted in BYOC'] == nil && host.flags['Quakecon in Host Name'] == nil
           puts "Host is no longer flagged"
-        when host.last_successful_query == Time.at(0)
-          puts "Host has no users and has never been queried."
         else
           visible = true
         end        
