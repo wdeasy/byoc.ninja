@@ -5,13 +5,13 @@
     <%= link_to "How it works", how_it_works_path %> |
     <%= link_to 'Link your seat', seat_path %> |
     <%= link_to "Games", games_path %> |
-    Source available on <%= link_to "GitHub", "https://github.com/wdeasy/qcon_steam_browser", :target => "_blank" %>
+    Source available on <%= link_to "GitHub", "https://github.com/wdeasy/byoc.ninja", :target => "_blank" %>
 </div>
   <div class="pull-right">
     This site is not affiliated with Valve or Steam. |
-    <%= link_to "Powered by Steam", "http://steampowered.com" %> | 
-    <%= link_to "Privacy Policy", privacy_policy_path %> | 
-    <%= link_to "Contact", new_contact_path %>                
+    <%= link_to "Powered by Steam", "http://steampowered.com" %> |
+    <%= link_to "Privacy Policy", privacy_policy_path %> |
+    <%= link_to "Contact", new_contact_path %>
   </div>
   </small>
   </div>
@@ -26,4 +26,4 @@
   ga('create', '<%= ENV["GA_CODE"] %>', 'auto');
   ga('send', 'pageview');
 
-</script>  
+</script>

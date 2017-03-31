@@ -12,8 +12,11 @@ gem 'turbolinks',           '2.3.0'
 gem 'jbuilder',             '2.2.3'
 gem 'sdoc',                 '0.4.0', group: :doc
 gem 'nokogiri'
+gem 'puma'
 gem 'capistrano', '~> 3.3.0'
-gem 'capistrano-rbenv', github: "capistrano/rbenv"
+#gem 'capistrano-rbenv', github: "capistrano/rbenv"
+gem 'capistrano-rvm'
+gem 'capistrano3-puma'
 gem 'capistrano-rails', '~> 1.1.1'
 gem 'capistrano-bundler', '~> 1.1.2'
 gem 'therubyracer'
@@ -34,4 +37,3 @@ group :production, :test do
   #gem 'rails_12factor', '0.0.2'
   gem 'whenever', :require => false
 end
-

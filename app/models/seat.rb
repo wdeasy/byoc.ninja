@@ -12,11 +12,11 @@ class Seat < ActiveRecord::Base
    super(:only => [:seat, :clan, :handle],
       :include => {
         :users => {:only => [:url],
-          :include => { 
+          :include => {
             :host => {:only => [:link]},
             :game => {:only => [:name]}
           }
-        }          
+        }
       }
     )
   end
@@ -37,7 +37,7 @@ class Seat < ActiveRecord::Base
 
   def Seat.update_seats(file,year)
     if file == nil
-      file = "https://app.seats.io/api/event/3a0fe5eb-64c2-4dc4-88a1-c1d61e25e066/live-2016/objects/statuses"
+      file = ENV["SEAT_API_URL"]
     end
 
     if year == nil
@@ -84,7 +84,7 @@ class Seat < ActiveRecord::Base
             handle = "Reserved"
           end
           if obj["extraData"]["clan"]
-            clan = obj["extraData"]["clan"] 
+            clan = obj["extraData"]["clan"]
           end
         end
       end
@@ -111,6 +111,6 @@ class Seat < ActiveRecord::Base
     end
     Seat.where(:updated => false, :year => year).update_all(:handle => nil, :clan => nil)
 
-    puts "Processed #{i} seats"  
+    puts "Processed #{i} seats"
   end
 end
