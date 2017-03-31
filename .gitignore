@@ -19,3 +19,6 @@
 # Ignore deploy files
 /config/deploy.rb
 /config/deploy/*
+/config/puma.rb
+/shared
+/shared/*
