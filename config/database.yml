@@ -17,11 +17,11 @@ default: &default
 development:
   adapter: postgresql
   encoding: unicode
-  database: <%= ENV["DATABASE"] %>
-  server: <%= ENV["HOSTNAME"] %>
+  database: byocninja
+  server: localhost
   pool: 5
-  username: <%= ENV["USERNAME"] %>
-  password: <%= ENV["PASSWORD"] %>
+  username: byocninja
+  password: development
 
 test:
   <<: *default

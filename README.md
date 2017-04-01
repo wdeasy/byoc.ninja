@@ -14,7 +14,7 @@ install git
 
 clone this repo. in this example i have it cloned in ~/Development/qcon_steam_browser
 
-> git clone https://github.com/wdeasy/qcon_steam_browser.git ~/Development/qcon_steam_browser
+> git clone https://github.com/wdeasy/byoc.ninja.git ~/Development/byoc.ninja
 
 install ruby on rails  
 > \curl -sSL https://get.rvm.io | bash -s stable --rails
@@ -132,8 +132,3 @@ add and save
 
 Once everything is set up, you should be able to navigate to http://qconsteambrowser.com   
 You will see the admin options in the drop down menu once you sign in through steam with the user you put in the seeds.rb file.
-
-
-
-
-
