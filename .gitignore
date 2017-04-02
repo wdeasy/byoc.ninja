@@ -18,6 +18,7 @@
 
 # Ignore deploy files
 /config/application.yml
+/config/database.yml
 /config/deploy.rb
 /config/deploy/*
 /config/puma.rb
