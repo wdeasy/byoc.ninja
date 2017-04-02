@@ -17,6 +17,7 @@
 /tmp
 
 # Ignore deploy files
+/config/application.yml
 /config/deploy.rb
 /config/deploy/*
 /config/puma.rb

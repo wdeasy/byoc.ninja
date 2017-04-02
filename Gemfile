@@ -13,10 +13,12 @@ gem 'jbuilder',             '2.2.3'
 gem 'sdoc',                 '0.4.0', group: :doc
 gem 'nokogiri'
 gem 'puma'
+gem 'figaro'
 gem 'capistrano', '~> 3.3.0'
 #gem 'capistrano-rbenv', github: "capistrano/rbenv"
 gem 'capistrano-rvm'
 gem 'capistrano3-puma'
+gem 'capistrano-figaro'
 gem 'capistrano-rails', '~> 1.1.1'
 gem 'capistrano-bundler', '~> 1.1.2'
 gem 'therubyracer'
