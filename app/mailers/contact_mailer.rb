@@ -1,6 +1,6 @@
 class ContactMailer < ActionMailer::Base
-  default from: "byoc ninja <#{ENV["EMAIL_USERNAME"]}>"
-  default to: "byoc ninja <#{ENV["EMAIL_USERNAME"]}>"
+  default from: "byoc.ninja <#{ENV["EMAIL_ADDRESS"]}>"
+  default to: "byoc.ninja <#{ENV["EMAIL_ADDRESS"]}>"
 
   def new(message)
     @message = message
