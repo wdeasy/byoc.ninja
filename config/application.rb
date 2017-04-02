@@ -32,6 +32,7 @@ module ServerBrowser
     config.action_mailer.smtp_settings = {
       address: ENV["SMTP_SERVER"],
       port: 587,
+      domain: ENV["EMAIL_DOMAIN"],
       user_name: ENV["EMAIL_USERNAME"],
       password: ENV["EMAIL_PASSWORD"],
       authentication: :login,
