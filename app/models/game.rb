@@ -3,13 +3,13 @@ class Game < ActiveRecord::Base
 
   has_many :hosts
   has_many :mods
-  has_many :users  
+  has_many :users
 
   def Game.update(appid, info, supported)
     game = Game.where(appid: appid).first_or_create do |game|
       name = name_from_appid(appid)
 
-      game.name = name
+      game.name = Host.valid_name(name)
       game.info = info
       game.source = "auto"
       game.supported = supported
@@ -44,7 +44,7 @@ class Game < ActiveRecord::Base
         if appid.to_i == app['appid'].to_i
           name = app['name']
         end
-      end       
+      end
     end
 
     return name
@@ -62,7 +62,7 @@ class Game < ActiveRecord::Base
           if name.downcase == app['name'].downcase
             appid = app['appid']
           end
-        end       
+        end
       end
     rescue => e
       puts "JSON failed to parse #{url}"
@@ -86,7 +86,7 @@ class Game < ActiveRecord::Base
     page = nil
 
     begin
-      html = open(url) 
+      html = open(url)
       page = Nokogiri::HTML(html.read)
     rescue => e
       puts "Nokogiri failed to open HTML #{url}"
