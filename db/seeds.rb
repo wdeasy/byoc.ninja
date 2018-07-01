@@ -7,10 +7,10 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
 group_list = [
-	[103582791429524812,"quakecon","http://steamcommunity.com/groups/quakecon"],
-	[103582791432330298,"Quakecon™","http://steamcommunity.com/groups/Quakecon-PeaceLoveRockets"],
-	[103582791432341478,"Quakecon Forum Wh0r3s","http://steamcommunity.com/groups/wh0r3s"],
-	[103582791434503100,"/r/Quakecon","http://steamcommunity.com/groups/rQuakecon"]
+	[103582791429524812,"quakecon","https://steamcommunity.com/groups/quakecon"],
+	[103582791432330298,"Quakecon™","https://steamcommunity.com/groups/Quakecon-PeaceLoveRockets"],
+	[103582791432341478,"Quakecon Forum Wh0r3s","https://steamcommunity.com/groups/wh0r3s"],
+	[103582791434503100,"/r/Quakecon","https://steamcommunity.com/groups/rQuakecon"]
 ]
 
 group_list.each do |steamid, name, url|
@@ -29,7 +29,7 @@ network_list.each do |name, cidr|
 	Network.create!(name: name, cidr: cidr)
 end
 
-user_list = [[76561197967593490,"|PpP| Ray Arnold","http://steamcommunity.com/id/RayArnold","http://cdn.akamai.steamstatic.com/steamcommunity/public/images/avatars/cf/cf9ad90b7219559f4259a552072e790a98befbef.jpg",true]]
+user_list = [[76561197967593490,"|PpP| Ray Arnold","https://steamcommunity.com/id/RayArnold","http://cdn.akamai.steamstatic.com/steamcommunity/public/images/avatars/cf/cf9ad90b7219559f4259a552072e790a98befbef.jpg",true]]
 
 user_list.each do |steamid, name, url, avatar, admin|
 	User.create!(steamid: steamid, name: name, url: url, avatar: avatar, admin: admin)

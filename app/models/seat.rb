@@ -11,7 +11,7 @@ class Seat < ActiveRecord::Base
   def as_json(options={})
    super(:only => [:seat, :clan, :handle],
       :include => {
-        :users => {:only => [:url],
+        :users => {:only => [:url, :name],
           :include => {
             :host => {:only => [:link]},
             :game => {:only => [:name]}
@@ -56,58 +56,38 @@ class Seat < ActiveRecord::Base
     i = 0
     Seat.where(:year => year).update_all(:updated => false)
 
-    parsed.each do |obj|
-      seat = nil
-      clan = nil
-      handle = nil
+    parsed["chart"]["subChart"]["rows"].each do |row|
+      row_letter = row["label"]
 
-      seat = obj["objectLabelOrUuid"]
-      a, b = seat.split('-')
+      row["seats"].each do |seat|
+        section = seat["categoryLabel"]
+        section.slice! "SECTION "
 
-      if a == "UAC"
-        col = "UAC"
-        row = ""
-      else
-        col = a[0]
-        a[0] = ''
-        row = "%02d" % a.to_i
-      end
-      num = "%02d" % b.to_i
+        number = seat["label"]
 
-      seat = "#{col}#{row}-#{num}"
+        seat = "#{section}-#{row_letter}-#{number}"
+        clan = nil
+        handle = nil
 
-      if obj["status"] == "booked"
-        if obj["extraData"]
-          if obj["extraData"]["alias"]
-            handle = obj["extraData"]["alias"]
-          else
-            handle = "Reserved"
-          end
-          if obj["extraData"]["clan"]
-            clan = obj["extraData"]["clan"]
-          end
+        info = { "seat"   => seat,
+             "clan"   => clan,
+             "handle" => handle,
+             "year" => year
+             }
+
+        line = "#{info['seat']}"
+        if info['clan']
+         line << " #{info['clan']}"
         end
+        if info['handle']
+         line << " #{info['handle']}"
+        end
+        puts line
+
+        Seat.update(info)
+        i+=1
+
       end
-
-      info = { "seat"   => seat,
-           "clan"   => clan,
-           "handle" => handle,
-           "year" => year
-           }
-
-      #puts "#{info['seat']} #{info['clan']} #{info['handle']}"
-
-      line = "#{info['seat']}"
-      if info['clan']
-        line << " #{info['clan']}"
-      end
-      if info['handle']
-        line << " #{info['handle']}"
-      end
-      puts line
-
-      Seat.update(info)
-      i+=1
     end
     Seat.where(:updated => false, :year => year).update_all(:handle => nil, :clan => nil)
 

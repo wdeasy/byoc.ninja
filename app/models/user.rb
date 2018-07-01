@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
 
   belongs_to :host, counter_cache: true
   has_and_belongs_to_many :seats
-  belongs_to :game 
+  belongs_to :game
 
   def User.update(player, host_id, game_id)
 
@@ -22,12 +22,12 @@ class User < ActiveRecord::Base
       user.update_attributes(
         :host_id => host_id,
         :updated => true
-      )  
-    end  
+      )
+    end
 
     if host_id != nil
       Host.reset_counters(host_id, :users)
-    end     
+    end
   end
 
   def User.url_cleanup(url)
@@ -36,7 +36,7 @@ class User < ActiveRecord::Base
         url.slice!(0..(url.index('steamcommunity.com')-1))
       end
 
-      url.prepend("http://")
+      url.prepend("https://")
 
       if url.last != "/"
         url << "/"
@@ -47,7 +47,8 @@ class User < ActiveRecord::Base
 
   def User.steamid_from_url(url)
     begin
-      html = open("#{url}?xml=1") 
+      url = url_cleanup(url)
+      html = open("#{url}?xml=1")
       doc = Nokogiri::XML(html)
 
       return doc.at_css("steamID64").text
@@ -58,8 +59,8 @@ class User < ActiveRecord::Base
 
   def User.search_summary_for_seat(steamid, seat)
     begin
-      url = "http://steamcommunity.com/profiles/#{steamid}/"
-      html = open(url) 
+      url = "https://steamcommunity.com/profiles/#{steamid}/"
+      html = open(url)
       doc = Nokogiri::HTML(html)
 
       if doc.css('div.profile_summary')
@@ -85,7 +86,7 @@ class User < ActiveRecord::Base
 
     url = User.url_cleanup(url)
 
-    unless url.start_with?('http://steamcommunity.com/id/','http://steamcommunity.com/profiles/')
+    unless url.start_with?('http://steamcommunity.com/id/','http://steamcommunity.com/profiles/','https://steamcommunity.com/id/','https://steamcommunity.com/profiles/')
       return "Please enter a valid profile URL"
     end
 
@@ -98,7 +99,7 @@ class User < ActiveRecord::Base
 
       response = search_summary_for_seat(steamid, seat)
       if response == "Match"
-        user = User.lookup(steamid) 
+        user = User.lookup(steamid)
         user.update_attributes(
           :seat_ids => seat_id
         )
@@ -107,7 +108,7 @@ class User < ActiveRecord::Base
       else
         return response
       end
-    else 
+    else
       return "Could not parse steamid from URL. Please check the url and try again."
     end
   end
@@ -117,7 +118,7 @@ class User < ActiveRecord::Base
   end
 
   def User.fill(steamid)
-    string = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{ENV['STEAM_WEB_API_KEY']}&steamids=#{steamid}"
+    string = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{ENV['STEAM_WEB_API_KEY']}&steamids=#{steamid}"
 
     begin
       parsed = JSON.parse(open(string).read)

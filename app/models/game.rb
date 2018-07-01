@@ -15,8 +15,8 @@ class Game < ActiveRecord::Base
       game.supported = supported
 
       if name.exclude? "Source SDK"
-         game.link = "http://store.steampowered.com/app/#{appid}"
-         game.image = "http://cdn.akamai.steamstatic.com/steam/apps/#{appid}/header.jpg"
+         game.link = "https://store.steampowered.com/app/#{appid}"
+         game.image = "https://cdn.akamai.steamstatic.com/steam/apps/#{appid}/header.jpg"
       end
     end
 
@@ -31,7 +31,7 @@ class Game < ActiveRecord::Base
 
   def self.name_from_appid(appid)
     name = ''
-    url = 'http://api.steampowered.com/ISteamApps/GetAppList/v0002/'
+    url = 'https://api.steampowered.com/ISteamApps/GetAppList/v0002/'
 
     begin
       parsed = JSON.parse(open(url).read)
@@ -52,7 +52,7 @@ class Game < ActiveRecord::Base
 
   def Game.appid_from_name(name)
     appid = nil
-    url = 'http://api.steampowered.com/ISteamApps/GetAppList/v0002/'
+    url = 'https://api.steampowered.com/ISteamApps/GetAppList/v0002/'
 
     begin
       parsed = JSON.parse(open(url).read)

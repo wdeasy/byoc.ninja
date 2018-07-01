@@ -8,7 +8,7 @@
 <h5><strong>What personal information do we collect?</strong></h5>
   <ul>Information is collected using the Steam Web API. This information includes your 64bit Steam Identifier, Display name, Avatar, Profile URL, and Current game.
     <br />
-    <br /><%= link_to "Steam Subscriber Agreement", "http://store.steampowered.com/subscriber_agreement/", :target => '_blank' %>
+    <br /><%= link_to "Steam Subscriber Agreement", "https://store.steampowered.com/subscriber_agreement/", :target => '_blank' %>
   </ul>
 
 <h5><strong>When do we collect information?</strong></h5>
@@ -28,7 +28,7 @@
       <ul>
       <% @groups.each do |g| %>
         <li><%= link_to g.name, g.url, :target => '_blank' %></li>
-      <% end %>  
+      <% end %>
       </ul>
     </li>
     <li><%= link_to "Sign in through Steam", "/auth/steam" %> and navigate to your byoc.ninja settings page.<br /> Change "Display game information" to no, and save.</li></ul>
@@ -52,8 +52,3 @@
 </div>
 </ul>
 </div>
-
-
-
-
-

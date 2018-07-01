@@ -15,16 +15,18 @@ module UsersHelper
     user.seats.each do |seat|
       if seat.year == Date.today.year
         name = "[#{user.seats.first.seat}]"
-        if !user.seats.first.handle.blank?
+        if user.seats.first.handle.blank?
+          name << " #{user.name}"
+        else
           name << " #{user.seats.first.handle}"
         end
       end
-    end    
+    end
 
     if name.blank?
       return user.steamid
     else
-      length = name.scan(/\^[1-8]/).count*2+25
+      length = name.scan(/\^[1-8]/).count*2+40
       return decolor_name(name[0..length])
     end
   end
@@ -34,8 +36,8 @@ module UsersHelper
     if name
       carets = name.scan(/\^[1-8]/).count
       if carets > 0
-        name.gsub!("^0","<font color=\"black\">")         
-        name.gsub!("^1","<font color=\"red\">") 
+        name.gsub!("^0","<font color=\"black\">")
+        name.gsub!("^1","<font color=\"red\">")
         name.gsub!("^2","<font color=\"green\">")
         name.gsub!("^3","<font color=\"yellow\">")
         name.gsub!("^4","<font color=\"blue\">")
@@ -48,9 +50,9 @@ module UsersHelper
           pos = (name.rindex("'s Lobby") ? name.rindex("'s Lobby") : -1)
           name.insert(pos,"</font>")
         end
-      end        
+      end
     end
 
     return sanitize name, :tags => %w(font), :attributes => %w(color)
-  end 
+  end
 end

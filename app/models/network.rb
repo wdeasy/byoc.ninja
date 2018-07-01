@@ -12,6 +12,7 @@ class Network < ActiveRecord::Base
 
     begin
       cidr = NetAddr::CIDR.create("#{i}/24")
+      #cidr = NetAddr::IPv4.parse(i)
       return true
     rescue NetAddr::ValidationError
       puts "#{i} is not a valid ip."
@@ -30,7 +31,7 @@ class Network < ActiveRecord::Base
       if !r.cidr.blank?
         cidr = NetAddr::CIDR.create(r.cidr)
 
-        if cidr.matches?(i)  
+        if cidr.matches?(i)
           network = r
 
           if network == "banned"
@@ -41,5 +42,5 @@ class Network < ActiveRecord::Base
     end
 
     return network
-  end 
+  end
 end

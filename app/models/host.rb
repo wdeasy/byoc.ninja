@@ -15,11 +15,11 @@ class Host < ActiveRecord::Base
    super(:only => [:name,:map,:users_count,:address,:lobby,:players,:flags,:link],
           :include => {
             :users => {:only => [:name, :url],
-              :include => { 
+              :include => {
                 :seats => {:only => [:seat, :clan, :handle]}
               }
             },
-            :game => {:only => [:name, :link]}            
+            :game => {:only => [:name, :link]}
           }
     )
   end
@@ -47,9 +47,9 @@ class Host < ActiveRecord::Base
       port        = p.to_i
       if valid_ip == true
         case
-        when host.query_port == nil,       
+        when host.query_port == nil,
             host.game_id != nil && host.game_id != host.game.id,
-            host.last_successful_query < 1.hour.ago 
+            host.last_successful_query < 1.hour.ago
           info        = Host.get_server_info(player["gameserverip"])
           query_port  = info["query_port"]
           lan         = info["lan"]
@@ -57,7 +57,7 @@ class Host < ActiveRecord::Base
           query_port  = host.query_port
           lan         = nil
         end
-        network     = Network.location(i)        
+        network     = Network.location(i)
       else
         query_port  = nil
         network     = Network.location(nil)
@@ -67,10 +67,10 @@ class Host < ActiveRecord::Base
       port        = nil
       query_port  = nil
       network     = Network.location(nil)
-      valid_ip    = true      
+      valid_ip    = true
     end
 
-    link        = link(player)    
+    link        = link(player)
     lobby       = player["lobbysteamid"] ? player["lobbysteamid"] : nil
     address     = player["gameserverip"] ? player["gameserverip"] : nil
     steamid     = player["gameserversteamid"] ? player["gameserversteamid"] : nil
@@ -105,8 +105,8 @@ class Host < ActiveRecord::Base
       when host.lobby == nil && valid_ip == false
         puts "Host address is invalid"
       when host.respond == false && host.last_successful_query < 1.hour.ago && host.users_count < 2
-        puts "Host is not responding"       
-      when host.lan == true && host.network.name != "byoc"  
+        puts "Host is not responding"
+      when host.lan == true && host.network.name != "byoc"
         puts "Host is a lan game outside of quakecon"
       else
         visible = true
@@ -122,10 +122,10 @@ class Host < ActiveRecord::Base
         :flags => flags(host),
         :updated => true,
         :visible => true
-      ) 
+      )
     end
 
-    return host.id  
+    return host.id
   end
 
   def Host.flags(host)
@@ -134,10 +134,10 @@ class Host < ActiveRecord::Base
     #check for quakecon in hostname
     if host.name != nil
       #if host.name.downcase.include? "quakecon"
-      if ["quakecon", "qcon"].any? { |q| host.name.downcase.include? q }   
+      if ["quakecon", "qcon"].any? { |q| host.name.downcase.include? q }
         flags['Quakecon in Host Name'] = true
         Host.pin(host)
-      end 
+      end
     end
 
     #byoc player in game
@@ -146,15 +146,15 @@ class Host < ActiveRecord::Base
         if seat.year == Date.today.year
           if flags['BYOC Player in Game']
           else
-            flags['BYOC Player in Game'] = true  
-          end              
+            flags['BYOC Player in Game'] = true
+          end
         end
       end
 
-      if ["quakecon", "qcon"].any? { |q| user.name.downcase.include? q }       
+      if ["quakecon", "qcon"].any? { |q| user.name.downcase.include? q }
         if flags['BYOC Player in Game']
         else
-          flags['BYOC Player in Game'] = true  
+          flags['BYOC Player in Game'] = true
         end
       end
     end
@@ -167,13 +167,13 @@ class Host < ActiveRecord::Base
 
     #password protected
     if host.password == true
-      flags['Password Protected'] = true  
+      flags['Password Protected'] = true
     end
 
     #is the server responding to queries?
     if host.respond == false
       flags['Last Query Attempt Failed'] = true
-    end 
+    end
 
     #server was manually added
     if host.source == "manual"
@@ -199,9 +199,9 @@ class Host < ActiveRecord::Base
       end
 
     rescue SteamCondenser::TimeoutError, Errno::ECONNREFUSED
-      puts "Unable to query #{ip}:#{query_port}"      
+      puts "Unable to query #{ip}:#{query_port}"
       return nil
-    end     
+    end
   end
 
   def Host.update_server_info(host)
@@ -229,7 +229,7 @@ class Host < ActiveRecord::Base
         if host.game.queryable == false
           host.game.update_attributes(
             :queryable => true
-          )      
+          )
         end
       elsif host.last_successful_query != Time.at(0)
         host.update_attributes(
@@ -259,9 +259,9 @@ class Host < ActiveRecord::Base
     g = 0
     groups.each do |group|
       begin
-        doc = Nokogiri::XML(open("http://steamcommunity.com/gid/#{group.steamid.to_s}/memberslistxml/?xml=1"))
+        doc = Nokogiri::XML(open("https://steamcommunity.com/gid/#{group.steamid.to_s}/memberslistxml/?xml=1"))
       rescue => e
-        puts "Nokogiri failed to open XML http://steamcommunity.com/gid/#{group.steamid.to_s}/memberslistxml/?xml=1"
+        puts "Nokogiri failed to open XML https://steamcommunity.com/gid/#{group.steamid.to_s}/memberslistxml/?xml=1"
       end
 
       if doc != nil
@@ -269,8 +269,8 @@ class Host < ActiveRecord::Base
           if !steamids.include? steamid.text
             steamids << steamid.text
             g += 1
-          end 
-        end     
+          end
+        end
       end
     end
 
@@ -283,7 +283,7 @@ class Host < ActiveRecord::Base
       if !steamids.include? linked_user.steamid.to_s
         steamids << linked_user.steamid.to_s
         l += 1
-      end 
+      end
     end
 
     puts "#{l} steamids from linked seats not in groups, #{linked_users.count} total"
@@ -309,12 +309,12 @@ class Host < ActiveRecord::Base
     lobbies = []
 
     combined = ''
-    string = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{ENV['STEAM_WEB_API_KEY']}&steamids="
+    string = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{ENV['STEAM_WEB_API_KEY']}&steamids="
 
     #iterate through steam ids to find hosts
     steamids.each do |steamid|
       combined << steamid.to_s + ','
-      
+
       #GetPlayerSummaries has a max of 100 steam ids
       if i == 100 || steamid == steamids.last
         begin
@@ -335,19 +335,19 @@ class Host < ActiveRecord::Base
                     #gameids over length 7 are mods
                     game_id = Mod.update(player, true)
                   else
-                    game_id = Game.update(player["gameid"],player["gameextrainfo"], true)                  
+                    game_id = Game.update(player["gameid"],player["gameextrainfo"], true)
                   end
                 else
                   if player["gameid"].length > 7
                     #gameids over length 7 are mods
                     game_id = Mod.update(player, false)
                   else
-                    game_id = Game.update(player["gameid"],player["gameextrainfo"], false)                  
+                    game_id = Game.update(player["gameid"],player["gameextrainfo"], false)
                   end
                 end
 
                 puts "User: #{player["personaname"]}, #{player["gameextrainfo"]}"
-                if player["gameserverip"] != nil && player["lobbysteamid"] != nil                    
+                if player["gameserverip"] != nil && player["lobbysteamid"] != nil
                   puts "-> Server: #{player["gameserverip"]}"
                   puts "-> Lobby: #{player["lobbysteamid"]}"
                 elsif player["gameserverip"] != nil
@@ -359,12 +359,12 @@ class Host < ActiveRecord::Base
                 if player["gameserverip"] != nil || player["lobbysteamid"] != nil
                   host_id = Host.update(player, game_id)
                   User.update(player, host_id, game_id)
-                  u += 1                  
+                  u += 1
                 else
                   User.update(player, nil, game_id)
                   n += 1
                 end
-                
+
                 if player["gameserverip"] != nil
                   if !servers.include? player["gameserverip"]
                     servers.push(player["gameserverip"])
@@ -375,30 +375,30 @@ class Host < ActiveRecord::Base
                   if !lobbies.include? player["lobbysteamid"]
                     lobbies.push(player["lobbysteamid"])
                   end
-                end          
-              end 
-            end 
+                end
+              end
+            end
           end
         end
         i = 0
         combined = ''
       end
       i += 1
-      j += 1    
+      j += 1
     end
 
     Host.update_pins
-    
+
     if x == 0
       Host.where(:updated => false).update_all(:visible => false)
       User.where(:updated => false).update_all(:host_id => nil)
-      User.where(:updated => false).update_all(:game_id => nil)      
+      User.where(:updated => false).update_all(:game_id => nil)
     end
 
     puts "Processed #{j} steam ids"
     puts "Found #{u+n} users in games"
     puts "Found #{u} users in #{servers.count} servers and #{lobbies.count} lobbies"
-    puts "Found #{n} users in non-joinable games"   
+    puts "Found #{n} users in non-joinable games"
   end
 
   def self.get_server_info(address)
@@ -406,7 +406,7 @@ class Host < ActiveRecord::Base
 
     if address != nil
       i, p = address.split(':')
-      string = "http://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{i}&format=json"
+      string = "https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{i}&format=json"
 
       begin
         parsed = JSON.parse(open(string).read)
@@ -422,7 +422,7 @@ class Host < ActiveRecord::Base
               info["appid"] = server["appid"]
               info["lan"] = server["lan"]
               info["respond"] = true
-            end 
+            end
           end
         else
           puts parsed["response"]["message"]
@@ -432,7 +432,7 @@ class Host < ActiveRecord::Base
       end
     end
 
-    return info  
+    return info
   end
 
   def Host.update_byoc
@@ -440,23 +440,23 @@ class Host < ActiveRecord::Base
       if !range.cidr.blank?
         puts "Searching range #{range.cidr}"
         cidr = NetAddr::CIDR.create(range.cidr)
-        i = 0  
+        i = 0
 
         until i == cidr.size do
           ip = cidr[i].ip
-          api = "http://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{ip}&format=json"
+          api = "https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{ip}&format=json"
 
           begin
             parsed = JSON.parse(open(api).read)
 
-            if parsed != nil && parsed["response"]["success"] == true              
+            if parsed != nil && parsed["response"]["success"] == true
               parsed["response"]["servers"].each do |server|
-                if server["addr"] && server["appid"] && server["gameport"]                  
+                if server["addr"] && server["appid"] && server["gameport"]
                   x, p = server["addr"].split(':')
                   port = server["gameport"].to_i
                   query_port = p.to_i
                   address = "#{ip}:#{port}"
-                  
+
                   game_id = Game.update(server["appid"],server["gamedir"], true)
                   host = Host.where(address: address).first_or_create
 
@@ -469,7 +469,7 @@ class Host < ActiveRecord::Base
                     :pin        => true,
                     :source     => "byoc"
                   )
-                  puts "Found a #{host.game.name} host at #{address}"                
+                  puts "Found a #{host.game.name} host at #{address}"
                 end
               end
             end
@@ -506,7 +506,7 @@ class Host < ActiveRecord::Base
           puts "Host is no longer flagged"
         else
           visible = true
-        end        
+        end
       end
 
       if visible == true
@@ -522,7 +522,7 @@ class Host < ActiveRecord::Base
 
   def Host.pin(host)
     if host.pin == false
-      puts "Pinning #{host.ip}:#{host.query_port}" 
+      puts "Pinning #{host.ip}:#{host.query_port}"
       host.update_attributes(
         :pin => true
       )
@@ -580,5 +580,5 @@ class Host < ActiveRecord::Base
       name = name.encode("UTF-16be", :invalid=>:replace, :replace=>"").encode('UTF-8')
     end
     return name
-  end  
+  end
 end

@@ -1,5 +1,5 @@
 class SessionsController < ApplicationController
-  skip_before_filter :verify_authenticity_token, :only => :create
+  skip_before_action :verify_authenticity_token, :only => :create
 
   def login
   end
@@ -14,9 +14,9 @@ class SessionsController < ApplicationController
     user.update_attributes(
    	  :name	=> temp[:name],
   	  :url 	=> temp[:url],
-  	  :avatar 		=> temp[:avatar]		
+  	  :avatar 		=> temp[:avatar]
   	)
-    if user 
+    if user
   	  log_in user
       redirect_to root_url
     else
@@ -32,7 +32,7 @@ class SessionsController < ApplicationController
 
   def destroy
     log_out if logged_in?
-    redirect_to root_url  
+    redirect_to root_url
   end
 
 end
