@@ -39,6 +39,7 @@ require "capistrano/bundler"
 require 'capistrano/rails'
 require 'capistrano/rvm'
 require 'capistrano/puma'
+install_plugin Capistrano::Puma
 
 
 # Load custom tasks from `lib/capistrano/tasks` if you have any defined

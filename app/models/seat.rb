@@ -27,6 +27,10 @@ class Seat < ActiveRecord::Base
   	seat.update_attributes(
   	  :clan   => info["clan"],
   	  :handle => info["handle"],
+      :section => info["section"],
+      :row => info["row"],
+      :number => info["number"],
+      :sort => info["sort"],
       :updated => true
   	)
   end
@@ -69,18 +73,28 @@ class Seat < ActiveRecord::Base
         clan = nil
         handle = nil
 
+        if row_letter.length == 2
+          sort_letter = "B#{row_letter[1]}"
+        else
+          sort_letter = row_letter.rjust(2, 'A')
+        end
+        sort ="#{section}#{sort_letter}#{sprintf '%02d', number}"
+
         info = { "seat"   => seat,
              "clan"   => clan,
              "handle" => handle,
-             "year" => year
+             "year" => year,
+             "section" => section,
+             "row" => row_letter,
+             "number" => number,
+             "sort" => sort
              }
 
-        line = "#{info['seat']}"
-        if info['clan']
-         line << " #{info['clan']}"
-        end
-        if info['handle']
-         line << " #{info['handle']}"
+        line = ""
+        info.each do |k,v|
+          unless v.nil?
+            line << "#{v} "
+          end
         end
         puts line
 

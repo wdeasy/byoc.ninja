@@ -3,10 +3,10 @@ class UsersController < ApplicationController
   before_action :correct_user, :only => [:edit, :update]
   before_action :admin_user, :except => [:edit, :update, :seat]
 
-  def index  	
+  def index
     @users = User.includes(:seats).where.not(host_id: nil).order("name ASC")
-    @users = User.includes(:seats).where(banned: true).order("name ASC") if params[:banned].present?     
-    @users = User.includes(:seats).order("name ASC") if params[:all].present?  
+    @users = User.includes(:seats).where(banned: true).order("name ASC") if params[:banned].present?
+    @users = User.includes(:seats).order("name ASC") if params[:all].present?
   end
 
   def show
@@ -31,10 +31,11 @@ class UsersController < ApplicationController
   def seat
     if cookies.signed[:hidden_message_ids].blank? || cookies.signed[:hidden_message_ids].include?("1")
       ids = [1, *cookies.signed[:hidden_message_ids]]
-      cookies.permanent.signed[:hidden_message_ids] = ids 
+      cookies.permanent.signed[:hidden_message_ids] = ids
     end
 
-    @seats = Seat.where(:year => Date.today.year).order("seat asc")
+    @sections = Seat.select(:section)
+    @seats = Seat.where(:year => Date.today.year).order("sort asc")
     if params[:link].present?
       @user = User.update_seat(params[:user][:seat_id],params[:url])
       if @user[0..12] == "You're linked"
@@ -70,5 +71,5 @@ class UsersController < ApplicationController
         @user = User.find(params[:id])
         redirect_to(root_url) unless @user == current_user
       end
-    end    
+    end
 end
