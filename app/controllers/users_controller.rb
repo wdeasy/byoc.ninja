@@ -15,7 +15,7 @@ class UsersController < ApplicationController
 
   def edit
     @user = User.find(params[:id])
-    @seats = Seat.where(:year => Date.today.year).order("seat asc")
+    @seats = Seat.where(:year => Date.today.year).order("sort asc")
   end
 
   def update
