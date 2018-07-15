@@ -1,4 +1,4 @@
-class Host < ActiveRecord::Base
+class Host < ApplicationRecord
   require 'open-uri'
   require 'socket'
   require 'timeout'

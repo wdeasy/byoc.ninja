@@ -1,4 +1,4 @@
-class Mod < ActiveRecord::Base
+class Mod < ApplicationRecord
   require 'open-uri'
 
   belongs_to :game
@@ -18,13 +18,11 @@ class Mod < ActiveRecord::Base
         mod.info = player["gameextrainfo"]
         if appid != nil
           game_id = Game.update(appid, player["gameextrainfo"], supported)
-          mod.game_id = game_id           
+          mod.game_id = game_id
         end
       end
     end
 
-    return mod.game_id  
+    return mod.game_id
   end
 end
-
-

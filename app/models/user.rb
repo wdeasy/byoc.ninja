@@ -1,4 +1,4 @@
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   require 'open-uri'
 
   belongs_to :host, counter_cache: true

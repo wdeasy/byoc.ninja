@@ -1,4 +1,4 @@
-class Network < ActiveRecord::Base
+class Network < ApplicationRecord
   has_many :hosts
 
   def name_cidr

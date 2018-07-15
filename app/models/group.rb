@@ -1,5 +1,5 @@
-class Group < ActiveRecord::Base
-  require 'open-uri'	
+class Group < ApplicationRecord
+  require 'open-uri'
 
   def Group.auto_add(url)
   		if url.blank?
@@ -7,7 +7,7 @@ class Group < ActiveRecord::Base
   		end
 
       begin
-        html = open(url) 
+        html = open(url)
         page = Nokogiri::HTML(html.read)
       rescue => e
         return "Unable to load URL #{url}"
@@ -31,5 +31,5 @@ class Group < ActiveRecord::Base
 
 				return "Added #{name}"
       end
-  end 
+  end
 end

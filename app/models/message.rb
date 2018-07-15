@@ -1,4 +1,4 @@
-class Message < ActiveRecord::Base
+class Message < ApplicationRecord
 
   def self.current(hidden_ids = nil)
     result = where(:show => true)
@@ -13,6 +13,6 @@ class Message < ActiveRecord::Base
 	      :show	=> false
 	    )
     end
-    return "Messages cleared." 
-  end 
+    return "Messages cleared."
+  end
 end
