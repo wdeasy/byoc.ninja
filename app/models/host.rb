@@ -144,18 +144,12 @@ class Host < ApplicationRecord
     host.users.each do |user|
       user.seats.each do |seat|
         if seat.year == Date.today.year
-          if flags['BYOC Player in Game']
-          else
-            flags['BYOC Player in Game'] = true
-          end
+          flags['BYOC Player in Game'] = true
         end
       end
 
       if ["quakecon", "qcon"].any? { |q| user.name.downcase.include? q }
-        if flags['BYOC Player in Game']
-        else
-          flags['BYOC Player in Game'] = true
-        end
+        flags['BYOC Player in Game'] = true
       end
     end
 

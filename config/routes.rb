@@ -5,7 +5,6 @@ Rails.application.routes.draw do
   match     'auth/failure', :to   => 'sessions#failure', via: [:get, :post]
   delete    'logout'              => 'sessions#destroy'
   get       'privacy_policy'      => 'static_pages#privacy_policy'
-  get       'how_it_works'        => 'static_pages#about'
 
   get       'admin/hosts'         => 'admin#hosts'
   get       'groups/auto'         => 'groups#auto'
@@ -13,7 +12,7 @@ Rails.application.routes.draw do
   get       'settings'            => 'users#edit'
   get       'seats'               => 'seats#index'
   get       'seats/update'        => 'seats#update'
-  
+
   get       'api/hosts'           => 'hosts#json'
   get       'api/seats'           => 'seats#json'
 

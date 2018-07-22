@@ -97,6 +97,10 @@ class User < ApplicationRecord
       s = seat_id.to_i
       seat = Seat.where(:id => s).first.seat
 
+      if seat == nil
+        return "Unknown seat."
+      end
+
       response = search_summary_for_seat(steamid, seat)
       if response == "Match"
         user = User.lookup(steamid)

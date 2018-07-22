@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_07_03_014203) do
+ActiveRecord::Schema.define(version: 2018_07_21_154407) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -36,7 +36,7 @@ ActiveRecord::Schema.define(version: 2018_07_03_014203) do
     t.string "url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "enabled", default: true
+    t.boolean "enabled", default: false
     t.index ["steamid"], name: "index_groups_on_steamid", unique: true
   end
 

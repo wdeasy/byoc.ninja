@@ -35,7 +35,7 @@ user_list.each do |steamid, name, url, avatar, admin|
 	User.create!(steamid: steamid, name: name, url: url, avatar: avatar, admin: admin)
 end
 
-message_list = [["Click <a href=https://byoc.ninja/seat class=\"alert-link\">HERE</a> to link your BYOC seat to your steam account!","success",true]]
+message_list = [["Click <a href=https://byoc.ninja/seat class=\"alert-link\">HERE</a> to link your BYOC seat to your steam account!","success",false]]
 
 message_list.each do |message, message_type, show|
 	Message.create!(message: message, message_type: message_type, show: show)

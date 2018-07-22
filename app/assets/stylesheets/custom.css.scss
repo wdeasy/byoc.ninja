@@ -21,6 +21,7 @@ html {
 
 body {
   padding-top: 60px;
+  background-color: $gray-dark;
   /* background: url('temp');         */
   /* background-position: center;     */
   /* background-repeat: no-repeat;    */
@@ -76,13 +77,13 @@ p {
   float: left;
   margin-right: 10px;
   font-size: 2em;
-  color: #fff;
+  color: $gray-lighter;
   text-transform: uppercase;
   letter-spacing: 1px;
   padding-top: 7px;
   font-weight: bold;
   &:hover {
-    color: #fff;
+    color: $gray-lighter;
     text-decoration: none;
   }
 }
@@ -253,10 +254,80 @@ input {
 .dropdown-submenu:hover>a:after{border-left-color:#ffffff;}
 .dropdown-submenu.pull-left{float:none;}.dropdown-submenu.pull-left>.dropdown-menu{left:-100%;margin-left:10px;-webkit-border-radius:6px 0 6px 6px;-moz-border-radius:6px 0 6px 6px;border-radius:6px 0 6px 6px;}
 
+
 #header {
   font-size: 1.7em;
   color: #000;
   text-transform: uppercase;
   letter-spacing: -1px;
   font-weight: bold;
+}
+
+.jumbotron {
+  background-color: $gray;
+  color: $gray-darker !important;
+  a {
+    color: $gray-light;
+    &:hover {
+      color: $gray-dark;
+    }
+  }
+}
+
+.table-striped {
+  thead {
+    tr{
+      th{
+        color: $gray-darker !important;
+        border-color: $gray-darker !important;
+      }
+    }
+  }
+  tbody{
+    tr {
+      td {
+        color: $gray-darker !important;
+        border-color: $gray-darker !important;
+        a {
+          color: $gray-darker;
+          &:hover {
+            color: $gray-dark;
+          }
+        }
+      }
+    }
+    tr:nth-child(odd) {
+      background-color: $gray-light;
+    }
+    tr:nth-child(even) {
+      background-color: $gray;
+    }
+  }
+}
+
+.footer {
+  div {
+    color: $gray-light;
+    a {
+      color: $gray;
+      &:hover {
+        color: $gray-light;
+      }
+    }
+  }
+}
+
+.form-control, .btn-primary {
+  background-color: $gray-light !important;
+  color: $gray-darker !important;
+  border: 1px solid $gray-darker !important;
+}
+
+.dropdown-menu {
+  background-color: $gray-lighter !important;
+}
+
+.form-control:focus {
+  border-color: $brand-warning;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(240, 173, 78, 0.6);
 }
