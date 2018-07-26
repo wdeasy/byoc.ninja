@@ -274,12 +274,17 @@ input {
   }
 }
 
+.panel-default {
+  border: none !important;
+}
+
 .table-striped {
   thead {
     tr{
       th{
         color: $gray-darker !important;
         border-color: $gray-darker !important;
+        background-color: $gray !important;
       }
     }
   }

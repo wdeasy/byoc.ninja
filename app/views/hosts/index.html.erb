@@ -3,39 +3,39 @@
         setTimeout(executeQuery, 60000);
       });
     </script>
-  <div id="hosts">
-    <div id="message">
-      <% Message.current(cookies.signed[:hidden_message_ids]).each do |m| %>
-        <%= div_for m do %>
-          <div class="alert alert-<%= m.message_type %>">
-            <%= sanitize m.message %>
-            <%= link_to hide_message_path(m), remote: true, :class => "close alert-link", "data-dismiss": "alert" do %>
-              <span class="glyphicon glyphicon-remove"></span>
-            <% end %>
-          </div>
-        <% end %>
+  <div id="message">
+    <% Message.current(cookies.signed[:hidden_message_ids]).each do |m| %>
+      <%= div_for m do %>
+        <div class="alert alert-<%= m.message_type %>">
+          <%= sanitize m.message %>
+          <%= link_to hide_message_path(m), remote: true, :class => "close alert-link", "data-dismiss": "alert" do %>
+            <span class="glyphicon glyphicon-remove"></span>
+          <% end %>
+        </div>
       <% end %>
-    </div>
-    <div class="jumbotron">
-    <table class="table table-striped table-condensed table-responsive">
-      <thead>
-        <tr>
-          <th class="col-md-2 text-left">Game</th>
-          <th class="col-md-1 text-center"><span class="glyphicon glyphicon-tags" title="Tags"></span></th>
-          <th class="col-md-3 text-left">Name</th>
-          <th class="col-md-1 text-right">Players</th>
-          <th class="col-md-1 text-center"><span class="glyphicon glyphicon-user" title="Quakecon Attendees"></span></th>
-          <th class="col-md-2 text-left">Map</th>
-         <th class="col-md-2 text-right">Address</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% if @hosts.empty? %>
-          <tr><td colspan="7" class="text-center">No Games Found.</td></tr>
-        <% else %>
-          <%= render @hosts %>
-        <% end %>
-      </tbody>
-    </table>
+    <% end %>
+  </div>
+  <div id="hosts">
+    <div class="panel panel-default">
+      <table class="table table-striped table-condensed table-responsive">
+        <thead>
+          <tr>
+            <th class="col-md-2 text-left">Game</th>
+            <th class="col-md-1 text-center"><span class="glyphicon glyphicon-tags" title="Tags"></span></th>
+            <th class="col-md-3 text-left">Name</th>
+            <th class="col-md-1 text-right">Players</th>
+            <th class="col-md-1 text-center"><span class="glyphicon glyphicon-user" title="Quakecon Attendees"></span></th>
+            <th class="col-md-2 text-left">Map</th>
+           <th class="col-md-2 text-right longtext">Address</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if @hosts.empty? %>
+            <tr><td colspan="7" class="text-center">No Games Found.</td></tr>
+          <% else %>
+            <%= render @hosts %>
+          <% end %>
+        </tbody>
+      </table>
     </div>
   </div>
