@@ -34,10 +34,10 @@ class UsersController < ApplicationController
       cookies.permanent.signed[:hidden_message_ids] = ids
     end
 
-    @sections = Seat.select(:section)
-    @seats = Seat.where(:year => Date.today.year).order("sort asc")
+    @sections = Seat.order("sort asc").pluck(:section).uniq
+
     if params[:link].present?
-      @user = User.update_seat(params[:user][:seat_id],params[:url])
+      @user = User.update_seat(params[:seat],params[:url])
       if @user[0..12] == "You're linked"
         flash["success"] = @user
         redirect_to root_url

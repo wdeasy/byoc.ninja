@@ -1,15 +1,43 @@
 <script type="text/javascript">
 
 	$(document).ready(function() {
-		$("#user_seat_id option").filter(function() {
-			return $(this).val() == $("#seat").val();
-		}).attr('selected', true);
 
-		$("#user_seat_id").on("change", function() {
-			$("#seat").val($(this).find("option:selected").text());
+
+    var section = "";
+		var row = "";
+		var seat = "";
+
+		$('#section').change(function(){
+			section = $(this).val();
+      $("#row").empty();
+			$("#number").empty();
+			$.get("/lookup.json", {section: section}, function(data){
+				$("#row").html("");
+				$.each(data, function(index, value) {
+					$("#row").append("<option value='" + value + "'>" + value + "</option>");
+				});
+				$("#row").prepend("<option value='' selected='selected'></option>");
+			});
 		});
-	});
 
+		$('#row').change(function(){
+			row = $(this).val();
+      $("#number").empty();
+			$.get("/lookup.json", {row: row, section: section}, function(data){
+				$("#number").html("");
+				$.each(data, function(index, value) {
+					$("#number").append("<option value='" + value.seat + "'>" + value.number + "</option>");
+				});
+				$("#number").prepend("<option value='' selected='selected'></option>");
+			});
+		});
+
+		$('#number').change(function(){
+			seat = $(this).val();
+			$("#seat").val(seat);
+		});
+
+	});
 </script>
 
 <% provide(:title, "Seat Link")  %>
@@ -23,7 +51,17 @@
 		  <%= hidden_field :link, "true" %>
 
 		  <%= label_tag "1) Select your seat:" %>
-		  <%= collection_select :user, :seat_id, @seats, :id, :seat, {:include_blank => true},{:class => 'form-control longtext'} %>
+			<div class="row">
+        <div class="col-sm-4">
+      <%= select_tag "section", options_for_select(@sections), :include_blank => true, id: "section", class: "form-control" %>
+		</div>
+		<div class="col-sm-4">
+			<%= select_tag "row", "", id: "row", class: "form-control" %>
+		</div>
+		<div class="col-sm-4">
+			<%= select_tag "number", "", id: "number", class: "form-control" %>
+			</div>
+			</div>
 
 			<%= label_tag "2) Paste your Steam profile URL here:" %>
 		  <%= text_field_tag(:url, nil, :class => 'form-control') %>

@@ -93,9 +93,7 @@ class User < ApplicationRecord
     steamid = User.steamid_from_url(url)
 
     if (steamid != nil)
-
-      s = seat_id.to_i
-      seat = Seat.where(:id => s).first.seat
+      seat = Seat.where(:seat => seat_id).first.seat
 
       if seat == nil
         return "Unknown seat."

@@ -20,6 +20,7 @@ Rails.application.routes.draw do
   get       'logs/update_seats'   => 'logs#update_seats'
 
   get        'seat'               => 'users#seat'
+  get        'lookup'             => 'seats#lookup'
   match      'messages/:id/hide', to: 'messages#hide', as: 'hide_message', via: [:get, :post]
 
   resources :contacts, :only      => [:new, :create]

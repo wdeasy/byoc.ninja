@@ -1,6 +1,6 @@
 class SeatsController < ApplicationController
-  before_action :logged_in_user, :except => [:json]
-  before_action :admin_user, :except => [:json]
+  before_action :logged_in_user, :except => [:json, :lookup]
+  before_action :admin_user, :except => [:json, :lookup]
 
   def index
 	@seats = Seat.order("sort asc")
@@ -18,6 +18,20 @@ class SeatsController < ApplicationController
   def json
     @seats = Seat.joins(:seats_users, :users).joins("LEFT JOIN hosts ON hosts.id = users.host_id").joins("LEFT JOIN games ON games.id = users.game_id").order("seats.sort ASC")
     render :json => @seats
+  end
+
+  def lookup
+    @seats = []
+
+    if params[:row].present? && params[:section].present?
+      @seats = Seat.where(section: params[:section], row: params[:row]).order("sort asc")
+    elsif params[:section].present?
+      @seats = Seat.where(section: params[:section]).order("sort asc").pluck(:row).uniq
+    end
+
+    respond_to do |format|
+      format.json { render :json => @seats.as_json(:only => [:seat, :section, :row, :number]) }
+    end
   end
 
   private

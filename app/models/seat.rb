@@ -9,7 +9,7 @@ class Seat < ApplicationRecord
   require 'json'
 
   def as_json(options={})
-   super(:only => [:seat, :clan, :handle],
+   super(:only => [:seat, :clan, :handle, :section, :row, :number],
       :include => {
         :users => {:only => [:url, :name],
           :include => {
