@@ -93,20 +93,20 @@ class User < ApplicationRecord
     steamid = User.steamid_from_url(url)
 
     if (steamid != nil)
-      seat = Seat.where(:seat => seat_id).first.seat
+      seat = Seat.where(:seat => seat_id).first
 
       if seat == nil
         return "Unknown seat."
       end
 
-      response = search_summary_for_seat(steamid, seat)
+      response = search_summary_for_seat(steamid, seat.seat)
       if response == "Match"
         user = User.lookup(steamid)
         user.update_attributes(
-          :seat_ids => seat_id
+          :seat_ids => seat.id
         )
         User.fill(steamid)
-        return "You're linked to #{seat}!"
+        return "You're linked to #{seat.seat}!"
       else
         return response
       end
