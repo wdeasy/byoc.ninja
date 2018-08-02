@@ -2,7 +2,6 @@
 
 	$(document).ready(function() {
 
-
     var section = "";
 		var row = "";
 		var seat = "";
@@ -11,13 +10,15 @@
 			section = $(this).val();
       $("#row").empty();
 			$("#number").empty();
+			$("#number").append("<option value='' selected='selected'>Seat</option>");
 			$.get("/lookup.json", {section: section}, function(data){
 				$("#row").html("");
 				$.each(data, function(index, value) {
 					$("#row").append("<option value='" + value + "'>" + value + "</option>");
 				});
-				$("#row").prepend("<option value='' selected='selected'></option>");
+				$("#row").prepend("<option value='' selected='selected'>Row</option>");
 			});
+			setSeat();
 		});
 
 		$('#row').change(function(){
@@ -28,16 +29,27 @@
 				$.each(data, function(index, value) {
 					$("#number").append("<option value='" + value.seat + "'>" + value.number + "</option>");
 				});
-				$("#number").prepend("<option value='' selected='selected'></option>");
+				$("#number").prepend("<option value='' selected='selected'>Seat</option>");
 			});
+			setSeat();
 		});
 
 		$('#number').change(function(){
 			seat = $(this).val();
-			$("#seat").val(seat);
+			setSeat();
 		});
 
+    function setSeat() {
+			if (section == '' || row == '' || seat == '') {
+				$("#seat").val("");
+			} else {
+				seat = $("#number").val();
+				$("#seat").val(seat);
+			}
+		}
+
 	});
+
 </script>
 
 <% provide(:title, "Seat Link")  %>
@@ -53,18 +65,18 @@
 		  <%= label_tag "1) Select your seat:" %>
 			<div class="row">
         <div class="col-sm-4">
-      <%= select_tag "section", options_for_select(@sections), :include_blank => true, id: "section", class: "form-control" %>
-		</div>
-		<div class="col-sm-4">
-			<%= select_tag "row", "", id: "row", class: "form-control" %>
-		</div>
-		<div class="col-sm-4">
-			<%= select_tag "number", "", id: "number", class: "form-control" %>
-			</div>
+		      <%= select_tag "section", options_for_select(@sections), :prompt => "Section", id: "section", class: "form-control" %>
+				</div>
+				<div class="col-sm-4">
+					<%= select_tag "row", "", :prompt => "Row", id: "row", class: "form-control" %>
+				</div>
+				<div class="col-sm-4">
+					<%= select_tag "number", "", :prompt => "Seat", id: "number", class: "form-control" %>
+				</div>
 			</div>
 
 			<%= label_tag "2) Paste your Steam profile URL here:" %>
-		  <%= text_field_tag(:url, nil, :class => 'form-control') %>
+		  <%= text_field_tag(:url, nil, :placeholder => 'https://steamcommunity.com/...', :class => 'form-control') %>
 
 		  <%= label_tag "3) Paste this code anywhere in the summary of your Steam Profile:" %>
 		  <%= text_field_tag(:seat, nil, :readonly => true, :class => 'form-control') %>
