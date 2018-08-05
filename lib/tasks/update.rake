@@ -12,9 +12,18 @@ namespace :update do
   task :seats, [:file,:year] => :environment do |t, args|
     beginning = start_time
     file = args.file
-    year = args.year    
+    year = args.year
     Seat.update_seats(file,year)
-    finish_time(beginning) 	
+    finish_time(beginning)
+  end
+
+  desc "Search for hosts by name args[name]"
+  task :hosts_by_name, [:name] => :environment do |t, args|
+    beginning = start_time
+    name = args.name
+    Host.update_hosts_by_name(name)
+    finish_time(beginning)
+    system("touch /tmp/hostbyname")
   end
 
   desc "Search byoc ip range for hosts"
@@ -42,4 +51,3 @@ namespace :update do
   	puts "Time elapsed #{Time.now - beginning} seconds."
   end
 end
-

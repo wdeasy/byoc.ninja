@@ -495,8 +495,7 @@ class Host < ApplicationRecord
           puts "Host address is nil"
         when host.last_successful_query < 1.hour.ago
           puts "Host hasn't responded in an hour"
-        when host.flags == nil,
-            host.flags['Hosted in BYOC'] == nil && host.flags['Quakecon in Host Name'] == nil
+        when host.flags == nil || (host.flags['Hosted in BYOC'] == nil && host.flags['Quakecon in Host Name'] == nil)
           puts "Host is no longer flagged"
         else
           visible = true
@@ -574,5 +573,56 @@ class Host < ApplicationRecord
       name = name.encode("UTF-16be", :invalid=>:replace, :replace=>"").encode('UTF-8')
     end
     return name
+  end
+
+  def Host.update_hosts_by_name(name)
+    if name == nil
+      name = "quakecon"
+    end
+
+    api = "https://api.steampowered.com/IGameServersService/GetServerList/v1/?filter=\\name_match\\*#{name}*&key=#{ENV['STEAM_WEB_API_KEY']}"
+
+    begin
+      parsed = JSON.parse(open(api).read)
+
+      if parsed != nil && parsed["response"]["servers"] != []
+        parsed["response"]["servers"].each do |server|
+          if server["addr"] && server["appid"] && server["gameport"]
+            ip, p = server["addr"].split(':')
+            port = server["gameport"].to_i
+            query_port = p.to_i
+            address = server["addr"]
+            flags = {}
+            flags['Quakecon in Host Name'] = true
+            name = server["name"]
+            players = players(server["players"], server["max_players"])
+            map = server["map"]
+
+            game_id = Game.update(server["appid"],server["gamedir"], true)
+            host = Host.where(address: address).first_or_create
+
+            host.update_attributes(
+              :game_id    => game_id,
+              :query_port => query_port,
+              :ip         => ip,
+              :port       => port,
+              :address    => address,
+              :pin        => true,
+              :source     => "host_by_name",
+              :flags      => flags,
+              :name       => name,
+              :players    => players,
+              :map        => map
+            )
+
+            update_server_info(host)
+            puts "Found a #{host.game.name} host at #{address}"
+          end
+        end
+      end
+    rescue => e
+      puts "JSON failed to parse #{api}"
+    end
+
   end
 end

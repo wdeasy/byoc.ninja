@@ -75,25 +75,25 @@
 				</div>
 			</div>
 
-			<%= label_tag "2) Paste your Steam profile URL here:" %>
+			<label>
+				2) Paste your <%= link_to 'Steam profile URL', 'steam://url/SteamIDMyProfile' %> here:
+			</label>
 		  <%= text_field_tag(:url, nil, :placeholder => 'https://steamcommunity.com/...', :class => 'form-control') %>
 
-		  <%= label_tag "3) Paste this code anywhere in the summary of your Steam Profile:" %>
+
+			<label>
+				3) Paste this code anywhere in the <%= link_to 'Summary of your Steam Profile', 'steam://url/SteamIDEditPage' %>:
+			</label>
 		  <%= text_field_tag(:seat, nil, :readonly => true, :class => 'form-control') %>
 
 		  <%= label_tag "4) Click this button:" %>
 		  <%= submit_tag("Click me!", class: "btn btn-primary") %>
 
-
 		  <br /><br /><h5>
 		  Link your seat to help other people find games being played in the BYOC!<br/>
 		  <br />
-		  Steam profile urls have to be in the either of the following formats:<br/>
-			https://steamcommunity.com/id/name<br />
-			https://steamcommunity.com/profiles/#############<br>
+			Your steam profile needs to be set to public before your seat can be linked.<br />
 			<br />
-			Your steam profile needs to be set to public before your seat can be linked.
-			<br /><br />
 			You can remove the seat code from your summary after your seat is linked.
 		  </h5>
 		<% end %>

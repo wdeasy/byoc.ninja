@@ -29,12 +29,12 @@ module HostsHelper
 
 		end
 
-		return html		
+		return html
 	end
 
 	def link(host)
 		if host.game.link?
-			link_to decolor_name(host.game.name), host.game.link, {:target => "_blank"}
+			link_to decolor_name(host.game.name), "steam://store/#{host.game.appid}"
 		else
 			decolor_name(host.game.name)
 		end
@@ -62,17 +62,17 @@ module HostsHelper
 
   def decolor_name(name)
     if name
-      name.gsub!("^0","") 
-      name.gsub!("^1","") 
+      name.gsub!("^0","")
+      name.gsub!("^1","")
       name.gsub!("^2","")
       name.gsub!("^3","")
       name.gsub!("^4","")
       name.gsub!("^5","")
       name.gsub!("^6","")
       name.gsub!("^7","")
-      name.gsub!("^8","") 
+      name.gsub!("^8","")
     end
 
-    return strip_tags(name)
-  end   
+    return sanitize(name, tags:[]) #strip_tags(name)
+  end
 end
