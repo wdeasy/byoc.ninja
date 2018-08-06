@@ -3,6 +3,7 @@ class Host < ApplicationRecord
   require 'socket'
   require 'timeout'
   require 'json'
+  require 'csv'
 
   belongs_to :game
   belongs_to :network
@@ -463,6 +464,9 @@ class Host < ApplicationRecord
                     :pin        => true,
                     :source     => "byoc"
                   )
+
+                  update_server_info(host)
+                  
                   puts "Found a #{host.game.name} host at #{address}"
                 end
               end
@@ -575,6 +579,69 @@ class Host < ApplicationRecord
     return name
   end
 
+  def Host.update_hosts_by_file(file)
+    servers = []
+
+    if file == nil
+      puts "No file specified."
+    else
+      puts "Reading #{file}..."
+      begin
+        CSV.new(open(file)).each do |line|
+          unless line[0] == nil || (servers.include? line[0])
+            puts "loading #{line[0]}..."
+            servers.push(line[0])
+          end
+        end
+      rescue => e
+        puts "Unable to read file #{file}"
+      end
+
+      if servers.empty?
+        puts "No servers to process."
+      else
+        servers.each do |address|
+          api = "https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{address}&format=json"
+
+          #begin
+            parsed = JSON.parse(open(api).read)
+
+            if parsed != nil && parsed["response"]["success"] == true
+              parsed["response"]["servers"].each do |server|
+                if server["addr"] == address && server["appid"] && server["gameport"]
+                  ip, p = server["addr"].split(':')
+                  port = server["gameport"].to_i
+                  query_port = p.to_i
+                  address = "#{ip}:#{port}"
+
+                  game_id = Game.update(server["appid"],server["gamedir"], true)
+                  host = Host.where(address: address).first_or_create
+
+                  host.update_attributes(
+                    :game_id    => game_id,
+                    :query_port => query_port.to_i,
+                    :ip         => ip,
+                    :port       => port,
+                    :address    => address,
+                    :pin        => true,
+                    :source     => "file"
+                  )
+
+                  update_server_info(host)
+
+                  puts "Found a #{host.game.name} host at #{address}"
+                end
+              end
+            end
+          #rescue => e
+          #  puts "JSON failed to parse #{api}"
+          #end
+
+        end
+      end
+    end
+  end
+
   def Host.update_hosts_by_name(name)
     if name == nil
       name = "quakecon"
@@ -616,6 +683,7 @@ class Host < ApplicationRecord
             )
 
             update_server_info(host)
+
             puts "Found a #{host.game.name} host at #{address}"
           end
         end
