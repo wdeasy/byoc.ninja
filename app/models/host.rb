@@ -164,7 +164,7 @@ class Host < ApplicationRecord
     end
 
     #is the server responding to queries?
-    if host.respond == false
+    if host.respond == false && !(['byoc'].include?(host.network.name))
       flags['Last Query Attempt Failed'] = true
     end
 
