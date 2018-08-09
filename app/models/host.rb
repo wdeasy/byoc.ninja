@@ -48,9 +48,7 @@ class Host < ApplicationRecord
       port        = p.to_i
       if valid_ip == true
         case
-        when host.query_port == nil,
-            host.game_id != nil && host.game_id != host.game.id,
-            host.last_successful_query < 1.hour.ago
+        when host.query_port == nil || (host.game_id != nil && host.game_id != host.game.id) || host.last_successful_query < 1.hour.ago
           info        = Host.get_server_info(player["gameserverip"])
           query_port  = info["query_port"]
           lan         = info["lan"]
@@ -105,7 +103,7 @@ class Host < ApplicationRecord
         puts "Host port is 0"
       when host.lobby == nil && valid_ip == false
         puts "Host address is invalid"
-      when host.respond == false && host.last_successful_query < 1.hour.ago && host.users_count < 2
+      when host.respond == false && host.last_successful_query < 1.hour.ago && host.users_count < 2 && !(['byoc'].include?(host.network.name))
         puts "Host is not responding"
       when host.lan == true && host.network.name != "byoc"
         puts "Host is a lan game outside of quakecon"
@@ -465,8 +463,6 @@ class Host < ApplicationRecord
                     :source     => "byoc"
                   )
 
-                  update_server_info(host)
-                  
                   puts "Found a #{host.game.name} host at #{address}"
                 end
               end
@@ -584,13 +580,29 @@ class Host < ApplicationRecord
 
     if file == nil
       puts "No file specified."
+    elsif File.zero?(file)
+      puts "File is empty."
     else
       puts "Reading #{file}..."
       begin
         CSV.new(open(file)).each do |line|
           unless line[0] == nil || (servers.include? line[0])
             puts "loading #{line[0]}..."
-            servers.push(line[0])
+            s = {
+              :address => line[0],
+              :name => line[1],
+              :map => line[2],
+              :gamename => line[3],
+              :appid => line[4],
+              :current => line[5],
+              :max => line[6],
+              :zero => line[7],
+              :listen => line[8],
+              :os => line[9],
+              :password => line[10]
+            }
+
+            servers.push(s)
           end
         end
       rescue => e
@@ -600,21 +612,26 @@ class Host < ApplicationRecord
       if servers.empty?
         puts "No servers to process."
       else
-        servers.each do |address|
-          api = "https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{address}&format=json"
+        servers.each do |s|
+          api = "https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{s[:address]}&format=json"
 
           #begin
             parsed = JSON.parse(open(api).read)
 
             if parsed != nil && parsed["response"]["success"] == true
               parsed["response"]["servers"].each do |server|
-                if server["addr"] == address && server["appid"] && server["gameport"]
+                if server["addr"] == s[:address] && server["appid"] && server["gameport"]
                   ip, p = server["addr"].split(':')
                   port = server["gameport"].to_i
                   query_port = p.to_i
                   address = "#{ip}:#{port}"
-
+                  network = Network.location(ip)
                   game_id = Game.update(server["appid"],server["gamedir"], true)
+                  password = false
+                  if s[:password] == 'True'
+                    password = true
+                  end
+
                   host = Host.where(address: address).first_or_create
 
                   host.update_attributes(
@@ -622,14 +639,38 @@ class Host < ApplicationRecord
                     :query_port => query_port.to_i,
                     :ip         => ip,
                     :port       => port,
+                    :network_id => network.id,
                     :address    => address,
                     :pin        => true,
-                    :source     => "file"
+                    :source     => "file",
+                    :name       => s[:name],
+                    :map        => s[:map],
+                    :current    => s[:current],
+                    :max        => s[:max],
+                    :players    => players(s[:current], s[:max]),
+                    :password   => password,
+                    :last_successful_query => Time.now
                   )
 
-                  update_server_info(host)
+                  flags = {}
+                  if host.network.name == "byoc"
+                    flags['Hosted in BYOC'] = true
+                  end
+
+                  host.update_attributes(
+                    :flags    => flags
+                  )
 
                   puts "Found a #{host.game.name} host at #{address}"
+                end
+              end
+
+              hosts = Host.where(:source => 'file')
+              hosts.each do |h|
+                if h[:last_successful_query] < 10.minutes.ago
+                  host.update_attributes(
+                    :pin        => false
+                  )
                 end
               end
             end
@@ -664,7 +705,6 @@ class Host < ApplicationRecord
             name = server["name"]
             players = players(server["players"], server["max_players"])
             map = server["map"]
-
             game_id = Game.update(server["appid"],server["gamedir"], true)
             host = Host.where(address: address).first_or_create
 
@@ -681,8 +721,6 @@ class Host < ApplicationRecord
               :players    => players,
               :map        => map
             )
-
-            update_server_info(host)
 
             puts "Found a #{host.game.name} host at #{address}"
           end
