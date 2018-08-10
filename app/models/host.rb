@@ -674,7 +674,7 @@ class Host < ApplicationRecord
           hosts = Host.where(:source => 'file')
           hosts.each do |h|
             if h[:last_successful_query] < 5.minutes.ago
-              host.update_attributes(
+              h.update_attributes(
                 :pin        => false
               )
             end
@@ -706,6 +706,8 @@ class Host < ApplicationRecord
             name = server["name"]
             players = players(server["players"], server["max_players"])
             map = server["map"]
+            current = server["players"]
+            max = server["max_players"]
             game_id = Game.update(server["appid"],server["gamedir"], true)
             host = Host.where(address: address).first_or_create
 
@@ -716,11 +718,14 @@ class Host < ApplicationRecord
               :port       => port,
               :address    => address,
               :pin        => true,
-              :source     => "host_by_name",
+              :source     => "name",
               :flags      => flags,
               :name       => name,
+              :current    => current,
+              :max        => max,
               :players    => players,
-              :map        => map
+              :map        => map,
+              :last_successful_query => Time.now
             )
 
             puts "Found a #{host.game.name} host at #{address}"
@@ -729,6 +734,15 @@ class Host < ApplicationRecord
       end
     rescue => e
       puts "JSON failed to parse #{api}"
+    end
+
+    hosts = Host.where(:source => 'name')
+    hosts.each do |h|
+      if h[:last_successful_query] < 5.minutes.ago
+        host.update_attributes(
+          :pin        => false
+        )
+      end
     end
 
   end
