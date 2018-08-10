@@ -739,7 +739,7 @@ class Host < ApplicationRecord
     hosts = Host.where(:source => 'name')
     hosts.each do |h|
       if h[:last_successful_query] < 5.minutes.ago
-        host.update_attributes(
+        h.update_attributes(
           :pin        => false
         )
       end
