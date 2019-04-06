@@ -103,7 +103,7 @@ class Host < ApplicationRecord
         puts "Host port is 0"
       when host.lobby == nil && valid_ip == false
         puts "Host address is invalid"
-      when host.respond == false && host.last_successful_query < 1.hour.ago && host.users_count < 2 && !(['byoc'].include?(host.network.name))
+      when host.respond == false && host.last_successful_query < 1.hour.ago && host.users_count < 2 && host.network.name != "byoc"
         puts "Host is not responding"
       when host.lan == true && host.network.name != "byoc"
         puts "Host is a lan game outside of quakecon"
@@ -164,7 +164,7 @@ class Host < ApplicationRecord
     end
 
     #is the server responding to queries?
-    if host.respond == false
+    if host.respond == false && host.network.name != "byoc"
       flags['Last Query Attempt Failed'] = true
     end
 
@@ -615,7 +615,7 @@ class Host < ApplicationRecord
         servers.each do |s|
           api = "https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{s[:address]}&format=json"
 
-          #begin
+          begin
             parsed = JSON.parse(open(api).read)
 
             if parsed != nil && parsed["response"]["success"] == true
@@ -630,6 +630,8 @@ class Host < ApplicationRecord
                   password = false
                   if s[:password] == 'True'
                     password = true
+                  else
+                    password = false
                   end
 
                   host = Host.where(address: address).first_or_create
@@ -664,20 +666,19 @@ class Host < ApplicationRecord
                   puts "Found a #{host.game.name} host at #{address}"
                 end
               end
-
-              hosts = Host.where(:source => 'file')
-              hosts.each do |h|
-                if h[:last_successful_query] < 10.minutes.ago
-                  host.update_attributes(
-                    :pin        => false
-                  )
-                end
-              end
             end
-          #rescue => e
-          #  puts "JSON failed to parse #{api}"
-          #end
+          rescue => e
+            puts "JSON failed to parse #{api}"
+          end
 
+          hosts = Host.where(:source => 'file')
+          hosts.each do |h|
+            if h[:last_successful_query] < 5.minutes.ago
+              h.update_attributes(
+                :pin        => false
+              )
+            end
+          end
         end
       end
     end
@@ -705,6 +706,8 @@ class Host < ApplicationRecord
             name = server["name"]
             players = players(server["players"], server["max_players"])
             map = server["map"]
+            current = server["players"]
+            max = server["max_players"]
             game_id = Game.update(server["appid"],server["gamedir"], true)
             host = Host.where(address: address).first_or_create
 
@@ -715,11 +718,14 @@ class Host < ApplicationRecord
               :port       => port,
               :address    => address,
               :pin        => true,
-              :source     => "host_by_name",
+              :source     => "name",
               :flags      => flags,
               :name       => name,
+              :current    => current,
+              :max        => max,
               :players    => players,
-              :map        => map
+              :map        => map,
+              :last_successful_query => Time.now
             )
 
             puts "Found a #{host.game.name} host at #{address}"
@@ -728,6 +734,15 @@ class Host < ApplicationRecord
       end
     rescue => e
       puts "JSON failed to parse #{api}"
+    end
+
+    hosts = Host.where(:source => 'name')
+    hosts.each do |h|
+      if h[:last_successful_query] < 5.minutes.ago
+        h.update_attributes(
+          :pin        => false
+        )
+      end
     end
 
   end
