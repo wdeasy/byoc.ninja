@@ -3,15 +3,14 @@
 <h3 class="center">Edit Host</h3>
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
-
-	<%= form_for(@host) do |f| %>
+  <%= form_for(@host) do |f| %>
 	  <%= render 'shared/error_messages', object: f.object %>
 
 	  <%= f.label :auto_update %>
 	  <%= f.select :auto_update, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
 
 	  <%= f.label :banned %>
-	  <%= f.select :banned, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+    <%= f.select :banned, [['yes',true],['no',false]], {},{:class => 'form-control', :disabled => true} %>
 
 	  <%= f.label :pin %>
 	  <%= f.select :pin, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
@@ -47,6 +46,12 @@
 	  <%= link_to "Go to Game", edit_game_path(@host.game_id), class: "btn btn-33 btn-primary pull-center" %>
 	  <%= link_to "Back", admin_hosts_url, class: "btn btn-33 btn-primary pull-right" %>
 	<% end %>
+
+  <% if @host.banned? %>
+    <%= button_to("Unban", unban_host_path(@host), :method => :post, :class => "btn btn-primary")%>
+  <% else %>
+    <%= button_to("Ban", ban_host_path(@host), :method => :post, :class => "btn btn-primary")%>
+  <% end %>
   </div>
 </div>
 </div>

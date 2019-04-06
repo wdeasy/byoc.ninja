@@ -4,7 +4,7 @@ class SeatsController < ApplicationController
 
   def index
 	@seats = Seat.order("sort asc")
-	@seats = Seat.order(params[:sort])  if params[:sort].present?
+	@seats = Seat.order(sort_column) if params[:sort].present?
   end
 
   def update
@@ -47,4 +47,9 @@ class SeatsController < ApplicationController
     def admin_user
       redirect_to(root_url) unless current_user.admin?
     end
+
+    def sort_column
+      Seat.column_names.include?(params[:sort]) ? params[:sort] : "sort"
+    end
+
 end

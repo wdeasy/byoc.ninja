@@ -7,7 +7,7 @@
 		  <div class="col-md-6 col-md-offset-3">
 			<div class="container center">
 				<%= @user.avatar == nil ? '' : full_av(@user) %><br />
-				<%= link_to @user.name, @user.url, {:target => "_blank"} %>
+				<%= sanitize link_to @user.name, slice_url(@user.url), {:target => "_blank"} %>
 			</div>
 		  </div>
 		</div>
@@ -26,8 +26,8 @@
 	  <% end %>
 
 	  <% if current_user.admin? %>
-		  <%= f.label :banned %>
-		  <%= f.select :banned, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+      <%= f.label :banned %><br />
+      <%= f.select :banned, [['Yes',true],['No',false]], {},{:class => 'form-control', :disabled => true} %>
 
 		  <%= f.label :auto_update %>
 		  <%= f.select :auto_update, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
@@ -47,6 +47,14 @@
 		  <%= link_to "Back", users_url, class: "btn btn-50 btn-primary pull-right" %>
 		<% end %>
 	<% end %>
+
+  <% if current_user.admin? %>
+    <% if @user.banned? %>
+      <%= button_to("Unban", unban_user_path(@user), :method => :post, :class => "btn btn-primary")%>
+    <% else %>
+      <%= button_to("Ban", ban_user_path(@user), :method => :post, :class => "btn btn-primary")%>
+    <% end %>
+  <% end %>
   </div>
 </div>
 </div>

@@ -55,4 +55,10 @@ module UsersHelper
 
     return sanitize name, :tags => %w(font), :attributes => %w(color)
   end
+
+  def slice_url(url)
+    url.slice! "javascript:"
+    url.slice! "data:"
+    url
+  end
 end

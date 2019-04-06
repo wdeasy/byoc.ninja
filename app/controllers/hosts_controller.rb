@@ -2,9 +2,9 @@ class HostsController < ApplicationController
   before_action :logged_in_user, :except => [:index, :json]
   before_action :admin_user, :except => [:index, :json]
 
-  def index    
+  def index
   	@hosts = Host.includes(:game, :users, :seats).where(visible: true).where("games.joinable = true").order("games.name ASC, users_count DESC, hosts.current IS NULL, hosts.current DESC, hosts.name DESC")
-    
+
     respond_to do |format|
       format.html
       format.js
@@ -47,6 +47,26 @@ class HostsController < ApplicationController
     end
   end
 
+  def ban
+    @host = Host.find(params[:id])
+    if @host.update_attribute(:banned, true)
+      flash[:success] = "Host banned."
+      redirect_to admin_hosts_url
+    else
+      render 'edit'
+    end
+  end
+
+  def unban
+    @host = Host.find(params[:id])
+    if @host.update_attribute(:banned, false)
+      flash[:success] = "Host unbanned."
+      redirect_to admin_hosts_url
+    else
+      render 'edit'
+    end
+  end
+
   def json
     @hosts = Host.includes(:game, :users, :seats).where(visible: true).where("games.joinable = true").order("games.name ASC, users_count DESC, hosts.current IS NULL, hosts.current DESC, hosts.name DESC")
     render :json => @hosts
@@ -58,7 +78,7 @@ class HostsController < ApplicationController
     end
 
     def host_params
-      params.require(:host).permit(:banned, :auto_update, :name, :map, :query_port, :network_id, :last_successful_query, :pin, :source)
+      params.require(:host).permit(:auto_update, :name, :map, :query_port, :network_id, :last_successful_query, :pin, :source)
     end
 
     # Confirms a logged-in user.
@@ -72,5 +92,5 @@ class HostsController < ApplicationController
     # Confirms an admin user.
     def admin_user
       redirect_to(root_url) unless current_user.admin?
-    end    
+    end
 end
