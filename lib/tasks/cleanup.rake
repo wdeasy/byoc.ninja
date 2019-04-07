@@ -21,10 +21,21 @@ namespace :cleanup do
     users.each do |user|
       puts "updating #{user.steamid}"
       User.fill(user.steamid)
-    end 
+    end
 
     finish_time(beginning)
-  end  
+  end
+
+  desc "Clear out tables for a new year"
+  task :tables => :environment do
+    beginning = start_time
+    users= User.where("admin = false")
+    puts "Deleting #{users.count} users."
+    users.delete_all
+    puts "Deleting #{Seat.all.count} seats."
+    Seat.destroy_all
+    finish_time(beginning)
+  end
 
   def start_time
   	beginning = Time.now

@@ -630,8 +630,6 @@ class Host < ApplicationRecord
                   password = false
                   if s[:password] == 'True'
                     password = true
-                  else
-                    password = false
                   end
 
                   host = Host.where(address: address).first_or_create

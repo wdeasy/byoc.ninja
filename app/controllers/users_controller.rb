@@ -54,7 +54,7 @@ class UsersController < ApplicationController
       cookies.permanent.signed[:hidden_message_ids] = ids
     end
 
-    @sections = Seat.order("sort asc").pluck(:section).uniq
+    @sections = Seat.where(:year => Date.today.year).order("sort asc").pluck(:section).uniq
 
     if params[:link].present?
       @user = User.update_seat(params[:seat],params[:url])
@@ -70,6 +70,10 @@ class UsersController < ApplicationController
 
   private
     def user_params
+      unless current_user.admin?
+        params.extract!(:auto_update, :name, :url)
+      end
+
       params.require(:user).permit(:display, :auto_update, :name, :url, :seat_ids)
     end
 

@@ -24,9 +24,9 @@ class SeatsController < ApplicationController
     @seats = []
 
     if params[:row].present? && params[:section].present?
-      @seats = Seat.where(section: params[:section], row: params[:row]).order("sort asc")
+      @seats = Seat.where(:year => Date.today.year, section: params[:section], row: params[:row]).order("sort asc")
     elsif params[:section].present?
-      @seats = Seat.where(section: params[:section]).order("sort asc").pluck(:row).uniq
+      @seats = Seat.where(:year => Date.today.year, section: params[:section]).order("sort asc").pluck(:row).uniq
     end
 
     respond_to do |format|
