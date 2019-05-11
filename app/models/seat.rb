@@ -60,23 +60,27 @@ class Seat < ApplicationRecord
     i = 0
     Seat.where(:year => year).update_all(:updated => false)
 
-    parsed["chart"]["subChart"]["rows"].each do |row|
+    parsed["subChart"]["rows"].each do |row|
       row_letter = row["label"]
+      row_letter .slice! "Row "
+      row_letter.strip!
 
       row["seats"].each do |seat|
         section = seat["categoryLabel"]
-        section.slice! "SECTION "
+        section.slice! "Section "
+        section.strip!
 
         number = seat["label"]
+        number.strip!
 
         seat = "#{section}-#{row_letter}-#{number}"
         clan = nil
         handle = nil
 
         if row_letter.length == 2
-          sort_letter = "B#{row_letter[1]}"
+          sort_letter = row_letter
         else
-          sort_letter = row_letter.rjust(2, 'A')
+          sort_letter = row_letter.rjust(2, '0')
         end
         sort ="#{section}#{sort_letter}#{sprintf '%02d', number}"
 

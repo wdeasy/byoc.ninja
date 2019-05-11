@@ -29,6 +29,9 @@ namespace :cleanup do
   desc "Clear out tables for a new year"
   task :tables => :environment do
     beginning = start_time
+    hosts = Host.where(:visible => true)
+    puts "Hiding #{hosts.count} hosts."
+    hosts.update_all(:visible => false)
     users= User.where("admin = false")
     puts "Deleting #{users.count} users."
     users.delete_all

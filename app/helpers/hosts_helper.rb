@@ -41,15 +41,15 @@ module HostsHelper
 	end
 
   def name(host)
-	if host.name.blank? && host.lobby
-	  if host.users_count > 0
-	    "#{display_name(host.users.first)}'s Lobby"
-	  else
-	    "#{host.game.name} Lobby"
-	  end
-	else
-      decolor_name(host.name)
-	end
+		if host.name.blank? && host.lobby
+		  if host.users_count > 0
+		    "#{display_name(host.users.first)}'s Lobby"
+		  else
+		    "#{host.game.name} Lobby"
+		  end
+		else
+	      decolor_name(host.name)
+		end
   end
 
   def join(host)
@@ -62,17 +62,9 @@ module HostsHelper
 
   def decolor_name(name)
     if name
-      name.gsub!("^0","")
-      name.gsub!("^1","")
-      name.gsub!("^2","")
-      name.gsub!("^3","")
-      name.gsub!("^4","")
-      name.gsub!("^5","")
-      name.gsub!("^6","")
-      name.gsub!("^7","")
-      name.gsub!("^8","")
+      name.gsub!(/\^[0-8]/,'')
     end
 
-    return sanitize(name, tags:[]) #strip_tags(name)
+    return name
   end
 end
