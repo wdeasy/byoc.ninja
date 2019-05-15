@@ -11,7 +11,7 @@ class Contact
 	include ActiveModel::Conversion
 	extend ActiveModel::Naming
 
-	attr_accessor :name, :email, :message
+	attr_accessor :name, :email, :message, :subject
 	validates :name, :email, :message, :presence => true
 	validates :email, email: true
 	validates :message, length: { maximum: 1000 }
