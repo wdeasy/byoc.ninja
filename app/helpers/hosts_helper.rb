@@ -36,7 +36,7 @@ module HostsHelper
 		if host.game.link?
 			link_to decolor_name(host.game.name), "steam://store/#{host.game.appid}"
 		else
-			decolor_name(host.game.name)
+			game_name(host)
 		end
 	end
 
@@ -51,6 +51,14 @@ module HostsHelper
 	      decolor_name(host.name)
 		end
   end
+
+	def game_name(host)
+		if host.mod.nil?
+			decolor_name(host.game.name)
+		else
+			decolor_name(host.mod.name)
+		end
+	end
 
   def join(host)
     if host.game.supported == true

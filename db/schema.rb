@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_11_021507) do
+ActiveRecord::Schema.define(version: 2019_05_15_143253) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -69,6 +69,7 @@ ActiveRecord::Schema.define(version: 2019_05_11_021507) do
     t.bigint "steamid"
     t.boolean "pin", default: false
     t.boolean "lan"
+    t.integer "mod_id"
     t.index ["game_id"], name: "index_hosts_on_game_id"
     t.index ["network_id"], name: "index_hosts_on_network_id"
   end
@@ -131,6 +132,7 @@ ActiveRecord::Schema.define(version: 2019_05_11_021507) do
     t.datetime "updated_at", null: false
     t.integer "host_id"
     t.integer "game_id"
+    t.integer "mod_id"
     t.index ["host_id"], name: "index_users_on_host_id"
     t.index ["steamid"], name: "index_users_on_steamid", unique: true
   end

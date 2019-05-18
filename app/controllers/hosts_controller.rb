@@ -3,7 +3,7 @@ class HostsController < ApplicationController
   before_action :admin_user, :except => [:index, :json]
 
   def index
-  	@hosts = Host.includes(:game, :users, :seats).where(visible: true).where("games.joinable = true").order("games.name ASC, users_count DESC, hosts.current IS NULL, hosts.current DESC, hosts.name DESC")
+  	@hosts = Host.includes(:game, :mod, :users, :seats).where(visible: true).where("games.joinable = true").order("games.name ASC, users_count DESC, hosts.current IS NULL, hosts.current DESC, hosts.name DESC")
 
     respond_to do |format|
       format.html

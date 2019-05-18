@@ -7,8 +7,11 @@
 	<%= form_for(@mod) do |f| %>
 	  <%= render 'shared/error_messages', object: f.object %>
 
-	  <%= f.label :id %>
-	  <%= f.text_field :id, class: 'form-control', :readonly => true %>
+	  <%= f.label :steamid %>
+	  <%= f.text_field :steamid, class: 'form-control', :readonly => true %>
+
+    <%= f.label :game_id %>
+	  <%= f.text_field :game_id, class: 'form-control', :readonly => true %>
 
 	  <%= f.label :name %>
 	  <%= f.text_field :name, class: 'form-control' %>
@@ -16,9 +19,12 @@
 	  <%= f.label :info %>
 	  <%= f.text_field :info, class: 'form-control', :readonly => true %>
 
-	  <%= f.submit "Save changes", class: "btn btn-33 btn-primary pull-left" %>
-	  <%= link_to "Delete", @mod, method: :delete, data: { confirm: "You sure?" }, class: "btn btn-33 btn-primary" %>	  
-	  <%= link_to "Back", mods_url, class: "btn btn-33 btn-primary pull-right" %>
+    <%= f.label :dir %>
+	  <%= f.text_field :dir, class: 'form-control', :readonly => true %>
+
+    <%= f.submit "Save changes", class: "btn btn-33 btn-primary pull-left" %>
+	  <%= link_to "Go to Game", edit_game_path(@mod.game_id), class: "btn btn-33 btn-primary pull-center" %>
+	  <%= link_to "Back", admin_hosts_url, class: "btn btn-33 btn-primary pull-right" %>
 	<% end %>
   </div>
 </div>

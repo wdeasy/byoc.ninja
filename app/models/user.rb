@@ -4,8 +4,9 @@ class User < ApplicationRecord
   belongs_to :host, counter_cache: true
   has_and_belongs_to_many :seats
   belongs_to :game
+  belongs_to :mod
 
-  def User.update(player, host_id, game_id)
+  def User.update(player, host_id, game_id, mod_id=nil)
 
     user = User.find_by_steamid(player["steamid"])
 
@@ -16,6 +17,7 @@ class User < ApplicationRecord
         :avatar => player["avatar"],
         :host_id => host_id,
         :game_id => game_id,
+        :mod_id => mod_id,
         :updated => true
       )
     else
@@ -134,4 +136,21 @@ class User < ApplicationRecord
       end
     end
   end
+
+  def clan
+    if name.match(/\[.*\].*/)
+      name.split(/[\[\]]/)[1].strip
+    else
+      nil
+    end
+  end
+
+  def handle
+    if name.match(/\[.*\].*/)
+      name.split(/[\[\]]/)[-1].strip
+    else
+      name
+    end
+  end
+
 end

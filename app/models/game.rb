@@ -9,7 +9,7 @@ class Game < ApplicationRecord
     game = Game.where(appid: appid).first_or_create do |game|
       name = name_from_appid(appid)
 
-      game.name = Host.valid_name(name)
+      game.name = name.blank? ? Host.valid_name(info) : Host.valid_name(name)
       game.info = info
       game.source = "auto"
       game.supported = supported

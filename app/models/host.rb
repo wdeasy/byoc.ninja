@@ -6,6 +6,7 @@ class Host < ApplicationRecord
   require 'csv'
 
   belongs_to :game
+  belongs_to :mod
   belongs_to :network
   has_many :users
   has_many :seats, :through => :users
@@ -33,7 +34,7 @@ class Host < ApplicationRecord
     end
   end
 
-  def Host.update(player, game_id)
+  def Host.update(player, game_id, mod_id=nil)
     if player["lobbysteamid"].present? && player["gameserverip"].present?
       host = Host.where('lobby = ? OR address = ?', player["lobbysteamid"], player["gameserverip"]).first_or_create
     elsif player["lobbysteamid"].present?
@@ -78,6 +79,7 @@ class Host < ApplicationRecord
 
     host.update_attributes(
       :game_id    => game_id,
+      :mod_id     => mod_id,
       :query_port => query_port,
       :ip         => i,
       :port       => port,
@@ -326,14 +328,16 @@ class Host < ApplicationRecord
                 if player["gameserverip"] != nil || player["lobbysteamid"] != nil
                   if player["gameid"].length > 7
                     #gameids over length 7 are mods
-                    game_id = Mod.update(player, true)
+                    mod_id = Mod.update(player, true)
+                    game_id = Mod.find(mod_id).game_id
                   else
                     game_id = Game.update(player["gameid"],player["gameextrainfo"], true)
                   end
                 else
                   if player["gameid"].length > 7
                     #gameids over length 7 are mods
-                    game_id = Mod.update(player, false)
+                    mod_id = Mod.update(player, false)
+                    game_id = Mod.find(mod_id).game_id
                   else
                     game_id = Game.update(player["gameid"],player["gameextrainfo"], false)
                   end
@@ -350,11 +354,11 @@ class Host < ApplicationRecord
                 end
 
                 if player["gameserverip"] != nil || player["lobbysteamid"] != nil
-                  host_id = Host.update(player, game_id)
-                  User.update(player, host_id, game_id)
+                  host_id = Host.update(player, game_id, mod_id)
+                  User.update(player, host_id, game_id, mod_id)
                   u += 1
                 else
-                  User.update(player, nil, game_id)
+                  User.update(player, nil, game_id, mod_id)
                   n += 1
                 end
 
@@ -386,6 +390,7 @@ class Host < ApplicationRecord
       Host.where(:updated => false).update_all(:visible => false)
       User.where(:updated => false).update_all(:host_id => nil)
       User.where(:updated => false).update_all(:game_id => nil)
+      User.where(:updated => false).update_all(:mod_id => nil)
     end
 
     puts "Processed #{j} steam ids"

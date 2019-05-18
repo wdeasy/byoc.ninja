@@ -25,6 +25,9 @@
 	  <%= f.label :info %>
 	  <%= f.text_field :info, class: 'form-control', :readonly => true %>
 
+		<%= f.label :link %>
+	  <%= f.text_field :link, class: 'form-control', :readonly => true %>
+
 	  <%= f.label :joinable %>
 	  <%= f.select :joinable, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
 
