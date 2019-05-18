@@ -22,9 +22,14 @@
     <%= f.label :dir %>
 	  <%= f.text_field :dir, class: 'form-control', :readonly => true %>
 
-    <%= f.submit "Save changes", class: "btn btn-33 btn-primary pull-left" %>
-	  <%= link_to "Go to Game", edit_game_path(@mod.game_id), class: "btn btn-33 btn-primary pull-center" %>
-	  <%= link_to "Back", admin_hosts_url, class: "btn btn-33 btn-primary pull-right" %>
+    <% if @mod.game_id.nil? %>
+      <%= f.submit "Save changes", class: "btn btn-50 btn-primary pull-left" %>
+  	  <%= link_to "Back", admin_hosts_url, class: "btn btn-50 btn-primary pull-right" %>
+    <% else %>
+      <%= f.submit "Save changes", class: "btn btn-33 btn-primary pull-left" %>
+  	  <%= link_to "Go to Game", edit_game_path(@mod.game_id), class: "btn btn-33 btn-primary pull-center" %>
+  	  <%= link_to "Back", admin_hosts_url, class: "btn btn-33 btn-primary pull-right" %>
+    <% end %>
 	<% end %>
   </div>
 </div>

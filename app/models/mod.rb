@@ -1,7 +1,7 @@
 class Mod < ApplicationRecord
   require 'open-uri'
 
-  belongs_to :game
+  belongs_to :game, optional: true
   has_many :users
   has_many :hosts
 
