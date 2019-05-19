@@ -134,10 +134,10 @@ class Game < ApplicationRecord
         x = 1
       end
 
-      name = Game.name
-      link = nil
-      image = nil
-
+      name  = game.name
+      image = game.image
+      link  = game.link
+      
       unless parsed.blank?
         if parsed["#{game.appid}"]['success']
           name  = Host.valid_name(parsed["#{game.appid}"]['data']['name'])
