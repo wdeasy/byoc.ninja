@@ -20,7 +20,7 @@ class Mod < ApplicationRecord
         mod.dir = info["gamedir"]
       else
         appid = Game.appid_from_name(name)
-        game_id = Game.update(appid, player["gameextrainfo"], supported, player["profileurl"])
+        game_id = Game.update(appid, player["gameextrainfo"], supported)
       end
 
       mod.game_id = game_id

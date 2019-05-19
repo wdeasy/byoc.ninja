@@ -29,7 +29,7 @@ class Game < ApplicationRecord
 
       if name.nil? && !profile.nil?
         name = name_from_profile(profile)
-      end 
+      end
 
       game.name = name.blank? ? Host.valid_name(info) : Host.valid_name(name)
       game.info = info
@@ -51,7 +51,7 @@ class Game < ApplicationRecord
   def self.valid_link(url)
     page = lookup(url)
 
-    if page.nil?
+    if page.blank?
       return nil
     end
 
