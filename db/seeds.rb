@@ -40,3 +40,5 @@ message_list = [["Click <a href=https://byoc.ninja/seat class=\"alert-link\">HER
 message_list.each do |message, message_type, show|
 	Message.create!(message: message, message_type: message_type, show: show)
 end
+
+Game.create!(appid: 0, name: "NO GAME DATA FOUND")

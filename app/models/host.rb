@@ -6,7 +6,7 @@ class Host < ApplicationRecord
   require 'csv'
 
   belongs_to :game
-  belongs_to :mod
+  belongs_to :mod, optional: true
   belongs_to :network
   has_many :users
   has_many :seats, :through => :users
@@ -331,7 +331,7 @@ class Host < ApplicationRecord
                     mod_id = Mod.update(player, true)
                     game_id = Mod.find(mod_id).game_id
                   else
-                    game_id = Game.update(player["gameid"],player["gameextrainfo"], true)
+                    game_id = Game.update(player["gameid"],player["gameextrainfo"], true, player["profileurl"])
                   end
                 else
                   if player["gameid"].length > 7
@@ -339,7 +339,7 @@ class Host < ApplicationRecord
                     mod_id = Mod.update(player, false)
                     game_id = Mod.find(mod_id).game_id
                   else
-                    game_id = Game.update(player["gameid"],player["gameextrainfo"], false)
+                    game_id = Game.update(player["gameid"],player["gameextrainfo"], false, player["profileurl"])
                   end
                 end
 

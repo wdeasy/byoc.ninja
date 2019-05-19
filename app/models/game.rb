@@ -5,19 +5,38 @@ class Game < ApplicationRecord
   has_many :mods
   has_many :users
 
-  def Game.update(appid, info, supported)
+  def Game.update(appid, info, supported, profile=nil)
     game = Game.where(appid: appid).first_or_create do |game|
-      name = name_from_appid(appid)
+      url = "https://store.steampowered.com/api/appdetails/?appids=#{appid}"
+
+      begin
+        parsed = JSON.parse(open(url).read)
+      rescue => e
+        puts "JSON failed to parse #{url}"
+      end
+
+      name = nil
+      link = nil
+      image = nil
+
+      unless parsed.blank?
+        if parsed["#{appid}"]['success']
+          name = parsed["#{appid}"]['data']['name']
+          image = parsed["#{appid}"]['data']['header_image']
+          link = valid_link("https://store.steampowered.com/app/#{appid}")
+        end
+      end
+
+      if name.nil? && !profile.nil?
+        name = name_from_profile(profile)
+      end 
 
       game.name = name.blank? ? Host.valid_name(info) : Host.valid_name(name)
       game.info = info
+      game.link = link
+      game.image = image
       game.source = "auto"
       game.supported = supported
-
-      if name.exclude? "Source SDK"
-         game.link = "https://store.steampowered.com/app/#{appid}"
-         game.image = "https://cdn.akamai.steamstatic.com/steam/apps/#{appid}/header.jpg"
-      end
     end
 
     if supported == true && game.supported == false
@@ -29,9 +48,24 @@ class Game < ApplicationRecord
     return game.id
   end
 
+  def self.valid_link(url)
+    page = lookup(url)
+
+    if page.nil?
+      return nil
+    end
+
+    name = page.css('title').text
+    if name == "Welcome to Steam"
+      return nil
+    end
+
+    return url
+  end
+
   def self.name_from_appid(appid)
     name = ''
-    url = 'https://api.steampowered.com/ISteamApps/GetAppList/v0002/'
+    url = "http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=#{ENV['STEAM_WEB_API_KEY']}&appid=#{appid}"
 
     begin
       parsed = JSON.parse(open(url).read)
@@ -39,41 +73,31 @@ class Game < ApplicationRecord
       puts "JSON failed to parse #{url}"
     end
 
-    if parsed != nil
-      parsed['applist']['apps'].each do |app|
-        if appid.to_i == app['appid'].to_i
-          name = app['name']
-        end
-      end
+    unless parsed.nil?
+      name = parsed['game']['gameName']
     end
 
     return name
   end
 
   def Game.appid_from_name(name)
-    appid = nil
-    url = 'https://api.steampowered.com/ISteamApps/GetAppList/v0002/'
-
-    begin
-      parsed = JSON.parse(open(url).read)
-
-      if parsed != nil
-        parsed['applist']['apps'].each do |app|
-          if name.downcase == app['name'].downcase
-            appid = app['appid']
-          end
-        end
-      end
-    rescue => e
-      puts "JSON failed to parse #{url}"
+    case name
+    when "Source SDK Base 2013 Multiplayer"
+      appid = 243750
+    when "Source SDK Base 2013 Singleplayer"
+      appid = 243730
+    when "Source SDK Base 2007"
+      appid = 218
+    when "Source SDK Base 2006"
+      appid = 215
+    else
+      appid = 0
     end
-
-    return appid
   end
 
-  def Game.name_from_profile(player)
+  def Game.name_from_profile(url)
     name = nil
-    page = lookup(player["profileurl"])
+    page = lookup(url)
 
     if !page.blank?
       name = page.css('div.profile_in_game_name').text

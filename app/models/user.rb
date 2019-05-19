@@ -1,10 +1,10 @@
 class User < ApplicationRecord
   require 'open-uri'
 
-  belongs_to :host, counter_cache: true
+  belongs_to :host, counter_cache: true, optional: true
   has_and_belongs_to_many :seats
-  belongs_to :game
-  belongs_to :mod
+  belongs_to :game, optional: true
+  belongs_to :mod, optional: true
 
   def User.update(player, host_id, game_id, mod_id=nil)
 
