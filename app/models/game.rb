@@ -118,4 +118,56 @@ class Game < ApplicationRecord
 
     return page
   end
+
+  def Game.update_games
+    puts "Updating #{Game.all.count} games."
+
+    Game.all.each do |game|
+      puts "Updating #{game.appid}: #{game.name}"
+
+      url = "https://store.steampowered.com/api/appdetails/?appids=#{game.appid}"
+
+      begin
+        parsed = JSON.parse(open(url).read)
+      rescue => e
+        puts "JSON failed to parse #{url}"
+        x = 1
+      end
+
+      name = Game.name
+      link = nil
+      image = nil
+
+      unless parsed.blank?
+        if parsed["#{game.appid}"]['success']
+          name  = Host.valid_name(parsed["#{game.appid}"]['data']['name'])
+          image = parsed["#{game.appid}"]['data']['header_image']
+          link  = valid_link("https://store.steampowered.com/app/#{game.appid}")
+        else
+          link = nil
+          image = nil
+        end
+      end
+
+      unless game.name == name
+        puts "Updating name to #{name}"
+      end
+
+      unless game.link == link
+        puts "Updating link to #{link}"
+      end
+
+      unless game.image == image
+        puts "Updating image to #{image}"
+      end
+
+      game.update_attributes(
+        :name  => name,
+        :image => image,
+        :link  => link
+      )
+
+      sleep 41
+    end
+  end
 end

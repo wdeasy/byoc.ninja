@@ -50,6 +50,13 @@ namespace :update do
     finish_time(beginning)
   end
 
+  desc "Update games"
+  task :games => :environment do
+    beginning = start_time
+    Game.update_games
+    finish_time(beginning)
+  end
+
   def start_time
   	beginning = Time.now
   	puts beginning.to_formatted_s(:db)
