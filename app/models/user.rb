@@ -138,7 +138,7 @@ class User < ApplicationRecord
   end
 
   def clan
-    if name.match(/\[.*\].*/)
+    if name.match(/^\[.*\S.*\].*\S.*$/)
       name.split(/[\[\]]/)[1].strip
     else
       nil
@@ -146,10 +146,20 @@ class User < ApplicationRecord
   end
 
   def handle
-    if name.match(/\[.*\].*/)
+    if name.match(/^\[.*\S.*\].*\S.*$/)
       name.split(/[\[\]]/)[-1].strip
     else
       name
+    end
+  end
+
+  def playing
+    if mod_id?
+      mod.name
+    elsif game_id?
+      game.name
+    else
+      nil
     end
   end
 

@@ -16,7 +16,7 @@ module UsersHelper
       if seat.year == Date.today.year
         name = "[#{user.seats.first.seat}]"
         if user.seats.first.handle.blank?
-          name << " #{user.name}"
+          name << " #{user.handle}"
         else
           name << " #{user.seats.first.handle}"
         end

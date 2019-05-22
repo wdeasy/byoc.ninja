@@ -1,6 +1,6 @@
-class RemoveTriedQueryFromHosts < ActiveRecord::Migration
+class RemoveTriedQueryFromHosts < ActiveRecord::Migration[5.2]
   def up
-    remove_column :hosts, :tried_query  
+    remove_column :hosts, :tried_query
   end
 
   def down

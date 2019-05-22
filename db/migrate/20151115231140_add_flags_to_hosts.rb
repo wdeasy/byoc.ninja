@@ -1,9 +1,9 @@
-class AddFlagsToHosts < ActiveRecord::Migration
+class AddFlagsToHosts < ActiveRecord::Migration[5.2]
   def up
   	add_column :hosts, :flags, :string
   	add_column :games, :store_link, :string
   	add_column :games, :comm_link, :string
-  	add_column :games, :full_img, :string  	
+  	add_column :games, :full_img, :string
   end
 
   def down

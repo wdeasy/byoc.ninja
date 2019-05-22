@@ -5,7 +5,7 @@ class Game < ApplicationRecord
   has_many :mods
   has_many :users
 
-  def Game.update(appid, info, supported, profile=nil)
+  def Game.update(appid, info, multiplayer, profile=nil)
     game = Game.where(appid: appid).first_or_create do |game|
       url = "https://store.steampowered.com/api/appdetails/?appids=#{appid}"
 
@@ -36,14 +36,18 @@ class Game < ApplicationRecord
       game.link = link
       game.image = image
       game.source = "auto"
-      game.supported = supported
+      game.multiplayer = multiplayer
     end
 
-    if supported == true && game.supported == false
+    if multiplayer == true && game.multiplayer == false
       game.update_attributes(
-        :supported => true
+        :multiplayer => true
       )
     end
+
+    game.update_attributes(
+      :last_seen => Time.now
+    )
 
     return game.id
   end
@@ -119,55 +123,63 @@ class Game < ApplicationRecord
     return page
   end
 
+  def Game.update_game(appid)
+    game = Game.where(appid: appid).first
+
+    url = "https://store.steampowered.com/api/appdetails/?appids=#{game.appid}"
+
+    begin
+      parsed = JSON.parse(open(url).read)
+    rescue => e
+      puts "JSON failed to parse #{url}"
+      x = 1
+    end
+
+    name  = game.name
+    image = game.image
+    link  = game.link
+
+    unless parsed.blank?
+      if parsed["#{game.appid}"]['success']
+        name  = Host.valid_name(parsed["#{game.appid}"]['data']['name'])
+        image = parsed["#{game.appid}"]['data']['header_image']
+        link  = valid_link("https://store.steampowered.com/app/#{game.appid}")
+      else
+        link = nil
+        image = nil
+      end
+    end
+
+    unless game.name == name
+      puts "Updating name to #{name}"
+    end
+
+    unless game.link == link
+      puts "Updating link to #{link}"
+    end
+
+    unless game.image == image
+      puts "Updating image to #{image}"
+    end
+
+    game.update_attributes(
+      :name  => name,
+      :image => image,
+      :link  => link
+    )
+  end
+
   def Game.update_games
-    puts "Updating #{Game.all.count} games."
-
+    appids = []
     Game.all.each do |game|
-      puts "Updating #{game.appid}: #{game.name}"
+      appids << game.appid
+    end
+    puts "Updating #{appids.count} games."
 
-      url = "https://store.steampowered.com/api/appdetails/?appids=#{game.appid}"
-
-      begin
-        parsed = JSON.parse(open(url).read)
-      rescue => e
-        puts "JSON failed to parse #{url}"
-        x = 1
-      end
-
-      name  = game.name
-      image = game.image
-      link  = game.link
-      
-      unless parsed.blank?
-        if parsed["#{game.appid}"]['success']
-          name  = Host.valid_name(parsed["#{game.appid}"]['data']['name'])
-          image = parsed["#{game.appid}"]['data']['header_image']
-          link  = valid_link("https://store.steampowered.com/app/#{game.appid}")
-        else
-          link = nil
-          image = nil
-        end
-      end
-
-      unless game.name == name
-        puts "Updating name to #{name}"
-      end
-
-      unless game.link == link
-        puts "Updating link to #{link}"
-      end
-
-      unless game.image == image
-        puts "Updating image to #{image}"
-      end
-
-      game.update_attributes(
-        :name  => name,
-        :image => image,
-        :link  => link
-      )
-
-      sleep 41
+    appids.each do |appid|
+      puts "Updating #{appid}"
+      update_game(appid)
+      sleep 10
     end
   end
 end

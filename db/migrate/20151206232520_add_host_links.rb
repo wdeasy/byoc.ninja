@@ -1,4 +1,4 @@
-class AddHostLinks < ActiveRecord::Migration
+class AddHostLinks < ActiveRecord::Migration[5.2]
   def up
   	#add join link
   	add_column :hosts, :join_link, :string
@@ -11,7 +11,7 @@ class AddHostLinks < ActiveRecord::Migration
   	rename_column :users, :gameserverip, :address
   	rename_column :hosts, :gameserverip, :address
   	rename_column :hosts, :lobbysteamid, :lobby
-  	rename_column :games, :gameextrainfo, :name	
+  	rename_column :games, :gameextrainfo, :name
   end
 
   def down
@@ -23,7 +23,7 @@ class AddHostLinks < ActiveRecord::Migration
   	rename_column :users, :name, :personaname
 		rename_column :users, :address, :gameserverip
   	rename_column :hosts, :address, :gameserverip
-  	rename_column :hosts, :lobby, :lobbysteamid  	
+  	rename_column :hosts, :lobby, :lobbysteamid
   	rename_column :games, :name, :gameextrainfo
 
   end

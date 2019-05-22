@@ -1,4 +1,4 @@
-class AddPinToHosts < ActiveRecord::Migration
+class AddPinToHosts < ActiveRecord::Migration[5.2]
   def up
 		add_column :hosts, :pin, :boolean, :default => false
 
@@ -16,7 +16,7 @@ class AddPinToHosts < ActiveRecord::Migration
       b.string :dir
 
       b.timestamps null: false
-    end				
+    end
   end
 
   def down

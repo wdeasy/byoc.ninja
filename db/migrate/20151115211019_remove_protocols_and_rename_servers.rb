@@ -1,4 +1,4 @@
-class RemoveProtocolsAndRenameServers < ActiveRecord::Migration
+class RemoveProtocolsAndRenameServers < ActiveRecord::Migration[5.2]
   def up
   	remove_column :games, :protocol
   	drop_table :protocols
@@ -10,7 +10,7 @@ class RemoveProtocolsAndRenameServers < ActiveRecord::Migration
 
     create_table :protocols do |b|
       b.string :protocol
-      b.string :name, unique: true     
+      b.string :name, unique: true
 	    b.string :host,       default: "hostname"
 	    b.string :map,        default: "map"
 	    b.string :num,        default: "num_players"

@@ -11,7 +11,7 @@ class Seat < ApplicationRecord
   def as_json(options={})
    super(:only => [:seat, :section, :row, :number],
       :include => {
-        :users => {:only => [:url, :name], :methods => [:clan, :handle],
+        :users => {:only => [:url, :name], :methods => [:clan, :handle, :playing],
           :include => {
             :host => {:only => [:link]},
             :game => {:only => [:name]}

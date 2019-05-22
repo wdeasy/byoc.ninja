@@ -5,7 +5,7 @@ class Mod < ApplicationRecord
   has_many :users
   has_many :hosts
 
-  def Mod.update(player, supported)
+  def Mod.update(player, multiplayer)
     mod = Mod.where(:steamid => player["gameid"]).first_or_create do |mod|
       info = Host.get_server_info(player["gameserverip"])
       name = Game.name_from_profile(player["profileurl"])
@@ -15,12 +15,12 @@ class Mod < ApplicationRecord
       mod.info = player["gameextrainfo"]
       if info["appid"]
         appid = info["appid"]
-        game_id = Game.update(appid, player["gameextrainfo"], supported, player["profileurl"])
+        game_id = Game.update(appid, player["gameextrainfo"], multiplayer, player["profileurl"])
 
         mod.dir = info["gamedir"]
       else
         appid = Game.appid_from_name(name)
-        game_id = Game.update(appid, player["gameextrainfo"], supported)
+        game_id = Game.update(appid, player["gameextrainfo"], multiplayer, player["profileurl"])
       end
 
       mod.game_id = game_id

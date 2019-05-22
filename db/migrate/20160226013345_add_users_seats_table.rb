@@ -1,4 +1,4 @@
-class AddUsersSeatsTable < ActiveRecord::Migration
+class AddUsersSeatsTable < ActiveRecord::Migration[5.2]
   def up
   	create_join_table :users, :seats
     remove_column :users, :seat_id

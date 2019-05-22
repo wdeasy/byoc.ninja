@@ -1,4 +1,4 @@
-class RemoveQueryPortFromGames < ActiveRecord::Migration
+class RemoveQueryPortFromGames < ActiveRecord::Migration[5.2]
   def up
   	remove_column :games, :query_port
   end

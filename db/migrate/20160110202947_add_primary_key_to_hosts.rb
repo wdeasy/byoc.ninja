@@ -1,4 +1,4 @@
-class AddPrimaryKeyToHosts < ActiveRecord::Migration
+class AddPrimaryKeyToHosts < ActiveRecord::Migration[5.2]
   def up
     remove_column :hosts, :network
   	add_column :hosts, :id, :primary_key
@@ -20,7 +20,7 @@ class AddPrimaryKeyToHosts < ActiveRecord::Migration
 
 
     rename_column :games, :gameid, :steamid
-    rename_column :groups, :groupid64, :steamid 
+    rename_column :groups, :groupid64, :steamid
   end
 
   def down
@@ -40,7 +40,7 @@ class AddPrimaryKeyToHosts < ActiveRecord::Migration
     add_column :networks, :min
     add_column :networks, :max
     add_column :hosts, :network, :string
-    rename_column :networks, :name, :network    
+    rename_column :networks, :name, :network
 
     rename_column :games, :steamid, :gameid
     rename_column :groups, :steamid, :groupid64

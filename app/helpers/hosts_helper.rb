@@ -61,7 +61,7 @@ module HostsHelper
 	end
 
   def join(host)
-    if host.game.supported == true
+    if host.game.multiplayer == true
     	link_to (host.address ? host.address : "Join Lobby") , host.link
     else
       host.address

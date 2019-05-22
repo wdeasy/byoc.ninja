@@ -1,4 +1,4 @@
-class CreateTables < ActiveRecord::Migration
+class CreateTables < ActiveRecord::Migration[5.2]
   def change
 
     create_table :servers, id: false do |t|
@@ -7,7 +7,7 @@ class CreateTables < ActiveRecord::Migration
       t.integer :port
       t.integer :query_port
       t.string :gameid
-      t.string :name      
+      t.string :name
       t.string :map
       t.integer :current
       t.integer :max
@@ -16,7 +16,7 @@ class CreateTables < ActiveRecord::Migration
       t.string :network, :default => 'wan'
       t.boolean :respond, :default => true
       t.boolean :override, :default => false
-      t.boolean :banned, :default => false      
+      t.boolean :banned, :default => false
       t.boolean :updated, :default => false
       t.boolean :visible, :default => false
       t.boolean :refresh, :default => false
@@ -38,7 +38,7 @@ class CreateTables < ActiveRecord::Migration
       u.boolean :override, :default => false
       u.boolean :optout, :default => false
       u.boolean :banned, :default => false
-      u.boolean :updated, :default => false      
+      u.boolean :updated, :default => false
 
       u.timestamps null: false
     end
@@ -50,7 +50,7 @@ class CreateTables < ActiveRecord::Migration
       w.string :name
       w.string :url
 
-      w.timestamps null: false      
+      w.timestamps null: false
     end
 
     add_index :groups, :groupid64, unique: true
@@ -61,7 +61,7 @@ class CreateTables < ActiveRecord::Migration
       y.integer :query_port
       y.string :protocol, :default => nil
 
-      y.timestamps null: false      
+      y.timestamps null: false
     end
 
     add_index :games, :gameid, unique: true
@@ -78,7 +78,7 @@ class CreateTables < ActiveRecord::Migration
 
     create_table :networks do |a|
       a.string :network
-      a.string :min      
+      a.string :min
       a.string :max
 
       a.timestamps null: false
@@ -86,7 +86,7 @@ class CreateTables < ActiveRecord::Migration
 
     create_table :protocols do |b|
       b.string :protocol
-      b.string :name, unique: true     
+      b.string :name, unique: true
 
       b.timestamps null: false
     end

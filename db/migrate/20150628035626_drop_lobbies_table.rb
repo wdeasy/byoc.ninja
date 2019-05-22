@@ -1,4 +1,4 @@
-class DropLobbiesTable < ActiveRecord::Migration
+class DropLobbiesTable < ActiveRecord::Migration[5.2]
   def up
   	add_column :servers, :lobbysteamid, :integer, :limit => 8
   	remove_column :users, :lobbysteamid

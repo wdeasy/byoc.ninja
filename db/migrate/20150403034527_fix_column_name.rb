@@ -1,5 +1,5 @@
-class FixColumnName < ActiveRecord::Migration
-  def self.up
+class FixColumnName < ActiveRecord::Migration[5.2]
+  def up
   	rename_column :servers, :override, :auto_update
   	change_column :servers, :auto_update, :boolean, :default => true
   	rename_column :users, :override, :auto_update
@@ -20,7 +20,7 @@ class FixColumnName < ActiveRecord::Migration
       t.string :handle
       t.boolean :updated, :default => true
 
-      t.timestamps null: false 
+      t.timestamps null: false
     end
 
     add_index :seats, :seat, unique: true
@@ -29,25 +29,25 @@ class FixColumnName < ActiveRecord::Migration
     change_column :users, :display, :boolean, :default => true
   end
 
-  def self.down
+  def down
   	rename_column :servers, :auto_update, :override
   	change_column :servers, :override, :boolean, :default => false
   	rename_column :users, :auto_update, :override
-  	change_column :users, :override, :boolean, :default => false	
+  	change_column :users, :override, :boolean, :default => false
 
    	remove_column :protocols, :host
   	remove_column :protocols, :map
   	remove_column :protocols, :num
   	remove_column :protocols, :max
-  	remove_column :protocols, :pass 
+  	remove_column :protocols, :pass
 
     remove_column :groups, :enabled
-    remove_column :users, :seat 
+    remove_column :users, :seat
 
     drop_table :seats
     remove_index :seats, :seat
 
     rename_column :users, :display, :optout
-    change_column :users, :optout, :boolean, :default => false    	
+    change_column :users, :optout, :boolean, :default => false
   end
 end

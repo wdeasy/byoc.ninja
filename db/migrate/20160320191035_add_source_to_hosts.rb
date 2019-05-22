@@ -1,4 +1,4 @@
-class AddSourceToHosts < ActiveRecord::Migration
+class AddSourceToHosts < ActiveRecord::Migration[5.2]
   def up
 		add_column :hosts, :source, :string
 

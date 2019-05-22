@@ -1,8 +1,8 @@
-class AddLanToHosts < ActiveRecord::Migration
+class AddLanToHosts < ActiveRecord::Migration[5.2]
   def up
-	add_column :hosts, :lan, :boolean	
+	add_column :hosts, :lan, :boolean
   end
   def down
-  	remove_column :hosts, :lan	
+  	remove_column :hosts, :lan
   end
 end
