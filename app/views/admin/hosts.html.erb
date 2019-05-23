@@ -5,7 +5,7 @@
   <table class="table table-striped table-condensed games">
     <thead>
       <tr class="row">
-        <th class="col-md-2 text-left">Game</th>        
+        <th class="col-md-2 text-left">Game</th>
         <th class="col-md-8 text-center">Name</th>
         <th class="col-md-2 text-right">Address</th>
       </tr>
@@ -13,11 +13,11 @@
     <tbody>
       <% @hosts.each do |host| %>
         <tr class="row">
-            <td class="text-left longtext"><%= host.game.name %></td>            
+            <td class="text-left longtext"><%= host.game.name %></td>
             <td class="text-center longtext"><%= link_to (host.name.blank? ? '' : host.name), edit_host_path(host) %></td>
-            <td class="text-right"><%= link_to (host.address.blank? ? host.lobby : host.address), edit_host_path(host) %></td>          
-        </tr>      
-      <% end %>                           
+            <td class="text-right"><%= link_to (host.address.blank? ? host.lobby : host.address), edit_host_path(host) %></td>
+        </tr>
+      <% end %>
     </tbody>
   </table>
 </div>

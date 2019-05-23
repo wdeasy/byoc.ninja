@@ -1,13 +1,13 @@
   <tr class="row">
-      <td class="text-left"><%= link_to mod.id, edit_mod_path(mod) %></td>      
+      <td class="text-left"><%= link_to mod.id, edit_mod_path(mod) %></td>
       <td class="text-center longtext">
         <% if mod.name %>
           <%= link_to mod.name, edit_mod_path(mod) %>
         <% end %>
       </td>
       <td class="text-right">
-        <% if mod.info %>
-          <%= link_to mod.info, edit_mod_path(mod) %>
+        <% if mod.steamid %>
+          <%= link_to mod.steamid, edit_mod_path(mod) %>
         <% end %>
       </td>
   </tr>

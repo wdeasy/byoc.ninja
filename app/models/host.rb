@@ -577,7 +577,10 @@ class Host < ApplicationRecord
     if !name.valid_encoding?
       name = name.encode("UTF-16be", :invalid=>:replace, :replace=>"").encode('UTF-8')
     end
+
     name.strip!
+    name.gsub(/[^[:print:]]/i, '')
+    
     return name
   end
 

@@ -12,18 +12,22 @@ class Mod < ApplicationRecord
       game_id = nil
 
       mod.name = player["gameextrainfo"].blank? ? name : player["gameextrainfo"]
-      mod.info = player["gameextrainfo"]
       if info["appid"]
         appid = info["appid"]
         game_id = Game.update(appid, player["gameextrainfo"], multiplayer, player["profileurl"])
-
-        mod.dir = info["gamedir"]
       else
         appid = Game.appid_from_name(name)
         game_id = Game.update(appid, player["gameextrainfo"], multiplayer, player["profileurl"])
       end
 
-      mod.game_id = game_id
+      mod.last_seen = Time.now
+      mod.game_id   = game_id
+    end
+
+    if mod.last_seen.nil? || !mod.last_seen.today?
+      mod.update_attributes(
+        :last_seen => Time.now
+      )
     end
 
     return mod.id

@@ -96,11 +96,13 @@
 			<br />
 			You can remove the seat code from your summary after your seat is linked.<br />
 		  <br /><br/></h5>
-			<h4>Add these tags to show up on <%= link_to 'findyourseat.info', 'https://findyourseat.info/' %>:</h4>
+			<div class="alert alert-info">
+			<h5><%= link_to 'findyourseat.info', 'https://findyourseat.info/', :class => "alert-link" %> scans your <%= link_to 'steam profile summary', 'steam://url/SteamIDEditPage', :class => "alert-link" %> for these tags:</h5>
 
-			<samp><b>CLAN</b>: Your Clan Here<br />
+			<b>CLAN</b>: Your Clan Here<br />
 			<b>CASE MOD</b>: CLASSIC, SCRATCH, or ID/BETHESDA<br />
-			<b>YEARS ATTENDED</b>: Number of years you've attended quakecon</samp>
+			<b>YEARS ATTENDED</b>: Number of years you've attended quakecon
+			</div>
 		<% end %>
 	  </div>
 	</div>

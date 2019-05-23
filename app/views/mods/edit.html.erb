@@ -16,11 +16,8 @@
 	  <%= f.label :name %>
 	  <%= f.text_field :name, class: 'form-control' %>
 
-	  <%= f.label :info %>
-	  <%= f.text_field :info, class: 'form-control', :readonly => true %>
-
-    <%= f.label :dir %>
-	  <%= f.text_field :dir, class: 'form-control', :readonly => true %>
+	  <%= f.label :last_seen %>
+	  <%= f.text_field :last_seen, class: 'form-control', :readonly => true %>
 
     <% if @mod.game_id.nil? %>
       <%= f.submit "Save changes", class: "btn btn-50 btn-primary pull-left" %>

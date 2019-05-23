@@ -32,11 +32,11 @@ class Game < ApplicationRecord
       end
 
       game.name = name.blank? ? Host.valid_name(info) : Host.valid_name(name)
-      game.info = info
-      game.link = link
-      game.image = image
-      game.source = "auto"
+      game.link        = link
+      game.image       = image
+      game.source      = "auto"
       game.multiplayer = multiplayer
+      game.last_seen   = Time.now
     end
 
     if multiplayer == true && game.multiplayer == false
@@ -45,9 +45,11 @@ class Game < ApplicationRecord
       )
     end
 
-    game.update_attributes(
-      :last_seen => Time.now
-    )
+    if game.last_seen.nil? || !game.last_seen.today?
+      game.update_attributes(
+        :last_seen => Time.now
+      )
+    end
 
     return game.id
   end

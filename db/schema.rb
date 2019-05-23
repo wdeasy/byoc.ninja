@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_21_212903) do
+ActiveRecord::Schema.define(version: 2019_05_23_012719) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,7 +22,6 @@ ActiveRecord::Schema.define(version: 2019_05_21_212903) do
     t.datetime "updated_at", null: false
     t.string "link"
     t.string "image"
-    t.string "info"
     t.boolean "joinable", default: true
     t.string "source"
     t.boolean "queryable", default: false, null: false
@@ -87,10 +86,9 @@ ActiveRecord::Schema.define(version: 2019_05_21_212903) do
     t.string "steamid"
     t.string "name"
     t.integer "game_id"
-    t.string "info"
-    t.string "dir"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "last_seen"
   end
 
   create_table "networks", force: :cascade do |t|
