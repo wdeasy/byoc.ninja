@@ -210,8 +210,8 @@ class Host < ApplicationRecord
         max = server.server_info[:max_players] ? server.server_info[:max_players] : host.max
         password = server.server_info[:password_needed] ? server.server_info[:password_needed] : host.password
 
-        if !current.nil? && !max.nil? && current > max && max > 0 
-          max = current
+        if !current.nil? && !max.nil? && current > max && max > 0
+          current = max
         end
 
         host.update_attributes(
