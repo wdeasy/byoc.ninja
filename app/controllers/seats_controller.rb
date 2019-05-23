@@ -16,7 +16,7 @@ class SeatsController < ApplicationController
   end
 
   def json
-    @seats = Seat.joins(:seats_users, :users).joins("LEFT JOIN hosts ON hosts.id = users.host_id").joins("LEFT JOIN games ON games.id = users.game_id").order("seats.sort ASC").uniq
+    @seats = Seat.joins(:seats_users, :users).joins("LEFT JOIN hosts ON hosts.id = users.host_id").order("seats.sort ASC").uniq
     render :json => @seats
   end
 

@@ -210,16 +210,20 @@ class Host < ApplicationRecord
         max = server.server_info[:max_players] ? server.server_info[:max_players] : host.max
         password = server.server_info[:password_needed] ? server.server_info[:password_needed] : host.password
 
-          host.update_attributes(
-            :name => valid_name(name),
-            :map => valid_name(map),
-            :current => current,
-            :max => max,
-            :players => players(current, max),
-            :password => password,
-            :respond => true,
-            :last_successful_query => Time.now
-          )
+        if !current.nil? && !max.nil? && current > max && max > 0 
+          max = current
+        end
+
+        host.update_attributes(
+          :name => valid_name(name),
+          :map => valid_name(map),
+          :current => current,
+          :max => max,
+          :players => players(current, max),
+          :password => password,
+          :respond => true,
+          :last_successful_query => Time.now
+        )
 
         if host.game.queryable == false
           host.game.update_attributes(
@@ -580,7 +584,7 @@ class Host < ApplicationRecord
 
     name.strip!
     name.gsub(/[^[:print:]]/i, '')
-    
+
     return name
   end
 

@@ -13,8 +13,7 @@ class Seat < ApplicationRecord
       :include => {
         :users => {:only => [:url, :name], :methods => [:clan, :handle, :playing],
           :include => {
-            :host => {:only => [:link]},
-            :game => {:only => [:name]}
+            :host => {:only => [:link]}
           }
         }
       }
