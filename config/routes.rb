@@ -22,7 +22,7 @@ Rails.application.routes.draw do
   get        'seat'               => 'users#seat'
   get        'lookup'             => 'seats#lookup'
   match      'messages/:id/hide', to: 'messages#hide', as: 'hide_message', via: [:get, :post]
-  
+
   match      'users/:id/ban', to: 'users#ban', as: 'ban_user', via: :post
   match      'users/:id/unban', to: 'users#unban', as: 'unban_user', via: :post
   match      'hosts/:id/ban', to: 'hosts#ban', as: 'ban_host', via: :post
