@@ -9,11 +9,7 @@ class Game < ApplicationRecord
     game = Game.where(appid: appid).first_or_create do |game|
       url = "https://store.steampowered.com/api/appdetails/?appids=#{appid}"
 
-      begin
-        parsed = JSON.parse(open(url).read)
-      rescue => e
-        puts "JSON failed to parse #{url}"
-      end
+      parsed = Host.get_json(url)
 
       name = nil
       link = nil
@@ -55,7 +51,7 @@ class Game < ApplicationRecord
   end
 
   def self.valid_link(url)
-    page = lookup(url)
+    page = get_html(url)
 
     if page.blank?
       return nil
@@ -73,11 +69,7 @@ class Game < ApplicationRecord
     name = ''
     url = "http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=#{ENV['STEAM_WEB_API_KEY']}&appid=#{appid}"
 
-    begin
-      parsed = JSON.parse(open(url).read)
-    rescue => e
-      puts "JSON failed to parse #{url}"
-    end
+    parsed = Host.get_json(url)
 
     unless parsed.nil?
       name = parsed['game']['gameName']
@@ -103,7 +95,7 @@ class Game < ApplicationRecord
 
   def Game.name_from_profile(url)
     name = nil
-    page = lookup(url)
+    page = get_html(url)
 
     if !page.blank?
       name = page.css('div.profile_in_game_name').text
@@ -112,7 +104,7 @@ class Game < ApplicationRecord
     return name
   end
 
-  def self.lookup(url)
+  def self.get_html(url)
     page = nil
 
     begin
@@ -130,12 +122,7 @@ class Game < ApplicationRecord
 
     url = "https://store.steampowered.com/api/appdetails/?appids=#{game.appid}"
 
-    begin
-      parsed = JSON.parse(open(url).read)
-    rescue => e
-      puts "JSON failed to parse #{url}"
-      x = 1
-    end
+    parsed = Host.get_json(url)
 
     name  = game.name
     image = game.image

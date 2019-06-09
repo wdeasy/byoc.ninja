@@ -50,11 +50,7 @@ class Seat < ApplicationRecord
     puts "File: #{file}"
     puts "Year: #{year}"
 
-    begin
-      parsed = JSON.parse(open(file).read)
-    rescue => e
-      return "JSON failed to parse #{file}"
-    end
+    parsed = Host.get_json(file)
 
     i = 0
     Seat.where(:year => year).update_all(:updated => false)

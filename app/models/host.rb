@@ -257,11 +257,8 @@ class Host < ApplicationRecord
     groups = Group.where(:enabled => true)
     g = 0
     groups.each do |group|
-      begin
-        doc = Nokogiri::XML(open("https://steamcommunity.com/gid/#{group.steamid.to_s}/memberslistxml/?xml=1"))
-      rescue => e
-        puts "Nokogiri failed to open XML https://steamcommunity.com/gid/#{group.steamid.to_s}/memberslistxml/?xml=1"
-      end
+      string = "https://steamcommunity.com/gid/#{group.steamid.to_s}/memberslistxml/?xml=1"
+      doc = get_xml(string)
 
       if doc != nil
         doc.xpath('//steamID64').each do |steamid|
@@ -316,12 +313,7 @@ class Host < ApplicationRecord
 
       #GetPlayerSummaries has a max of 100 steam ids
       if i == 100 || steamid == steamids.last
-        begin
-          parsed = JSON.parse(open(string + combined).read)
-        rescue => e
-          puts "JSON failed to parse #{string + combined}"
-          x = 1
-        end
+        parsed = get_json(string + combined)
 
         if parsed != nil
           parsed["response"]["players"].each do |player|
@@ -380,6 +372,8 @@ class Host < ApplicationRecord
               end
             end
           end
+        else
+          x = 1
         end
         i = 0
         combined = ''
@@ -410,27 +404,23 @@ class Host < ApplicationRecord
       i, p = address.split(':')
       string = "https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{i}&format=json"
 
-      begin
-        parsed = JSON.parse(open(string).read)
+      parsed = get_json(string)
 
-        if parsed != nil && parsed["response"]["success"] == true
-          info["respond"] = false
-          parsed["response"]["servers"].each do |server|
-            gameport = server["gameport"]
-            if gameport.to_i == p.to_i
-              ip, po = server["addr"].split(':')
-              info["query_port"] = po.to_i
-              info["gamedir"] = server["gamedir"]
-              info["appid"] = server["appid"]
-              info["lan"] = server["lan"]
-              info["respond"] = true
-            end
+      if parsed != nil && parsed["response"]["success"] == true
+        info["respond"] = false
+        parsed["response"]["servers"].each do |server|
+          gameport = server["gameport"]
+          if gameport.to_i == p.to_i
+            ip, po = server["addr"].split(':')
+            info["query_port"] = po.to_i
+            info["gamedir"] = server["gamedir"]
+            info["appid"] = server["appid"]
+            info["lan"] = server["lan"]
+            info["respond"] = true
           end
-        else
-          puts parsed["response"]["message"]
         end
-      rescue => e
-        puts "JSON failed to parse #{string}"
+      else
+        puts parsed["response"]["message"]
       end
     end
 
@@ -448,36 +438,34 @@ class Host < ApplicationRecord
           ip = cidr[i].ip
           api = "https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{ip}&format=json"
 
-          begin
-            parsed = JSON.parse(open(api).read)
+          parsed = get_json(api)
 
-            if parsed != nil && parsed["response"]["success"] == true
-              parsed["response"]["servers"].each do |server|
-                if server["addr"] && server["appid"] && server["gameport"]
-                  x, p = server["addr"].split(':')
-                  port = server["gameport"].to_i
-                  query_port = p.to_i
-                  address = "#{ip}:#{port}"
+          parsed = JSON.parse(open(api).read)
 
-                  game_id = Game.update(server["appid"],server["gamedir"], true)
-                  host = Host.where(address: address).first_or_create
+          if parsed != nil && parsed["response"]["success"] == true
+            parsed["response"]["servers"].each do |server|
+              if server["addr"] && server["appid"] && server["gameport"]
+                x, p = server["addr"].split(':')
+                port = server["gameport"].to_i
+                query_port = p.to_i
+                address = "#{ip}:#{port}"
 
-                  host.update_attributes(
-                    :game_id    => game_id,
-                    :query_port => query_port.to_i,
-                    :ip         => ip,
-                    :port       => port,
-                    :address    => address,
-                    :pin        => true,
-                    :source     => "byoc"
-                  )
+                game_id = Game.update(server["appid"],server["gamedir"], true)
+                host = Host.where(address: address).first_or_create
 
-                  puts "Found a #{host.game.name} host at #{address}"
-                end
+                host.update_attributes(
+                  :game_id    => game_id,
+                  :query_port => query_port.to_i,
+                  :ip         => ip,
+                  :port       => port,
+                  :address    => address,
+                  :pin        => true,
+                  :source     => "byoc"
+                )
+
+                puts "Found a #{host.game.name} host at #{address}"
               end
             end
-          rescue => e
-            puts "JSON failed to parse #{api}"
           end
 
           i += 1
@@ -628,58 +616,56 @@ class Host < ApplicationRecord
         servers.each do |s|
           api = "https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{s[:address]}&format=json"
 
-          begin
-            parsed = JSON.parse(open(api).read)
+          parsed = get_json(api)
 
-            if parsed != nil && parsed["response"]["success"] == true
-              parsed["response"]["servers"].each do |server|
-                if server["addr"] == s[:address] && server["appid"] && server["gameport"]
-                  ip, p = server["addr"].split(':')
-                  port = server["gameport"].to_i
-                  query_port = p.to_i
-                  address = "#{ip}:#{port}"
-                  network = Network.location(ip)
-                  game_id = Game.update(server["appid"],server["gamedir"], true)
-                  password = false
-                  if s[:password] == 'True'
-                    password = true
-                  end
+          parsed = JSON.parse(open(api).read)
 
-                  host = Host.where(address: address).first_or_create
-
-                  host.update_attributes(
-                    :game_id    => game_id,
-                    :query_port => query_port.to_i,
-                    :ip         => ip,
-                    :port       => port,
-                    :network_id => network.id,
-                    :address    => address,
-                    :pin        => true,
-                    :source     => "file",
-                    :name       => s[:name],
-                    :map        => s[:map],
-                    :current    => s[:current],
-                    :max        => s[:max],
-                    :players    => players(s[:current], s[:max]),
-                    :password   => password,
-                    :last_successful_query => Time.now
-                  )
-
-                  flags = {}
-                  if host.network.name == "byoc"
-                    flags['Hosted in BYOC'] = true
-                  end
-
-                  host.update_attributes(
-                    :flags    => flags
-                  )
-
-                  puts "Found a #{host.game.name} host at #{address}"
+          if parsed != nil && parsed["response"]["success"] == true
+            parsed["response"]["servers"].each do |server|
+              if server["addr"] == s[:address] && server["appid"] && server["gameport"]
+                ip, p = server["addr"].split(':')
+                port = server["gameport"].to_i
+                query_port = p.to_i
+                address = "#{ip}:#{port}"
+                network = Network.location(ip)
+                game_id = Game.update(server["appid"],server["gamedir"], true)
+                password = false
+                if s[:password] == 'True'
+                  password = true
                 end
+
+                host = Host.where(address: address).first_or_create
+
+                host.update_attributes(
+                  :game_id    => game_id,
+                  :query_port => query_port.to_i,
+                  :ip         => ip,
+                  :port       => port,
+                  :network_id => network.id,
+                  :address    => address,
+                  :pin        => true,
+                  :source     => "file",
+                  :name       => s[:name],
+                  :map        => s[:map],
+                  :current    => s[:current],
+                  :max        => s[:max],
+                  :players    => players(s[:current], s[:max]),
+                  :password   => password,
+                  :last_successful_query => Time.now
+                )
+
+                flags = {}
+                if host.network.name == "byoc"
+                  flags['Hosted in BYOC'] = true
+                end
+
+                host.update_attributes(
+                  :flags    => flags
+                )
+
+                puts "Found a #{host.game.name} host at #{address}"
               end
             end
-          rescue => e
-            puts "JSON failed to parse #{api}"
           end
 
           hosts = Host.where(:source => 'file')
@@ -702,49 +688,45 @@ class Host < ApplicationRecord
 
     api = "https://api.steampowered.com/IGameServersService/GetServerList/v1/?filter=\\name_match\\*#{name}*&key=#{ENV['STEAM_WEB_API_KEY']}"
 
-    begin
-      parsed = JSON.parse(open(api).read)
+    parsed = get_json(api)
 
-      if parsed != nil && parsed["response"]["servers"] != []
-        parsed["response"]["servers"].each do |server|
-          if server["addr"] && server["appid"] && server["gameport"]
-            ip, p = server["addr"].split(':')
-            port = server["gameport"].to_i
-            query_port = p.to_i
-            address = server["addr"]
-            flags = {}
-            flags['Quakecon in Host Name'] = true
-            name = server["name"]
-            players = players(server["players"], server["max_players"])
-            map = server["map"]
-            current = server["players"]
-            max = server["max_players"]
-            game_id = Game.update(server["appid"],server["gamedir"], true)
-            host = Host.where(address: address).first_or_create
+    if parsed != nil && parsed["response"]["servers"] != []
+      parsed["response"]["servers"].each do |server|
+        if server["addr"] && server["appid"] && server["gameport"]
+          ip, p = server["addr"].split(':')
+          port = server["gameport"].to_i
+          query_port = p.to_i
+          address = server["addr"]
+          flags = {}
+          flags['Quakecon in Host Name'] = true
+          name = server["name"]
+          players = players(server["players"], server["max_players"])
+          map = server["map"]
+          current = server["players"]
+          max = server["max_players"]
+          game_id = Game.update(server["appid"],server["gamedir"], true)
+          host = Host.where(address: address).first_or_create
 
-            host.update_attributes(
-              :game_id    => game_id,
-              :query_port => query_port,
-              :ip         => ip,
-              :port       => port,
-              :address    => address,
-              :pin        => true,
-              :source     => "name",
-              :flags      => flags,
-              :name       => name,
-              :current    => current,
-              :max        => max,
-              :players    => players,
-              :map        => map,
-              :last_successful_query => Time.now
-            )
+          host.update_attributes(
+            :game_id    => game_id,
+            :query_port => query_port,
+            :ip         => ip,
+            :port       => port,
+            :address    => address,
+            :pin        => true,
+            :source     => "name",
+            :flags      => flags,
+            :name       => name,
+            :current    => current,
+            :max        => max,
+            :players    => players,
+            :map        => map,
+            :last_successful_query => Time.now
+          )
 
-            puts "Found a #{host.game.name} host at #{address}"
-          end
+          puts "Found a #{host.game.name} host at #{address}"
         end
       end
-    rescue => e
-      puts "JSON failed to parse #{api}"
     end
 
     hosts = Host.where(:source => 'name')
@@ -756,5 +738,31 @@ class Host < ApplicationRecord
       end
     end
 
+  end
+
+  def self.get_json(url)
+    parsed = nil
+
+    begin
+      parsed = JSON.parse(open(url).read)
+    rescue => e
+      puts "JSON failed to parse #{url}"
+      puts e.message
+    end
+
+    return parsed
+  end
+
+  def self.get_xml(url)
+    parsed = nil
+
+    begin
+      parsed = Nokogiri::XML(open(url))
+    rescue => e
+      puts "Nokogiri failed to open XML #{url}"
+      puts e.message
+    end
+
+    return parsed
   end
 end

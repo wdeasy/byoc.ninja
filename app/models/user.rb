@@ -124,11 +124,7 @@ class User < ApplicationRecord
   def User.fill(steamid)
     string = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{ENV['STEAM_WEB_API_KEY']}&steamids=#{steamid}"
 
-    begin
-      parsed = JSON.parse(open(string).read)
-    rescue => e
-      puts "JSON failed to parse #{string}"
-    end
+    parsed = Host.get_json(string)
 
     if parsed != nil
       parsed["response"]["players"].each do |player|
