@@ -28,6 +28,12 @@ Rails.application.routes.draw do
   match      'hosts/:id/ban', to: 'hosts#ban', as: 'ban_host', via: :post
   match      'hosts/:id/unban', to: 'hosts#unban', as: 'unban_host', via: :post
 
+  namespace :api, defaults: {format: 'json'} do
+    namespace :v1 do
+      resources :hosts, :only => [:index]
+      resources :seats, :only => [:index]
+    end
+  end
 
   resources :contacts, :only      => [:new, :create]
   resources :games
