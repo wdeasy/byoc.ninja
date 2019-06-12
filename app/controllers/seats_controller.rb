@@ -1,6 +1,6 @@
 class SeatsController < ApplicationController
-  before_action :logged_in_user, :except => [:json, :lookup]
-  before_action :admin_user, :except => [:json, :lookup]
+  before_action :logged_in_user, :except => [:lookup]
+  before_action :admin_user, :except => [:lookup]
 
   def index
 	@seats = Seat.order("sort asc")
@@ -13,11 +13,6 @@ class SeatsController < ApplicationController
       flash[:success] = @update
       redirect_to seats_update_url
     end
-  end
-
-  def json
-    @seats = Seat.joins(:seats_users, :users).joins("LEFT JOIN hosts ON hosts.id = users.host_id").order("seats.sort ASC").uniq
-    render :json => @seats
   end
 
   def lookup
@@ -51,5 +46,4 @@ class SeatsController < ApplicationController
     def sort_column
       Seat.column_names.include?(params[:sort]) ? params[:sort] : "sort"
     end
-
 end

@@ -4,8 +4,7 @@
     <title><%= full_title(yield(:title)) %></title>
     <%= stylesheet_link_tag 'application', media: 'all' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
-    <%= favicon_link_tag asset_path('plr.png') %>
-    <%= favicon_link_tag asset_path('plr.png'), rel: 'apple-touch-icon', type: 'image/png' %>
+    <%= render 'layouts/favicon' %>
     <%= csrf_meta_tags %>
     <link href='https://fonts.googleapis.com/css?family=Bangers|Orbitron' rel='stylesheet' type='text/css'>
     <%= render 'layouts/shim' %>

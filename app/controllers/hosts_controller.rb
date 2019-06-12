@@ -1,6 +1,6 @@
 class HostsController < ApplicationController
-  before_action :logged_in_user, :except => [:index, :json]
-  before_action :admin_user, :except => [:index, :json]
+  before_action :logged_in_user, :except => [:index]
+  before_action :admin_user, :except => [:index]
 
   def index
   	@hosts = Host.includes(:game, :mod, :users, :seats).where(visible: true).where("games.joinable = true").order("games.name ASC, users_count DESC, hosts.current IS NULL, hosts.current DESC, hosts.name DESC")
@@ -65,11 +65,6 @@ class HostsController < ApplicationController
     else
       render 'edit'
     end
-  end
-
-  def json
-    @hosts = Host.includes(:game, :users, :seats).where(visible: true).where("games.joinable = true").order("games.name ASC, users_count DESC, hosts.current IS NULL, hosts.current DESC, hosts.name DESC")
-    render :json => @hosts
   end
 
   private
