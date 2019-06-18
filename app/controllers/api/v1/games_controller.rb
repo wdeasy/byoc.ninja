@@ -1,19 +1,19 @@
 module Api
   module V1
-    class HostsController < ApplicationController
+    class GamesController < ApplicationController
       skip_before_action :verify_authenticity_token
       before_action :restrict_access
       before_action :admin_api_user, :except => [:index]
 
       def index
-        @hosts = Host.includes(:game, :users, :seats).where(visible: true).where("games.joinable = true").order("games.name ASC, users_count DESC, hosts.current IS NULL, hosts.current DESC, hosts.name DESC")
-        render :json => @hosts
+        @games = Game.all
+        render :json => @games
       end
 
       def update
-        @host = Host.find_by_id(params[:id])
-        if @host.update_attributes(host_params)
-          render :json => @host
+        @game = Game.find_by_appid(params[:id])
+        if @game.update_attributes(game_params)
+          render :json => @game
         end
       end
 
@@ -24,8 +24,8 @@ module Api
         end
       end
 
-      def host_params
-        params.require(:host).permit(:name, :map, :current, :max, :password, :flags, :last_successful_query, :pin, :source)
+      def game_params
+        params.require(:game).permit(:name, :link, :image)
       end
 
       def admin_api_user

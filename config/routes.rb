@@ -27,12 +27,13 @@ Rails.application.routes.draw do
 
   namespace :api, defaults: {format: 'json'} do
     namespace :v1 do
-      resources :hosts, :only => [:index]
+      resources :hosts, :only => [:index, :update]
+      resources :games, :only => [:index, :update]
       resources :seats, :only => [:index]
     end
   end
 
-  resources :contacts, :only      => [:new, :create]
+  resources :contacts, :only => [:new, :create]
   resources :games
   resources :hosts
   resources :users

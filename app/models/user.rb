@@ -5,6 +5,7 @@ class User < ApplicationRecord
   has_and_belongs_to_many :seats
   belongs_to :game, optional: true
   belongs_to :mod, optional: true
+  has_many :api_keys
 
   def User.update(player, host_id, game_id, mod_id=nil)
 
@@ -122,9 +123,9 @@ class User < ApplicationRecord
   end
 
   def User.fill(steamid)
-    string = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{ENV['STEAM_WEB_API_KEY']}&steamids=#{steamid}"
+    string = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{SteamWebApi.get_key}&steamids=#{steamid}"
 
-    parsed = Host.get_json(string)
+    parsed = SteamWebApi.get_json(string)
 
     if parsed != nil
       parsed["response"]["players"].each do |player|

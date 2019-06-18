@@ -6,12 +6,7 @@ class Group < ApplicationRecord
   			return "Please enter a URL"
   		end
 
-      begin
-        html = open(url)
-        page = Nokogiri::HTML(html.read)
-      rescue => e
-        return "Unable to load URL #{url}"
-      end
+      page =  SteamWebApi.get_html(url)
 
       if !page.blank?
 		    name = page.css('title').text.strip

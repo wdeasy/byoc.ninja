@@ -258,7 +258,7 @@ class Host < ApplicationRecord
     g = 0
     groups.each do |group|
       string = "https://steamcommunity.com/gid/#{group.steamid.to_s}/memberslistxml/?xml=1"
-      doc = get_xml(string)
+      doc = SteamWebApi.get_xml(string)
 
       if doc != nil
         doc.xpath('//steamID64').each do |steamid|
@@ -305,7 +305,7 @@ class Host < ApplicationRecord
     lobbies = []
 
     combined = ''
-    string = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{ENV['STEAM_WEB_API_KEY']}&steamids="
+    string = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{SteamWebApi.get_key}&steamids="
 
     #iterate through steam ids to find hosts
     steamids.each do |steamid|
@@ -313,7 +313,7 @@ class Host < ApplicationRecord
 
       #GetPlayerSummaries has a max of 100 steam ids
       if i == 100 || steamid == steamids.last
-        parsed = get_json(string + combined)
+        parsed = SteamWebApi.get_json(string + combined)
 
         if parsed != nil
           parsed["response"]["players"].each do |player|
@@ -404,7 +404,7 @@ class Host < ApplicationRecord
       i, p = address.split(':')
       string = "https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{i}&format=json"
 
-      parsed = get_json(string)
+      parsed = SteamWebApi.get_json(string)
 
       if parsed != nil && parsed["response"]["success"] == true
         info["respond"] = false
@@ -438,7 +438,7 @@ class Host < ApplicationRecord
           ip = cidr[i].ip
           api = "https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{ip}&format=json"
 
-          parsed = get_json(api)
+          parsed = SteamWebApi.get_json(api)
 
           parsed = JSON.parse(open(api).read)
 
@@ -616,7 +616,7 @@ class Host < ApplicationRecord
         servers.each do |s|
           api = "https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{s[:address]}&format=json"
 
-          parsed = get_json(api)
+          parsed = SteamWebApi.get_json(api)
 
           parsed = JSON.parse(open(api).read)
 
@@ -686,9 +686,9 @@ class Host < ApplicationRecord
       name = "quakecon"
     end
 
-    api = "https://api.steampowered.com/IGameServersService/GetServerList/v1/?filter=\\name_match\\*#{name}*&key=#{ENV['STEAM_WEB_API_KEY']}"
+    api = "https://api.steampowered.com/IGameServersService/GetServerList/v1/?filter=\\name_match\\*#{name}*&key=#{SteamWebApi.get_key}"
 
-    parsed = get_json(api)
+    parsed = SteamWebApi.get_json(api)
 
     if parsed != nil && parsed["response"]["servers"] != []
       parsed["response"]["servers"].each do |server|
@@ -738,31 +738,5 @@ class Host < ApplicationRecord
       end
     end
 
-  end
-
-  def self.get_json(url)
-    parsed = nil
-
-    begin
-      parsed = JSON.parse(open(url).read)
-    rescue => e
-      puts "JSON failed to parse #{url}"
-      puts e.message
-    end
-
-    return parsed
-  end
-
-  def self.get_xml(url)
-    parsed = nil
-
-    begin
-      parsed = Nokogiri::XML(open(url))
-    rescue => e
-      puts "Nokogiri failed to open XML #{url}"
-      puts e.message
-    end
-
-    return parsed
   end
 end

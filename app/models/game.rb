@@ -5,11 +5,15 @@ class Game < ApplicationRecord
   has_many :mods
   has_many :users
 
+  def as_json(options={})
+   super(:only => [:appid, :name, :image, :link])
+  end
+
   def Game.update(appid, info, multiplayer, profile=nil)
     game = Game.where(appid: appid).first_or_create do |game|
       url = "https://store.steampowered.com/api/appdetails/?appids=#{appid}"
 
-      parsed = Host.get_json(url)
+      parsed = SteamWebApi.get_json(url)
 
       name = nil
       link = nil
@@ -51,7 +55,7 @@ class Game < ApplicationRecord
   end
 
   def self.valid_link(url)
-    page = get_html(url)
+    page = SteamWebApi.get_html(url)
 
     if page.blank?
       return nil
@@ -67,9 +71,9 @@ class Game < ApplicationRecord
 
   def self.name_from_appid(appid)
     name = ''
-    url = "http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=#{ENV['STEAM_WEB_API_KEY']}&appid=#{appid}"
+    url = "http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=#{SteamWebApi.get_key}&appid=#{appid}"
 
-    parsed = Host.get_json(url)
+    parsed = SteamWebApi.get_json(url)
 
     unless parsed.nil?
       name = parsed['game']['gameName']
@@ -95,7 +99,7 @@ class Game < ApplicationRecord
 
   def Game.name_from_profile(url)
     name = nil
-    page = get_html(url)
+    page =  SteamWebApi.get_html(url)
 
     if !page.blank?
       name = page.css('div.profile_in_game_name').text
@@ -104,25 +108,12 @@ class Game < ApplicationRecord
     return name
   end
 
-  def self.get_html(url)
-    page = nil
-
-    begin
-      html = open(url)
-      page = Nokogiri::HTML(html.read)
-    rescue => e
-      puts "Nokogiri failed to open HTML #{url}"
-    end
-
-    return page
-  end
-
   def Game.update_game(appid)
     game = Game.where(appid: appid).first
 
     url = "https://store.steampowered.com/api/appdetails/?appids=#{game.appid}"
 
-    parsed = Host.get_json(url)
+    parsed = SteamWebApi.get_json(url)
 
     name  = game.name
     image = game.image

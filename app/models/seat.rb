@@ -50,7 +50,7 @@ class Seat < ApplicationRecord
     puts "File: #{file}"
     puts "Year: #{year}"
 
-    parsed = Host.get_json(file)
+    parsed = SteamWebApi.get_json(file)
 
     i = 0
     Seat.where(:year => year).update_all(:updated => false)
