@@ -7,9 +7,8 @@ class SteamWebApi < ApplicationRecord
         :calls  => steam_key.calls+1
       )
     else
-      puts "Total number of api calls for #{1.day.ago}: #{steam_key.calls}"
-
       steam_key.update_attributes(
+        :yesterday => steam_key.calls,
         :calls  => 1
       )
     end
