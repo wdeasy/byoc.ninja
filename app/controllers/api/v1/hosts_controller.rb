@@ -25,7 +25,7 @@ module Api
       end
 
       def host_params
-        params.require(:host).permit(:name, :map, :current, :max, :password, :flags, :last_successful_query, :pin, :source)
+        params.require(:host).permit(:name, :map, :current, :max, :password, :last_successful_query)
       end
 
       def admin_api_user
