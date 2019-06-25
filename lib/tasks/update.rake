@@ -17,24 +17,6 @@ namespace :update do
     finish_time(beginning)
   end
 
-  desc "Search for hosts by name args[name]"
-  task :hosts_by_name, [:name] => :environment do |t, args|
-    beginning = start_time
-    name = args.name
-    Host.update_hosts_by_name(name)
-    finish_time(beginning)
-    system("touch /tmp/hostsbyname")
-  end
-
-  desc "Search for hosts by file args[file]"
-  task :hosts_by_file, [:file] => :environment do |t, args|
-    beginning = start_time
-    file = args.file
-    Host.update_hosts_by_file(file)
-    finish_time(beginning)
-    system("touch /tmp/hostsbyfile")
-  end
-
   desc "Search byoc ip range for hosts"
   task :byoc => :environment do
     beginning = start_time

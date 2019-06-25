@@ -57,16 +57,16 @@ class Host < ApplicationRecord
           query_port  = host.query_port
           lan         = nil
         end
-        network     = Network.location(i)
+        network_id     = Network.location(i)
       else
         query_port  = nil
-        network     = Network.location(nil)
+        network_id     = Network.location(nil)
       end
     else
       i           = nil
       port        = nil
       query_port  = nil
-      network     = Network.location(nil)
+      network_id     = Network.location(nil)
       valid_ip    = true
     end
 
@@ -83,7 +83,7 @@ class Host < ApplicationRecord
       :query_port => query_port,
       :ip         => i,
       :port       => port,
-      :network_id => network.id,
+      :network_id => network_id,
       :address    => address,
       :lobby      => lobby,
       :link       => link,
@@ -91,29 +91,7 @@ class Host < ApplicationRecord
       :lan        => lan
     )
 
-    visible = false
-
-    if host.source == 'manual'
-      visible = true
-    else
-      case
-      when host.banned == true
-        puts "Host is banned"
-      when ['banned','private'].include?(host.network.name)
-        puts "Network is #{host.network.name}"
-      when host.port == 0
-        puts "Host port is 0"
-      when host.lobby == nil && valid_ip == false
-        puts "Host address is invalid"
-      when host.respond == false && host.last_successful_query < 1.hour.ago && host.users_count < 2 && host.network.name != "byoc"
-        puts "Host is not responding"
-      when host.lan == true && host.network.name != "byoc"
-        puts "Host is a lan game outside of quakecon"
-      else
-        visible = true
-      end
-    end
-
+    visible = is_visible(host, valid_ip)
     if visible == true
       if host.ip != nil && host.query_port != nil && valid_ip == true
         update_server_info(host)
@@ -129,6 +107,80 @@ class Host < ApplicationRecord
     return host.id
   end
 
+  def Host.update_host_from_master(server)
+    ip, query_port = server[:address].split(':')
+    address = "#{ip}:#{server[:port]}"
+
+    host = Host.where(address: address).first_or_create
+
+    if host.updated == false
+
+      if server[:appid].nil?
+        server[:appid] = Game.appid_from_name(server[:product])
+      end
+
+      game_id  = Game.update(server[:appid],server[:product], true)
+      network_id  = Network.location(ip)
+      valid_ip = Network.valid_ip(ip)
+
+      host.update_attributes(
+        :game_id    => game_id,
+        :query_port => query_port,
+        :ip         => ip,
+        :port       => server[:port],
+        :network_id => network_id,
+        :address    => address,
+        :link       => "steam://connect/#{address}",
+        :steamid    => server[:steamid],
+        :name       => valid_name(server[:name]),
+        :current    => server[:current],
+        :max        => server[:max],
+        :players    => players(server[:current], server[:max]),
+        :map        => valid_name(server[:map]),
+        :source     => "name",
+        :last_successful_query => Time.now
+      )
+
+      visible = is_visible(host, valid_ip)
+      if visible == true
+        host.update_attributes(
+          :flags => flags(host),
+          :updated => true,
+          :visible => true
+        )
+      end
+    end
+  end
+
+  def Host.is_visible(host, valid_ip)
+    visible = false
+
+    if host.source == 'manual'
+      visible = true
+    else
+      case
+      when host.banned == true
+        puts "Host is banned"
+      when ['banned','private'].include?(host.network.name)
+        puts "Network is #{host.network.name}"
+      when host.port == 0
+        puts "Host port is 0"
+      when host.lobby == nil && valid_ip == false
+        puts "Host address is invalid"
+      # when host.respond == false && host.last_successful_query < 1.hour.ago && host.users_count < 2 && host.network.name != "byoc"
+      #   puts "Host is not responding"
+      when host.lan == true && host.network.name != "byoc"
+        puts "Host is a lan game outside of quakecon"
+      when host.source == "name" && Filter.contains(host.name)
+        puts "Host has been filtered out by keyword."
+      else
+        visible = true
+      end
+    end
+
+    return visible
+  end
+
   def Host.flags(host)
     flags = {}
 
@@ -137,7 +189,6 @@ class Host < ApplicationRecord
       #if host.name.downcase.include? "quakecon"
       if ["quakecon", "qcon"].any? { |q| host.name.downcase.include? q }
         flags['Quakecon in Host Name'] = true
-        Host.pin(host)
       end
     end
 
@@ -183,36 +234,94 @@ class Host < ApplicationRecord
   end
 
   def Host.query_host(ip, query_port)
+    info = nil
+
     begin
       server = SourceServer.new(ip, query_port)
       server.init
 
       if server != nil
-        return server
-      else
-        return nil
+        info = {}
+        info[:name] = server.server_info[:server_name]
+        info[:map] = server.server_info[:map_name]
+        info[:current] = server.server_info[:number_of_players]
+        info[:max] = server.server_info[:max_players]
+        info[:password] = server.server_info[:password_needed]
       end
-
     rescue SteamCondenser::TimeoutError, Errno::ECONNREFUSED
       puts "Unable to query #{ip}:#{query_port}"
-      return nil
     end
+
+    return info
+  end
+
+  def Host.query_master(address)
+    api = SteamWebApi.get_server_list_by_address(address)
+    parsed = SteamWebApi.get_json(api)
+    info = nil
+
+    if parsed != nil && !parsed["response"].empty? && !parsed["response"]["servers"].empty?
+      info = {}
+      parsed["response"]["servers"].each do |server|
+        info[:name] = server["name"]
+        info[:map] = server["map"]
+        info[:current] = server["players"]
+        info[:max] = server["max_players"]
+        info[:password] = server["gametype"].nil? ? false : (server["gametype"].include? "pw,")
+      end
+    else
+      puts "No master server info for #{address}"
+    end
+
+    return info
+  end
+
+  def Host.query_master_by_names
+    servers = []
+    names = ['quakecon','qcon']
+    names.each do |name|
+      puts "Searching for servers that include \"#{name}\"."
+      api = SteamWebApi.get_server_list_by_name(name)
+      parsed = SteamWebApi.get_json(api)
+      info = nil
+
+      if parsed != nil && !parsed["response"].empty? && !parsed["response"]["servers"].empty?
+        parsed["response"]["servers"].each do |server|
+          puts "-> Server: #{server["addr"]}"
+
+          info = {}
+          info[:name]     = server["name"]
+          info[:map]      = server["map"]
+          info[:current]  = server["players"]
+          info[:max]      = server["max_players"]
+          info[:password] = server["gametype"].nil? ? false : (server["gametype"].include? "pw,")
+          info[:address]  = server["addr"]
+          info[:port]     = server["gameport"].to_i
+          info[:appid]    = server["appid"]
+          info[:product]  = server["product"]
+          info[:steamid]  = server["steamid"]
+          servers << info
+        end
+      end
+    end
+
+    return servers
   end
 
   def Host.update_server_info(host)
     if host.last_successful_query < 1.minute.ago
-      server = Host.query_host(host.ip, host.query_port)
+      info = Host.query_host(host.ip, host.query_port)
+      if info.nil?
+        puts "Unable to query #{host.address} directly. Trying master server."
+        info = Host.query_master(host.address)
+      end
 
-      if server != nil
-        name = (server.server_info[:server_name] && host.auto_update == true) ? server.server_info[:server_name] :  host.name
-        map = (server.server_info[:map_name] && host.auto_update == true) ? server.server_info[:map_name] : host.name
-        current = server.server_info[:number_of_players] ? server.server_info[:number_of_players] : host.current
-        max = server.server_info[:max_players] ? server.server_info[:max_players] : host.max
-        password = server.server_info[:password_needed] ? server.server_info[:password_needed] : host.password
-
-        if !current.nil? && !max.nil? && current > max && max > 0
-          current = max
-        end
+      if info != nil
+        name = (info[:name] && host.auto_update == true) ? info[:name] : host.name
+        map = (info[:map] && host.auto_update == true) ? info[:map] : host.name
+        current = info[:current] ? info[:current] : host.current
+        max = info[:max] ? info[:max] : host.max
+        password = info[:password] ? info[:password] : host.password
 
         host.update_attributes(
           :name => valid_name(name),
@@ -239,10 +348,17 @@ class Host < ApplicationRecord
   end
 
   def Host.players(current, max)
-    players = ''
+    players = nil
 
     if !current.blank? && !max.blank?
-      players << "#{current.to_s}/#{max}"
+      current = current.to_i
+      max = max.to_i
+
+      if current > max && max > 0
+        current = max
+      end
+
+      players = "#{current.to_s}/#{max}"
     end
 
     return players
@@ -257,7 +373,7 @@ class Host < ApplicationRecord
     groups = Group.where(:enabled => true)
     g = 0
     groups.each do |group|
-      string = "https://steamcommunity.com/gid/#{group.steamid.to_s}/memberslistxml/?xml=1"
+      string = SteamWebApi.get_members_list(group.steamid.to_s)
       doc = SteamWebApi.get_xml(string)
 
       if doc != nil
@@ -305,7 +421,6 @@ class Host < ApplicationRecord
     lobbies = []
 
     combined = ''
-    string = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{SteamWebApi.get_key}&steamids="
 
     #iterate through steam ids to find hosts
     steamids.each do |steamid|
@@ -313,9 +428,9 @@ class Host < ApplicationRecord
 
       #GetPlayerSummaries has a max of 100 steam ids
       if i == 100 || steamid == steamids.last
-        parsed = SteamWebApi.get_json(string + combined)
+        parsed = SteamWebApi.get_json(SteamWebApi.get_player_summaries + combined)
 
-        if parsed != nil
+        if parsed != nil && !parsed["response"].empty? && !parsed["response"]["players"].empty?
           parsed["response"]["players"].each do |player|
             if player["gameid"] != nil
               user = User.lookup(player["steamid"])
@@ -382,6 +497,20 @@ class Host < ApplicationRecord
       j += 1
     end
 
+    #find hosts by name
+    name_servers = Host.query_master_by_names
+    name_servers.each do |server|
+      Host.update_host_from_master(server)
+    end
+    m = name_servers.count
+
+    #import servers from qclan.info
+    file_servers = Host.load_hosts_from_file
+    file_servers.each do |server|
+      Host.update_host_from_file(server)
+    end
+    f = file_servers.count
+
     Host.update_pins
 
     if x == 0
@@ -395,6 +524,8 @@ class Host < ApplicationRecord
     puts "Found #{u+n} users in games"
     puts "Found #{u} users in #{servers.count} servers and #{lobbies.count} lobbies"
     puts "Found #{n} users in non-joinable games"
+    puts "Found #{m} servers by name"
+    puts "Found #{f} servers by file"
   end
 
   def self.get_server_info(address)
@@ -402,11 +533,10 @@ class Host < ApplicationRecord
 
     if address != nil
       i, p = address.split(':')
-      string = "https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{i}&format=json"
-
+      string = SteamWebApi.get_servers_at_address(i)
       parsed = SteamWebApi.get_json(string)
 
-      if parsed != nil && parsed["response"]["success"] == true
+      if parsed != nil && !parsed["response"].empty? &&  parsed["response"]["success"] == true
         info["respond"] = false
         parsed["response"]["servers"].each do |server|
           gameport = server["gameport"]
@@ -436,13 +566,10 @@ class Host < ApplicationRecord
 
         until i == cidr.size do
           ip = cidr[i].ip
-          api = "https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{ip}&format=json"
-
+          api = SteamWebApi.get_servers_at_address(ip)
           parsed = SteamWebApi.get_json(api)
 
-          parsed = JSON.parse(open(api).read)
-
-          if parsed != nil && parsed["response"]["success"] == true
+          if parsed != nil && !parsed["response"].empty? &&  parsed["response"]["success"] == true
             parsed["response"]["servers"].each do |server|
               if server["addr"] && server["appid"] && server["gameport"]
                 x, p = server["addr"].split(':')
@@ -492,7 +619,7 @@ class Host < ApplicationRecord
           puts "Host address is nil"
         when host.last_successful_query < 1.hour.ago
           puts "Host hasn't responded in an hour"
-        when host.flags == nil || (host.flags['Hosted in BYOC'] == nil && host.flags['Quakecon in Host Name'] == nil)
+        when host.flags == nil || (host.flags['Hosted in BYOC'] == nil)
           puts "Host is no longer flagged"
         else
           visible = true
@@ -566,177 +693,126 @@ class Host < ApplicationRecord
   end
 
   def Host.valid_name(name)
-    if !name.valid_encoding?
-      name = name.encode("UTF-16be", :invalid=>:replace, :replace=>"").encode('UTF-8')
-    end
+    unless name.nil?
+      if !name.valid_encoding?
+        name = name.encode("UTF-16be", :invalid=>:replace, :replace=>"").encode('UTF-8')
+      end
 
-    name.strip!
-    name.gsub(/[^[:print:]]/i, '')
+      name.strip!
+      name = name.gsub(/[^[:print:]]/i, '')
+    end
 
     return name
   end
 
-  def Host.update_hosts_by_file(file)
+  def Host.load_hosts_from_file
+    puts "Loading servers by file."
     servers = []
+
+    if ENV["HOSTS_FILE"].nil?
+      puts "Host file location is not set."
+      return servers
+    end
+
+    file = ENV["HOSTS_FILE"]
 
     if file == nil
       puts "No file specified."
+    elsif !File.file?(file)
+      puts "File not found."
     elsif File.zero?(file)
       puts "File is empty."
     else
       puts "Reading #{file}..."
       begin
-        CSV.new(open(file)).each do |line|
+        CSV.new(open(file), liberal_parsing: true).each do |line|
           unless line[0] == nil || (servers.include? line[0])
-            puts "loading #{line[0]}..."
-            s = {
-              :address => line[0],
-              :name => line[1],
-              :map => line[2],
-              :gamename => line[3],
-              :appid => line[4],
-              :current => line[5],
-              :max => line[6],
-              :zero => line[7],
-              :listen => line[8],
-              :os => line[9],
-              :password => line[10]
-            }
-
-            servers.push(s)
+            puts "-> Server: #{line[0]}"
+            info = {}
+            info[:address]  = line[0]
+            info[:name]     = line[1]
+            info[:map]      = line[2]
+            info[:product]  = line[3]
+            info[:appid]    = line[4]
+            info[:current]  = line[5]
+            info[:max]      = line[6]
+            info[:password] = line[10]
+            servers << info
           end
         end
       rescue => e
         puts "Unable to read file #{file}"
-      end
-
-      if servers.empty?
-        puts "No servers to process."
-      else
-        servers.each do |s|
-          api = "https://api.steampowered.com/ISteamApps/GetServersAtAddress/v0001?addr=#{s[:address]}&format=json"
-
-          parsed = SteamWebApi.get_json(api)
-
-          parsed = JSON.parse(open(api).read)
-
-          if parsed != nil && parsed["response"]["success"] == true
-            parsed["response"]["servers"].each do |server|
-              if server["addr"] == s[:address] && server["appid"] && server["gameport"]
-                ip, p = server["addr"].split(':')
-                port = server["gameport"].to_i
-                query_port = p.to_i
-                address = "#{ip}:#{port}"
-                network = Network.location(ip)
-                game_id = Game.update(server["appid"],server["gamedir"], true)
-                password = false
-                if s[:password] == 'True'
-                  password = true
-                end
-
-                host = Host.where(address: address).first_or_create
-
-                host.update_attributes(
-                  :game_id    => game_id,
-                  :query_port => query_port.to_i,
-                  :ip         => ip,
-                  :port       => port,
-                  :network_id => network.id,
-                  :address    => address,
-                  :pin        => true,
-                  :source     => "file",
-                  :name       => s[:name],
-                  :map        => s[:map],
-                  :current    => s[:current],
-                  :max        => s[:max],
-                  :players    => players(s[:current], s[:max]),
-                  :password   => password,
-                  :last_successful_query => Time.now
-                )
-
-                flags = {}
-                if host.network.name == "byoc"
-                  flags['Hosted in BYOC'] = true
-                end
-
-                host.update_attributes(
-                  :flags    => flags
-                )
-
-                puts "Found a #{host.game.name} host at #{address}"
-              end
-            end
-          end
-
-          hosts = Host.where(:source => 'file')
-          hosts.each do |h|
-            if h[:last_successful_query] < 5.minutes.ago
-              h.update_attributes(
-                :pin        => false
-              )
-            end
-          end
-        end
+        puts e
       end
     end
+
+    return servers
   end
 
-  def Host.update_hosts_by_name(name)
-    if name == nil
-      name = "quakecon"
-    end
+  def Host.update_host_from_file(server)
+    host = Host.where(address: server[:address]).first_or_create
 
-    api = "https://api.steampowered.com/IGameServersService/GetServerList/v1/?filter=\\name_match\\*#{name}*&key=#{SteamWebApi.get_key}"
-
-    parsed = SteamWebApi.get_json(api)
-
-    if parsed != nil && parsed["response"]["servers"] != []
-      parsed["response"]["servers"].each do |server|
-        if server["addr"] && server["appid"] && server["gameport"]
-          ip, p = server["addr"].split(':')
-          port = server["gameport"].to_i
-          query_port = p.to_i
-          address = server["addr"]
-          flags = {}
-          flags['Quakecon in Host Name'] = true
-          name = server["name"]
-          players = players(server["players"], server["max_players"])
-          map = server["map"]
-          current = server["players"]
-          max = server["max_players"]
-          game_id = Game.update(server["appid"],server["gamedir"], true)
-          host = Host.where(address: address).first_or_create
-
-          host.update_attributes(
-            :game_id    => game_id,
-            :query_port => query_port,
-            :ip         => ip,
-            :port       => port,
-            :address    => address,
-            :pin        => true,
-            :source     => "name",
-            :flags      => flags,
-            :name       => name,
-            :current    => current,
-            :max        => max,
-            :players    => players,
-            :map        => map,
-            :last_successful_query => Time.now
-          )
-
-          puts "Found a #{host.game.name} host at #{address}"
-        end
+    if host.updated == false
+      if server[:appid].nil? || server[:appid] == 0
+        info = Host.get_server_info(server[:address])
+        appid = info["appid"]
+        query_port = info["query_port"]
+      else
+        appid = server[:appid]
+        query_port = nil
       end
-    end
 
-    hosts = Host.where(:source => 'name')
-    hosts.each do |h|
-      if h[:last_successful_query] < 5.minutes.ago
-        h.update_attributes(
-          :pin        => false
+      if appid.nil?
+        appid = Game.appid_from_name(server[:product])
+      end
+
+      name = server[:name] == "noname" ? nil : server[:name]
+
+      ip, port = server[:address].split(':')
+      game_id = Game.update(appid,server[:product], true)
+
+      network_id = Network.location(ip)
+      valid_ip = Network.valid_ip(ip)
+
+      host.update_attributes(
+        :game_id    => game_id,
+        :query_port => query_port,
+        :ip         => ip,
+        :port       => port,
+        :network_id => network_id,
+        :address    => server[:address],
+        :link       => "steam://connect/#{server[:address]}",
+        :name       => valid_name(name),
+        :current    => server[:current],
+        :max        => server[:max],
+        :players    => players(server[:current], server[:max]),
+        :map        => valid_name(server[:map]),
+        :source     => "file",
+        :last_successful_query => Time.now
+      )
+
+      visible = is_visible(host, valid_ip)
+      if visible == true
+        host.update_attributes(
+          :flags => flags(host),
+          :updated => true,
+          :visible => true
+        )
+      end
+    else
+      if host.respond == false
+        host.update_attributes(
+          :name       => valid_name(server[:name]),
+          :current    => server[:current],
+          :max        => server[:max],
+          :players    => players(server[:current], server[:max]),
+          :map        => valid_name(server[:map]),
         )
       end
     end
 
+    unless ENV["HOSTS_FILE"].nil?
+      File.delete ENV["HOSTS_FILE"] if File.file? ENV["HOSTS_FILE"]
+    end
   end
 end

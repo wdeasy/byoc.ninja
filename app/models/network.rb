@@ -24,7 +24,7 @@ class Network < ApplicationRecord
     network = Network.where(:name => 'wan').first
 
     if i == nil
-      return network
+      return network.id
     end
 
     Network.where.not(:name => 'wan').each do |r|
@@ -35,12 +35,12 @@ class Network < ApplicationRecord
           network = r
 
           if network == "banned"
-            return network
+            return network.id
           end
         end
       end
     end
 
-    return network
+    return network.id
   end
 end

@@ -11,7 +11,7 @@ class Game < ApplicationRecord
 
   def Game.update(appid, info, multiplayer, profile=nil)
     game = Game.where(appid: appid).first_or_create do |game|
-      url = "https://store.steampowered.com/api/appdetails/?appids=#{appid}"
+      url = SteamWebApi.get_app_details(appid)
 
       parsed = SteamWebApi.get_json(url)
 
@@ -20,7 +20,7 @@ class Game < ApplicationRecord
       image = nil
 
       unless parsed.blank?
-        if parsed["#{appid}"]['success']
+        if parsed["#{appid}"] && parsed["#{appid}"]['success']
           name = parsed["#{appid}"]['data']['name']
           image = parsed["#{appid}"]['data']['header_image']
           link = valid_link("https://store.steampowered.com/app/#{appid}")
@@ -71,8 +71,7 @@ class Game < ApplicationRecord
 
   def self.name_from_appid(appid)
     name = ''
-    url = "http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=#{SteamWebApi.get_key}&appid=#{appid}"
-
+    url = SteamWebApi.get_schema_for_game(appid)
     parsed = SteamWebApi.get_json(url)
 
     unless parsed.nil?
@@ -111,8 +110,7 @@ class Game < ApplicationRecord
   def Game.update_game(appid)
     game = Game.where(appid: appid).first
 
-    url = "https://store.steampowered.com/api/appdetails/?appids=#{game.appid}"
-
+    url = SteamWebApi.get_app_details(game.appid)
     parsed = SteamWebApi.get_json(url)
 
     name  = game.name

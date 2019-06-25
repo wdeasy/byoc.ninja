@@ -29,7 +29,7 @@ network_list.each do |name, cidr|
 	Network.create!(name: name, cidr: cidr)
 end
 
-user_list = [[76561197967593490,"|PpP| Ray Arnold","https://steamcommunity.com/id/RayArnold","http://cdn.akamai.steamstatic.com/steamcommunity/public/images/avatars/cf/cf9ad90b7219559f4259a552072e790a98befbef.jpg",true]]
+user_list = [[76561197967593490,"|PpP| Ray Arnold","https://steamcommunity.com/id/RayArnold","https://cdn.akamai.steamstatic.com/steamcommunity/public/images/avatars/cf/cf9ad90b7219559f4259a552072e790a98befbef.jpg",true]]
 
 user_list.each do |steamid, name, url, avatar, admin|
 	User.create!(steamid: steamid, name: name, url: url, avatar: avatar, admin: admin)
