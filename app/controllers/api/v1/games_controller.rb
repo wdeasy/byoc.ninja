@@ -14,6 +14,8 @@ module Api
         @game = Game.find_by_appid(params[:id])
         if @game.update_attributes(game_params)
           render :json => @game
+        else
+          render :json => {:error => "unable to update game"}
         end
       end
 

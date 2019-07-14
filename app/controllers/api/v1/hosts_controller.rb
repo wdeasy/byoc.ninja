@@ -11,9 +11,18 @@ module Api
       end
 
       def update
-        @host = Host.find_by_id(params[:id])
-        if @host.update_attributes(host_params)
-          render :json => @host
+        address = Host.deperameterize(params[:id])
+        if address.nil?
+          render :json => {:error => "invalid address"}
+        else
+          @host = Host.find_by_address(address)
+          if @host.nil?
+            render :json => {:error => "address not found"}
+          elsif @host.update_attributes(host_params)
+            render :json => @host
+          else
+            render :json => {:error => "unable to update host"}
+          end
         end
       end
 
@@ -25,7 +34,7 @@ module Api
       end
 
       def host_params
-        params.require(:host).permit(:name, :map, :current, :max, :password, :last_successful_query)
+        params.require(:host).permit(:name, :map, :current, :max, :players, :password, :last_successful_query)
       end
 
       def admin_api_user

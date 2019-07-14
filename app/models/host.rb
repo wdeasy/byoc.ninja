@@ -226,6 +226,11 @@ class Host < ApplicationRecord
       flags['Manually Added'] = true
     end
 
+    #server was added from file
+    if host.source == "file"
+      flags['Added From File'] = true
+    end
+
     unless flags.empty? && host.flags.blank?
       return flags
     else
@@ -700,6 +705,7 @@ class Host < ApplicationRecord
 
       name.strip!
       name = name.gsub(/[^[:print:]]/i, '')
+      name = name.gsub(/(<color[^>]*>)|(<\/color>)/,'')
     end
 
     return name
@@ -800,7 +806,7 @@ class Host < ApplicationRecord
         )
       end
     else
-      if host.respond == false
+      if host.respond == false && host.source = "file"
         host.update_attributes(
           :name       => valid_name(server[:name]),
           :current    => server[:current],
@@ -813,6 +819,18 @@ class Host < ApplicationRecord
 
     unless ENV["HOSTS_FILE"].nil?
       File.delete ENV["HOSTS_FILE"] if File.file? ENV["HOSTS_FILE"]
+    end
+  end
+
+  def Host.deperameterize(address)
+    puts "address: " + address
+    if address.nil?
+      return nil
+    elsif address !~ /([0-9]{1,3}\-[0-9]{1,3}\-[0-9]{1,3}\-[0-9]{1,3})\-([0-9]{1,5})/
+      return nil
+    else
+      one, two, three, four, five = address.split("-")
+      "#{one}.#{two}.#{three}.#{four}:#{five}"
     end
   end
 end

@@ -27,6 +27,10 @@ module HostsHelper
 				html << '<span class="glyphicon glyphicon-pushpin" title="Pinned"></span>'
 			end
 
+			if host.flags['Added From File']
+				html << '<span class="glyphicon glyphicon-transfer" title="Found by qclan.info"></span>'
+			end
+
 		end
 
 		return html
