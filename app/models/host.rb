@@ -14,7 +14,7 @@ class Host < ApplicationRecord
   serialize :flags
 
   def as_json(options={})
-   super(:only => [:name,:map,:users_count,:address,:lobby,:players,:flags,:link],
+   super(:only => [:name,:map,:users_count,:address,:lobby,:players,:flags,:link,:query_port],
           :include => {
             :users => {:only => [:name, :url],
               :include => {
@@ -823,7 +823,6 @@ class Host < ApplicationRecord
   end
 
   def Host.deperameterize(address)
-    puts "address: " + address
     if address.nil?
       return nil
     elsif address !~ /([0-9]{1,3}\-[0-9]{1,3}\-[0-9]{1,3}\-[0-9]{1,3})\-([0-9]{1,5})/
