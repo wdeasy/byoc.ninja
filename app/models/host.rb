@@ -14,7 +14,7 @@ class Host < ApplicationRecord
   serialize :flags
 
   def as_json(options={})
-   super(:only => [:name,:map,:users_count,:address,:lobby,:players,:flags,:link,:query_port],
+   super(:only => [:name,:map,:users_count,:address,:lobby,:players,:flags,:link,:query_port], :methods => [:location],
           :include => {
             :users => {:only => [:name, :url],
               :include => {
@@ -187,7 +187,7 @@ class Host < ApplicationRecord
     #check for quakecon in hostname
     if host.name != nil
       #if host.name.downcase.include? "quakecon"
-      if ["quakecon", "qcon"].any? { |q| host.name.downcase.include? q }
+      if ["quakecon", "qcon", "byoc"].any? { |q| host.name.downcase.include? q }
         flags['Quakecon in Host Name'] = true
       end
     end
@@ -283,7 +283,7 @@ class Host < ApplicationRecord
 
   def Host.query_master_by_names
     servers = []
-    names = ['quakecon','qcon']
+    names = ['quakecon','qcon','byoc']
     names.each do |name|
       puts "Searching for servers that include \"#{name}\"."
       api = SteamWebApi.get_server_list_by_name(name)
@@ -831,5 +831,9 @@ class Host < ApplicationRecord
       one, two, three, four, five = address.split("-")
       "#{one}.#{two}.#{three}.#{four}:#{five}"
     end
+  end
+
+  def location
+    network.name
   end
 end
