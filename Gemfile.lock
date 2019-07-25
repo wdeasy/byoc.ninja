@@ -255,7 +255,7 @@ DEPENDENCIES
   omniauth-rails_csrf_protection
   omniauth-steam!
   pg
-  puma (= 3.11.0)
+  puma
   rails
   record_tag_helper
   sass-rails
