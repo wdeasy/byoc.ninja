@@ -49,7 +49,7 @@ class Host < ApplicationRecord
       port        = p.to_i
       if valid_ip == true
         case
-        when host.query_port == nil || (host.game_id != nil && host.game_id != host.game.id) || host.last_successful_query < 1.hour.ago
+        when host.query_port == nil || (host.game_id != nil && host.game_id != host.game.id) || host.last_successful_query < 5.minutes.ago
           info        = Host.get_server_info(player["gameserverip"])
           query_port  = info["query_port"]
           lan         = info["lan"]
