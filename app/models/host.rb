@@ -49,7 +49,7 @@ class Host < ApplicationRecord
       port        = p.to_i
       if valid_ip == true
         case
-        when host.query_port == nil || (host.game_id != nil && host.game_id != host.game.id) || host.last_successful_query < 5.minutes.ago
+        when host.query_port == nil || (host.game_id != nil && host.game_id != host.game.id) || host.last_successful_query < 1.hour.ago
           info        = Host.get_server_info(player["gameserverip"])
           query_port  = info["query_port"]
           lan         = info["lan"]
@@ -622,8 +622,8 @@ class Host < ApplicationRecord
         case
         when host.address == nil
           puts "Host address is nil"
-        when host.last_successful_query < 1.hour.ago
-          puts "Host hasn't responded in an hour"
+        when host.last_successful_query < 5.minutes.ago
+          puts "Host isn't responding"
         when host.flags == nil || (host.flags['Hosted in BYOC'] == nil)
           puts "Host is no longer flagged"
         else
