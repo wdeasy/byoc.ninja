@@ -138,6 +138,7 @@ class Host < ApplicationRecord
         :players    => players(server[:current], server[:max]),
         :map        => valid_name(server[:map]),
         :source     => "name",
+        :respond    => true,
         :last_successful_query => Time.now
       )
 
@@ -794,6 +795,7 @@ class Host < ApplicationRecord
         :players    => players(server[:current], server[:max]),
         :map        => valid_name(server[:map]),
         :source     => "file",
+        :respond    => true,
         :last_successful_query => Time.now
       )
 
