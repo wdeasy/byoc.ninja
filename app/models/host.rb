@@ -208,7 +208,7 @@ class Host < ApplicationRecord
     #hosted in byoc
     if host.network.name == "byoc"
       flags['Hosted in BYOC'] = true
-      Host.pin(host)
+      #Host.pin(host)
     end
 
     #password protected
