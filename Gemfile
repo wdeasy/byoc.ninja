@@ -23,7 +23,7 @@ gem 'pg'
 gem "omniauth-steam", github: "krtschmr/omniauth-steam"
 gem 'omniauth-rails_csrf_protection'
 gem 'steam-condenser'
-gem 'netaddr',          '1.5.1'
+gem 'netaddr',          '2.0.4'
 gem 'record_tag_helper'
 
 group :development do
