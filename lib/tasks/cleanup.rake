@@ -37,6 +37,8 @@ namespace :cleanup do
     users.delete_all
     puts "Deleting #{Seat.all.count} seats."
     Seat.destroy_all
+    puts "Resetting User seat counts."
+    User.update_all(:seat_count => 0);
     finish_time(beginning)
   end
 

@@ -6,7 +6,7 @@ module Api
       before_action :admin_api_user, :except => [:index]
 
       def index
-        @hosts = Host.includes(:game, :users, :seats).where(visible: true).where("games.joinable = true").order("games.name ASC, users_count DESC, hosts.current IS NULL, hosts.current DESC, hosts.name DESC")
+        @hosts = Host.includes(:game, :users, :seats).where(visible: true).where("games.joinable = true").where("users.banned = false").order("games.name ASC, users_count DESC, hosts.current IS NULL, hosts.current DESC, hosts.name DESC")
         render :json => @hosts
       end
 

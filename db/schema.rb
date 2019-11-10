@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_22_020424) do
+ActiveRecord::Schema.define(version: 2019_08_11_200436) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -153,6 +153,7 @@ ActiveRecord::Schema.define(version: 2019_06_22_020424) do
     t.bigint "host_id"
     t.integer "game_id"
     t.integer "mod_id"
+    t.integer "seat_count", default: 0
     t.index ["host_id"], name: "index_users_on_host_id"
     t.index ["steamid"], name: "index_users_on_steamid", unique: true
   end

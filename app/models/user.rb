@@ -105,10 +105,15 @@ class User < ApplicationRecord
       response = search_summary_for_seat(steamid, seat.seat)
       if response == "Match"
         user = User.lookup(steamid)
-        user.update_attributes(
-          :seat_ids => seat.id
-        )
-        User.fill(steamid)
+
+        unless (user.seat_count > 2 && user.admin = false)
+          user.update_attributes(
+            :seat_ids => seat.id,
+            :seat_count => user.seat_count + 1
+          )
+          User.fill(steamid)
+        end
+
         return "You're linked to #{seat.seat}!"
       else
         return response
