@@ -11,8 +11,7 @@ class Network < ApplicationRecord
     end
 
     begin
-      cidr = NetAddr::CIDR.create("#{i}/24")
-      #cidr = NetAddr::IPv4.parse(i)
+      cidr = NetAddr::IPv4.parse(i)
       return true
     rescue NetAddr::ValidationError
       puts "#{i} is not a valid ip."
@@ -27,16 +26,27 @@ class Network < ApplicationRecord
       return network.id
     end
 
+    begin
+      ip = NetAddr::IPv4.parse(i)
+    rescue NetAddr::ValidationError
+      puts "Skipping location. #{i} is not a valid ip."
+      return network.id
+    end
+
     Network.where.not(:name => 'wan').each do |r|
       if !r.cidr.blank?
-        cidr = NetAddr::CIDR.create(r.cidr)
+        begin
+          cidr = NetAddr::IPv4Net.parse(r.cidr)
 
-        if cidr.matches?(i)
-          network = r
+          if cidr.contains(ip)
+            network = r
 
-          if network == "banned"
-            return network.id
+            if network == "banned"
+              return network.id
+            end
           end
+        rescue NetAddr::ValidationError
+          puts "Invalid CIDR: #{r.cidr}"
         end
       end
     end
