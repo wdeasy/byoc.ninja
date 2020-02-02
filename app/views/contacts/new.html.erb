@@ -4,21 +4,21 @@
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
 	<%= form_for(@contact) do |f| %>
-	  <%= render 'shared/error_messages', object: f.object %>
+    <%= render 'shared/error_messages', object: f.object %>
 
-	  <%= f.label :name %>
-	  <%= f.text_field :name, class: 'form-control' %>
+    <%= f.label :name %>
+    <%= f.text_field :name, class: 'form-control' %>
 
-	  <%= f.label :email %>
-	  <%= f.text_field :email, class: 'form-control' %>
+    <%= f.label :email %>
+    <%= f.text_field :email, class: 'form-control' %>
 
-    <%= f.label :subject, class: 'form-subject' %>
-    <%= f.text_field :subject, class: 'form-subject' %>
+    <%= f.label :comment, class: 'form-comment' %>
+    <%= f.text_field :comment, class: 'form-comment' %>
 
-	  <%= f.label :message %>
-	  <%= f.text_area :message, class: 'form-control' %>
+    <%= f.label :message %>
+    <%= f.text_area :message, class: 'form-control' %>
 
-	  <%= f.submit "Submit", class: "btn btn-primary pull-left" %>
+    <%= f.submit "Submit", class: "btn btn-primary pull-left" %>
 	<% end %>
   </div>
 </div>
