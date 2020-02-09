@@ -328,6 +328,10 @@ input {
   border: 1px solid $gray-darker !important;
 }
 
+::placeholder {
+  color: $gray !important;
+}
+
 .dropdown-menu {
   background-color: $gray-lighter !important;
 }
@@ -338,6 +342,9 @@ input {
 }
 
 .form-comment {
-  display: none !important;
-  visibility:hidden !important;
+  position: fixed;
+  top: 100%;
+  background-color: $gray;
+  color: $gray;
+  border: 0px;
 }

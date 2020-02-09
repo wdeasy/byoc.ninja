@@ -71,10 +71,10 @@ class UsersController < ApplicationController
   private
     def user_params
       unless current_user.admin?
-        params.extract!(:auto_update, :name, :url)
+        params.extract!(:auto_update, :name, :url, :seat_ids)
       end
 
-      params.require(:user).permit(:display, :auto_update, :name, :url, :seat_ids)
+      params.require(:user).permit(:display, :auto_update, :name, :url)
     end
 
     # Confirms a logged-in user.

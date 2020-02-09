@@ -3,23 +3,24 @@
 <h3 class="center">Contact</h3>
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
-	<%= form_for(@contact) do |f| %>
-    <%= render 'shared/error_messages', object: f.object %>
+    <%= form_for(@contact) do |f| %>
+      <%= render 'shared/error_messages', object: f.object %>
 
-    <%= f.label :name %>
-    <%= f.text_field :name, class: 'form-control' %>
+      <%# this is a honeypot field %>
+      <%= f.label :comment, class: 'form-comment' %>
+      <%= f.text_field :comment, class: 'form-comment' %>
 
-    <%= f.label :email %>
-    <%= f.text_field :email, class: 'form-control' %>
+      <%= f.label :name %>
+      <%= f.text_field :name, class: 'form-control' %>
 
-    <%= f.label :comment, class: 'form-comment' %>
-    <%= f.text_field :comment, class: 'form-comment' %>
+      <%= f.label :email %>
+      <%= f.text_field :email, class: 'form-control' %>
 
-    <%= f.label :message %>
-    <%= f.text_area :message, class: 'form-control' %>
+      <%= f.label :message %>
+      <%= f.text_area :message, class: 'form-control' %>
 
-    <%= f.submit "Submit", class: "btn btn-primary pull-left" %>
-	<% end %>
+      <%= f.submit "Submit", class: "btn btn-primary pull-left" %>
+    <% end %>
   </div>
 </div>
 </div>

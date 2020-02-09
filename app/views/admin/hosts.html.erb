@@ -11,12 +11,16 @@
       </tr>
     </thead>
     <tbody>
-      <% @hosts.each do |host| %>
-        <tr class="row">
+      <% if @hosts.empty? %>
+        <tr class="row"><td colspan="3" class="col-md-offset-2 text-center">No Hosts Found.</td></tr>
+      <% else %>
+        <% @hosts.each do |host| %>
+          <tr class="row">
             <td class="text-left longtext"><%= host.game.name %></td>
             <td class="text-center longtext"><%= link_to (host.name.blank? ? '' : host.name), edit_host_path(host) %></td>
             <td class="text-right"><%= link_to (host.address.blank? ? host.lobby : host.address), edit_host_path(host) %></td>
-        </tr>
+          </tr>
+        <% end %>
       <% end %>
     </tbody>
   </table>
