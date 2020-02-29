@@ -106,7 +106,7 @@ class User < ApplicationRecord
       if response == "Match"
         user = User.lookup(steamid)
 
-        unless (user.seat_count > 2 && user.admin = false)
+        unless (user.seat_count > 2 && user.admin == false)
           user.update_attributes(
             :seat_ids => seat.id,
             :seat_count => user.seat_count + 1
