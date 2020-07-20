@@ -1,5 +1,5 @@
 GIT
-  remote: git://github.com/krtschmr/omniauth-steam.git
+  remote: https://github.com/krtschmr/omniauth-steam.git
   revision: 8891aa727c89007f0a55e81e0ce0cde86d81df4b
   specs:
     omniauth-steam (1.0.5)
@@ -280,4 +280,4 @@ DEPENDENCIES
   whenever
 
 BUNDLED WITH
-   1.17.2
+   2.1.4
