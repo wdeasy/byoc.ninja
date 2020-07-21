@@ -732,7 +732,7 @@ class Host < ApplicationRecord
     else
       puts "Reading #{file}..."
       begin
-        CSV.new(open(file), liberal_parsing: true).each do |line|
+        CSV.new(URI.open(file), liberal_parsing: true).each do |line|
           unless line[0] == nil || (servers.include? line[0])
             puts "-> Server: #{line[0]}"
             info = {}

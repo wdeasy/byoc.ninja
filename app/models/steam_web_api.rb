@@ -25,7 +25,7 @@ class SteamWebApi < ApplicationRecord
     parsed = nil
 
     begin
-      parsed = JSON.parse(open(url).read)
+      parsed = JSON.parse(URI.open(url).read)
     rescue => e
       puts "JSON failed to parse #{url}"
       puts e.message
@@ -38,7 +38,7 @@ class SteamWebApi < ApplicationRecord
     parsed = nil
 
     begin
-      parsed = Nokogiri::XML(open(url))
+      parsed = Nokogiri::XML(URI.open(url))
     rescue => e
       puts "Nokogiri failed to open XML #{url}"
       puts e.message
@@ -51,7 +51,7 @@ class SteamWebApi < ApplicationRecord
     page = nil
 
     begin
-      html = open(url)
+      html = URI.open(url)
       page = Nokogiri::HTML(html.read)
     rescue => e
       puts "Nokogiri failed to open HTML #{url}"

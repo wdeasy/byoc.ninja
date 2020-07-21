@@ -51,7 +51,7 @@ class User < ApplicationRecord
   def User.steamid_from_url(url)
     begin
       url = url_cleanup(url)
-      html = open("#{url}?xml=1")
+      html = URI.open("#{url}?xml=1")
       doc = Nokogiri::XML(html)
 
       return doc.at_css("steamID64").text
@@ -63,7 +63,7 @@ class User < ApplicationRecord
   def User.search_summary_for_seat(steamid, seat)
     begin
       url = "https://steamcommunity.com/profiles/#{steamid}/"
-      html = open(url)
+      html = URI.open(url)
       doc = Nokogiri::HTML(html)
 
       if doc.css('div.profile_summary')
