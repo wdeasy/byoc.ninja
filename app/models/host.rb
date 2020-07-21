@@ -410,9 +410,9 @@ class Host < ApplicationRecord
   end
 
   def Host.update_hosts
-    steamids = gather_steamids
+    return if SteamWebApi.get_key.nil?
 
-    return "No steam ids to process" if steamids.empty?
+    steamids = gather_steamids
 
     Host.update_all(:updated => false)
     User.update_all(:updated => false)
