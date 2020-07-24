@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_21_020425) do
+ActiveRecord::Schema.define(version: 2020_07_23_230523) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -87,6 +87,14 @@ ActiveRecord::Schema.define(version: 2020_07_21_020425) do
     t.index ["network_id"], name: "index_hosts_on_network_id"
   end
 
+  create_table "identities", force: :cascade do |t|
+    t.string "uid", null: false
+    t.string "provider"
+    t.bigint "user_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "messages", force: :cascade do |t|
     t.string "message"
     t.string "message_type"
@@ -125,11 +133,6 @@ ActiveRecord::Schema.define(version: 2020_07_21_020425) do
     t.string "sort"
   end
 
-  create_table "seats_users", id: false, force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "seat_id", null: false
-  end
-
   create_table "steam_web_apis", force: :cascade do |t|
     t.string "key"
     t.integer "calls", default: 0
@@ -139,7 +142,7 @@ ActiveRecord::Schema.define(version: 2020_07_21_020425) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.bigint "steamid", null: false
+    t.bigint "steamid"
     t.string "name"
     t.string "url"
     t.string "avatar"
@@ -154,6 +157,10 @@ ActiveRecord::Schema.define(version: 2020_07_21_020425) do
     t.integer "game_id"
     t.integer "mod_id"
     t.integer "seat_count", default: 0
+    t.string "discord_uid"
+    t.string "discord_username"
+    t.string "discord_avatar"
+    t.bigint "seat_id"
     t.index ["host_id"], name: "index_users_on_host_id"
     t.index ["steamid"], name: "index_users_on_steamid", unique: true
   end

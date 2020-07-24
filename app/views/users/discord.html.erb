@@ -1,0 +1,79 @@
+<script type="text/javascript">
+
+	$(document).ready(function() {
+
+    var section = "";
+		var row = "";
+		var seat = "";
+
+		$('#section').change(function(){
+			section = $(this).val();
+      $("#row").empty();
+			$("#number").empty();
+			$("#number").append("<option value='' selected='selected'>Seat</option>");
+			$.get("/lookup.json", {section: section}, function(data){
+				$("#row").html("");
+				$.each(data, function(index, value) {
+					$("#row").append("<option value='" + value + "'>" + value + "</option>");
+				});
+				$("#row").prepend("<option value='' selected='selected'>Row</option>");
+			});
+			setSeat();
+		});
+
+		$('#row').change(function(){
+			row = $(this).val();
+      $("#number").empty();
+			$.get("/lookup.json", {row: row, section: section}, function(data){
+				$("#number").html("");
+				$.each(data, function(index, value) {
+					$("#number").append("<option value='" + value.seat + "'>" + value.number + "</option>");
+				});
+				$("#number").prepend("<option value='' selected='selected'>Seat</option>");
+			});
+			setSeat();
+		});
+
+		$('#number').change(function(){
+			seat = $(this).val();
+		});
+
+		$('')
+
+		$('#discord_submit').click(function(){
+			var seatVal = $("#number").val();
+			$('#discord_form').attr('action', function(i,value) {
+				return value + "?seat=" + seatVal;
+			});
+		});
+	});
+
+</script>
+
+<% provide(:title, "Seat Link")  %>
+<div class="jumbotron">
+<h3 class="center">Link your seat to your discord account!</h3>
+<br />
+<p></p>
+	<div class="row">
+	  <div class="col-md-6 col-md-offset-3">
+			<%= form_tag('auth/discord', method: :post, id: "discord_form") do %>
+			  <%= label_tag "1) Select your seat:" %>
+				<div class="row">
+	        <div class="col-sm-4">
+			      <%= select_tag "section", options_for_select(@sections), :prompt => "Section", id: "section", class: "form-control" %>
+					</div>
+					<div class="col-sm-4">
+						<%= select_tag "row", "", :prompt => "Row", id: "row", class: "form-control" %>
+					</div>
+					<div class="col-sm-4">
+						<%= select_tag "number", "", :prompt => "Seat", id: "number", class: "form-control" %>
+					</div>
+				</div>
+
+				<%= label_tag "2) Click this button:" %>
+			  <%= submit_tag("Click me!", class: "btn btn-primary", id: "discord_submit") %>
+			<% end %>
+		</div>
+	</div>
+</div>

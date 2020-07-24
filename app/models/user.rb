@@ -2,10 +2,40 @@ class User < ApplicationRecord
   require 'open-uri'
 
   belongs_to :host, counter_cache: true, optional: true
-  has_and_belongs_to_many :seats
+  belongs_to :seat, optional:true
   belongs_to :game, optional: true
   belongs_to :mod, optional: true
   has_many :api_keys
+  has_many :identities
+
+  def self.create_with_omniauth(auth)
+    user = nil
+    if auth['provider'] == 'steam'
+      user = User.where(steamid: auth.uid).first_or_create
+    elsif auth['provider'] == 'discord'
+      user = User.where(discord_uid: auth.uid).first_or_create
+    end
+
+    return user
+  end
+
+  def self.update_with_omniauth(user_id, auth)
+    user = find_by(id: user_id)
+    if auth['provider'] == 'steam'
+      user.update_attributes(
+        :steamid => auth.uid,
+     	  :name	   => auth.info['nickname'],
+    	  :url 	   => auth.extra['raw_info']['profileurl'],
+    	  :avatar  => auth.extra['raw_info']['avatar']
+    	)
+    elsif auth['provider'] == 'discord'
+      user.update_attributes(
+        :discord_uid      => auth.uid,
+        :discord_username => "#{auth.extra['raw_info']['username']}\##{auth.extra['raw_info']['discriminator']}",
+    	  :discord_avatar   => auth.info['image']
+    	)
+    end
+  end
 
   def User.update(player, host_id, game_id, mod_id=nil)
 
@@ -68,7 +98,7 @@ class User < ApplicationRecord
 
       if doc.css('div.profile_summary')
         if doc.css('div.profile_summary').text.include? seat
-          return "Match"
+          return true
         else
           return "Could not find #{seat} in your steam profile summary."
         end
@@ -80,46 +110,91 @@ class User < ApplicationRecord
     end
   end
 
+  def User.update_seat_from_omniauth(user_id, seat_id)
+    success = false
+    message = ""
+
+    user = User.find_by(id: user_id)
+    if user.nil?
+      message = "That user doesn't exist!"
+      return {:success => success, :message => message}
+    end
+
+    seat = Seat.where(:seat => seat_id).first
+    if seat.nil?
+      message = "That seat doesn't exist!"
+      return {:success => success, :message => message}
+    end
+
+    if (user.seat_count > 2 && user.admin == false)
+      message = "You're linked to #{seat.seat}!"
+      return {:success => true, :message => message}
+    else
+      success = user.update_attributes(
+        :seat_id => seat.id,
+        :seat_count => user.seat_count + 1
+      )
+
+      if success == true
+        message = "You're linked to #{seat.seat}!"
+        return {:success => success, :message => message}
+      else
+        message = "Unable to save your seat."
+        return {:success => success, :message => message}
+      end
+    end
+  end
+
   def User.update_seat(seat_id, url)
-    if seat_id == ""
-      return "Please select a seat."
-    elsif url == ""
-      return "Please enter your profile URL"
+    success = false
+    message = ""
+
+    if seat_id.nil?
+      message = "Please select a seat."
+      return {:success => success, :message => message}
+    end
+
+    if url.nil?
+      message = "Please enter your profile URL"
+      return {:success => success, :message => message}
     end
 
     url = User.url_cleanup(url)
-
     unless url.start_with?('http://steamcommunity.com/id/','http://steamcommunity.com/profiles/','https://steamcommunity.com/id/','https://steamcommunity.com/profiles/')
-      return "Please enter a valid profile URL"
+      message "Please enter a valid profile URL"
+      return {:success => success, :message => message}
     end
 
     steamid = User.steamid_from_url(url)
+    if steamid.nil?
+      message = "Could not parse steamid from URL. Please check the url and try again."
+      return {:success => success, :message => message}
+    end
 
-    if (steamid != nil)
-      seat = Seat.where(:seat => seat_id).first
+    seat = Seat.where(:seat => seat_id).first
+    if seat.nil?
+      message = "Unknown seat."
+      return {:success => success, :message => message}
+    end
 
-      if seat == nil
-        return "Unknown seat."
+    response = search_summary_for_seat(steamid, seat.seat)
+    if response == true
+      user = User.lookup(steamid)
+
+      unless (user.seat_count > 2 && user.admin == false)
+        user.update_attributes(
+          :seat_id => seat.id,
+          :seat_count => user.seat_count + 1
+        )
+        User.fill(steamid)
       end
 
-      response = search_summary_for_seat(steamid, seat.seat)
-      if response == "Match"
-        user = User.lookup(steamid)
-
-        unless (user.seat_count > 2 && user.admin == false)
-          user.update_attributes(
-            :seat_ids => seat.id,
-            :seat_count => user.seat_count + 1
-          )
-          User.fill(steamid)
-        end
-
-        return "You're linked to #{seat.seat}!"
-      else
-        return response
-      end
+      success = true
+      message =  "You're linked to #{seat.seat}!"
+      return {:success => success, :message => message}
     else
-      return "Could not parse steamid from URL. Please check the url and try again."
+      message = response
+      return {:success => success, :message => message}
     end
   end
 
@@ -138,18 +213,24 @@ class User < ApplicationRecord
   end
 
   def clan
-    if name.match(/^\[.*\S.*\].*\S.*$/)
-      name.split(/[\[\]]/)[1].strip
-    else
-      nil
+    unless name.nil?
+      if name.match(/^\[.*\S.*\].*\S.*$/)
+        name.split(/[\[\]]/)[1].strip
+      else
+        nil
+      end
     end
   end
 
   def handle
-    if name.match(/^\[.*\S.*\].*\S.*$/)
-      name.split(/[\[\]]/)[-1].strip
+    if name.nil? && !discord_username.nil?
+      discord_username[0..(discord_username.rindex('#')-1)]
     else
-      name
+      if name.match(/^\[.*\S.*\].*\S.*$/)
+        name.split(/[\[\]]/)[-1].strip
+      else
+        name
+      end
     end
   end
 

@@ -6,23 +6,42 @@ class SessionsController < ApplicationController
 
   def create
     auth = request.env['omniauth.auth']
-    temp = { :name => auth.info['nickname'],
-    				:avatar => auth.extra['raw_info']['avatar'],
-                    :url => auth.extra['raw_info']['profileurl'],
-                    :uid => auth.uid }
-    user = User.where(steamid: temp[:uid]).first_or_create
-    user.update_attributes(
-   	  :name	=> temp[:name],
-  	  :url 	=> temp[:url],
-  	  :avatar 		=> temp[:avatar]
-  	)
-    if user
-  	  log_in user
-      redirect_to root_url
-    else
-      flash.now[:danger] = 'Failed to create session.'
-      redirect_to root_url
+
+    @identity = Identity.find_with_omniauth(auth)
+    if @identity.nil?
+      @identity = Identity.create_with_omniauth(auth)
     end
+
+    if logged_in?
+      unless @identity.user == current_user
+        @identity.user = current_user
+        @identity.save
+      end
+    else
+      if @identity.user.present?
+        log_in @identity.user
+      else
+        user = User.create_with_omniauth(auth)
+        if user
+          log_in user
+          @identity.user = current_user
+          @identity.save
+        else
+          flash.now[:danger] = 'Failed to create session.'
+        end
+      end
+    end
+
+    if logged_in?
+      User.update_with_omniauth(@identity.user.id, auth)
+    end
+
+    if request.env['omniauth.params']['seat'].present?
+      result = User.update_seat_from_omniauth(@identity.user_id, request.env['omniauth.params']['seat'])
+      flash[result[:success] ? :success : :danger] = result[:message]
+    end
+
+    redirect_to root_url
   end
 
   def failure

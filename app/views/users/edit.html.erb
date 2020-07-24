@@ -6,8 +6,8 @@
   	<div class="row">
   	  <div class="col-md-6 col-md-offset-3">
     		<div class="container center">
-    			<%= @user.avatar == nil ? '' : full_av(@user) %><br />
-    			<%= sanitize link_to @user.name, slice_url(@user.url), {:target => "_blank"} %>
+    			<%= display_avatar(@user) %><br />
+    			<%= @user.url == nil ? @user.discord_username : (sanitize link_to @user.name, slice_url(@user.url), {:target => "_blank"}) %>
     		</div>
   	  </div>
   	</div>
@@ -25,7 +25,7 @@
 
     	  <% if current_user.admin? %>
           <%= f.label :seat %>
-          <%= f.collection_select :seat_ids, @seats, :id, :seat, {:include_blank => true},{:class => 'form-control longtext'} %>
+          <%= f.collection_select :seat_id, @seats, :id, :seat, {:include_blank => true},{:class => 'form-control longtext'} %>
 
           <%= f.label :banned %><br />
           <%= f.select :banned, [['Yes',true],['No',false]], {},{:class => 'form-control', :disabled => true} %>
@@ -41,6 +41,12 @@
 
     		  <%= f.label :url %>
     		  <%= f.text_field :url, class: 'form-control' %>
+
+          <%= f.label :discord_uid %>
+    		  <%= f.text_field :discord_uid, class: 'form-control', :readonly => true %>
+
+          <%= f.label :discord_username %>
+    		  <%= f.text_field :discord_username, class: 'form-control' %>                           
     		<% end %>
 
     		<% if current_user?(@user) || current_user.admin? %>

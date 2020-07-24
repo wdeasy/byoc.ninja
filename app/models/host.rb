@@ -16,10 +16,10 @@ class Host < ApplicationRecord
   def as_json(options={})
    super(:only => [:name,:map,:users_count,:address,:lobby,:players,:flags,:link,:query_port], :methods => [:location],
           :include => {
-            :users => {:only => [:name, :url],
+            :users => {:only => [:name, :url, :discord_username, :discord_avatar],
               :include => {
-                :seats => {:only => [:seat, :clan, :handle]}
-              }
+                :seat => {:only => [:seat, :clan, :handle]}
+              }, :methods => [:clan, :handle, :playing]
             },
             :game => {:only => [:name, :link]}
           }
@@ -195,10 +195,8 @@ class Host < ApplicationRecord
 
     #byoc player in game
     host.users.each do |user|
-      user.seats.each do |seat|
-        if seat.year == Date.today.year
-          flags['BYOC Player in Game'] = true
-        end
+      if user.seat.year == Date.today.year
+        flags['BYOC Player in Game'] = true
       end
 
       if ["quakecon", "qcon"].any? { |q| user.name.downcase.include? q }
@@ -395,7 +393,8 @@ class Host < ApplicationRecord
     puts "#{g} steamids from groups"
 
     l = 0
-    linked_users = User.where('id IN (SELECT user_id from seats_users)')
+    #linked_users = User.where('id IN (SELECT user_id from seats_users)')
+    linked_users = User.where.not(seat_id: [nil, ""]).where.not(steamid: [nil, ""])
 
     linked_users.each do |linked_user|
       if !steamids.include? linked_user.steamid.to_s

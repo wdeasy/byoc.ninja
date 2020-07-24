@@ -1,12 +1,12 @@
 class UsersController < ApplicationController
-  before_action :logged_in_user, :except => [:seat]
+  before_action :logged_in_user, :except => [:seat, :discord]
   before_action :correct_user, :only => [:edit, :update]
-  before_action :admin_user, :except => [:edit, :update, :seat]
+  before_action :admin_user, :except => [:edit, :update, :seat, :discord]
 
   def index
-    @users = User.includes(:seats).where.not(host_id: nil).order("name ASC")
-    @users = User.includes(:seats).where(banned: true).order("name ASC") if params[:banned].present?
-    @users = User.includes(:seats).order("name ASC") if params[:all].present?
+    @users = User.includes(:seat).where.not(host_id: nil).order("name ASC")
+    @users = User.includes(:seat).where(banned: true).order("name ASC") if params[:banned].present?
+    @users = User.includes(:seat).order("name ASC") if params[:all].present?
   end
 
   def show
@@ -55,26 +55,29 @@ class UsersController < ApplicationController
     end
 
     @sections = Seat.where(:year => Date.today.year).order("sort asc").pluck(:section).uniq
-
     if params[:link].present?
-      @user = User.update_seat(params[:seat],params[:url])
-      if @user[0..12] == "You're linked"
-        flash["success"] = @user
+      result = User.update_seat(params[:seat], params[:url])
+      if result[:success]
+        flash[:success] = result[:message]
         redirect_to root_url
       else
-        flash["danger"] = @user
+        flash["danger"] = result[:message]
         redirect_to seat_url
       end
     end
   end
 
+  def discord
+    @sections = Seat.where(:year => Date.today.year).order("sort asc").pluck(:section).uniq
+  end
+
   private
     def user_params
       unless current_user.admin?
-        params.extract!(:auto_update, :name, :url, :seat_ids)
+        params.extract!(:auto_update)
       end
 
-      params.require(:user).permit(:display, :auto_update, :name, :url)
+      params.require(:user).permit(:display, :auto_update, :name, :url, :seat_id, :discord_username)
     end
 
     # Confirms a logged-in user.

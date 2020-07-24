@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   root      'hosts#index'
   get       'login'               => 'sessions#login'
   post      'auth/steam/callback' => 'sessions#create'
+  get       'auth/discord/callback' => 'sessions#create'
   match     'auth/failure', :to   => 'sessions#failure', via: [:get, :post]
   delete    'logout'              => 'sessions#destroy'
   get       'privacy_policy'      => 'static_pages#privacy_policy'
@@ -17,6 +18,7 @@ Rails.application.routes.draw do
   get       'logs/update_seats'   => 'logs#update_seats'
 
   get        'seat'               => 'users#seat'
+  get        'discord'            => 'users#discord'
   get        'lookup'             => 'seats#lookup'
   match      'messages/:id/hide', to: 'messages#hide', as: 'hide_message', via: [:get, :post]
 

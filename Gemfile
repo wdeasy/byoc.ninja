@@ -25,6 +25,7 @@ gem 'omniauth-rails_csrf_protection'
 gem 'steam-condenser'
 gem 'netaddr'
 gem 'record_tag_helper'
+gem 'omniauth-discord'
 
 group :development do
   gem 'sqlite3'

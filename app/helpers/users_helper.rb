@@ -1,30 +1,31 @@
 module UsersHelper
-  def full_av(user, options={})
-  	avatarfull = user.avatar.gsub(".jpg","_full.jpg")
-  	image_tag avatarfull, options
-  end
+  def display_avatar(user, options={})
+    size = "_full.jpg"
+    #size = "_medium.jpg"
+    avatar = ''
+    if !user.avatar.nil?
+  	   avatar = user.avatar.gsub(".jpg", size)
+    elsif !user.discord_avatar.nil?
+       avatar = user.discord_avatar
+    end
 
-  def med_av(user, options={})
-  	avatarmed = user.avatar.gsub(".jpg","_medium.jpg")
-  	image_tag avatarmed, options
+    avatar.blank? ? avatar : (image_tag avatar, options)
   end
 
   def display_name(user)
     name = user.name
 
-    user.seats.each do |seat|
-      if seat.year == Date.today.year
-        name = "[#{user.seats.first.seat}]"
-        if user.seats.first.handle.blank?
-          name << " #{user.handle}"
-        else
-          name << " #{user.seats.first.handle}"
-        end
+    if user.seat.present?
+      name = "[#{user.seat.seat}]"
+      if user.seat.handle.blank?
+        name << " #{user.handle}"
+      else
+        name << " #{user.seat.handle}"
       end
     end
 
     if name.blank?
-      return user.steamid
+      return user.steamid.nil? ? user.discord_uid : user.steamid
     else
       length = name.scan(/\^[1-8]/).count*2+40
       return decolor_name(name[0..length])
