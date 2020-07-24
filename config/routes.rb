@@ -1,8 +1,7 @@
 Rails.application.routes.draw do
   root      'hosts#index'
   get       'login'               => 'sessions#login'
-  post      'auth/steam/callback' => 'sessions#create'
-  get       'auth/discord/callback' => 'sessions#create'
+  match     'auth/:provider/callback' => 'sessions#create', via: [:get, :post]
   match     'auth/failure', :to   => 'sessions#failure', via: [:get, :post]
   delete    'logout'              => 'sessions#destroy'
   get       'privacy_policy'      => 'static_pages#privacy_policy'
