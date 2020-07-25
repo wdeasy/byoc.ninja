@@ -8,12 +8,11 @@ namespace :update do
     system("touch /tmp/finished")
   end
 
-  desc "Update byoc seat information args[file,year]"
-  task :seats, [:file,:year] => :environment do |t, args|
+  desc "Update byoc seat information args[file]"
+  task :seats, [:file] => :environment do |t, args|
     beginning = start_time
     file = args.file
-    year = args.year
-    Seat.update_seats(file,year)
+    Seat.update_seats(file)
     finish_time(beginning)
   end
 

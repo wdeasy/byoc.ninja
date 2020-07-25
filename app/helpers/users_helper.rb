@@ -13,23 +13,18 @@ module UsersHelper
   end
 
   def display_name(user)
-    name = user.name
+    name = user.handle
 
     if user.seat.present?
-      name = "[#{user.seat.seat}]"
       if user.seat.handle.blank?
-        name << " #{user.handle}"
+        name.prepend("[#{user.seat.seat}] ")
       else
-        name << " #{user.seat.handle}"
+        name << "[#{user.seat.seat}] #{user.seat.handle}"
       end
     end
 
-    if name.blank?
-      return user.steamid.nil? ? user.discord_uid : user.steamid
-    else
-      length = name.scan(/\^[1-8]/).count*2+40
-      return decolor_name(name[0..length])
-    end
+    length = name.scan(/\^[1-8]/).count*2+40
+    return decolor_name(name[0..length])
   end
 
   def color_name(name)

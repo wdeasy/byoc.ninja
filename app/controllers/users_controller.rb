@@ -15,7 +15,7 @@ class UsersController < ApplicationController
 
   def edit
     @user = User.find(params[:id])
-    @seats = Seat.where(:year => Date.today.year).order("sort asc")
+    @seats = Seat.all.order("sort asc")
   end
 
   def update
@@ -54,7 +54,7 @@ class UsersController < ApplicationController
       cookies.permanent.signed[:hidden_message_ids] = ids
     end
 
-    @sections = Seat.where(:year => Date.today.year).order("sort asc").pluck(:section).uniq
+    @sections = Seat.all.order("sort asc").pluck(:section).uniq
     if params[:link].present?
       result = User.update_seat(params[:seat], params[:url])
       if result[:success]
@@ -68,7 +68,7 @@ class UsersController < ApplicationController
   end
 
   def discord
-    @sections = Seat.where(:year => Date.today.year).order("sort asc").pluck(:section).uniq
+    @sections = Seat.all.order("sort asc").pluck(:section).uniq
   end
 
   private

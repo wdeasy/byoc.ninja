@@ -21,7 +21,7 @@ class Seat < ApplicationRecord
   end
 
   def Seat.update(info)
-  	seat = Seat.where(seat: info["seat"], year: info["year"]).first_or_create
+  	seat = Seat.where(seat: info["seat"]).first_or_create
 
   	seat.update_attributes(
   	  :clan   => info["clan"],
@@ -38,22 +38,17 @@ class Seat < ApplicationRecord
     "#{seat} -- #{clan} #{handle}"[0..40]
   end
 
-  def Seat.update_seats(file,year)
+  def Seat.update_seats(file)
     if file == nil
       file = ENV["SEAT_API_URL"]
     end
 
-    if year == nil
-      year = Date.today.year
-    end
-
     puts "File: #{file}"
-    puts "Year: #{year}"
 
     parsed = SteamWebApi.get_json(file)
 
     i = 0
-    Seat.where(:year => year).update_all(:updated => false)
+    Seat.update_all(:updated => false)
 
     parsed["subChart"]["rows"].each do |row|
       row_letter = row["label"]
@@ -82,7 +77,6 @@ class Seat < ApplicationRecord
         info = { "seat"   => seat,
              "clan"   => clan,
              "handle" => handle,
-             "year" => year,
              "section" => section,
              "row" => row_letter,
              "number" => number,
@@ -102,7 +96,7 @@ class Seat < ApplicationRecord
 
       end
     end
-    Seat.where(:updated => false, :year => year).update_all(:handle => nil, :clan => nil)
+    Seat.where(:updated => false).update_all(:handle => nil, :clan => nil)
 
     puts "Processed #{i} seats"
   end

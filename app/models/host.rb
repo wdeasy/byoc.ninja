@@ -173,7 +173,7 @@ class Host < ApplicationRecord
       when host.lan == true && host.network.name != "byoc"
         puts "Host is a lan game outside of quakecon"
       when host.source == "name" && Filter.contains(host.name)
-        puts "Host has been filtered out by keyword."
+        puts "#{host.name[0..46]} has been filtered out by keyword."
       else
         visible = true
       end
@@ -195,7 +195,7 @@ class Host < ApplicationRecord
 
     #byoc player in game
     host.users.each do |user|
-      if user.seat.year == Date.today.year
+      if user.seat?
         flags['BYOC Player in Game'] = true
       end
 

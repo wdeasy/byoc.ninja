@@ -212,25 +212,37 @@ class User < ApplicationRecord
     end
   end
 
-  def clan
-    unless name.nil?
-      if name.match(/^\[.*\S.*\].*\S.*$/)
-        name.split(/[\[\]]/)[1].strip
+  def username
+    if !name.nil?
+      return name
+    end
+
+    if !discord_username.nil?
+      if discord_username.include? "#"
+        return discord_username[0..(discord_username.rindex('#')-1)]
       else
-        nil
+        return discord_username
       end
+    end
+
+    return "No Username found."
+  end
+
+  def clan
+    h = username
+    if h.match(/^\[.*\S.*\].*\S.*$/)
+      h.split(/[\[\]]/)[1].strip
+    else
+      nil
     end
   end
 
   def handle
-    if name.nil? && !discord_username.nil?
-      discord_username[0..(discord_username.rindex('#')-1)]
+    h = username
+    if h.match(/^\[.*\S.*\].*\S.*$/)
+      h.split(/[\[\]]/)[-1].strip
     else
-      if name.match(/^\[.*\S.*\].*\S.*$/)
-        name.split(/[\[\]]/)[-1].strip
-      else
-        name
-      end
+      h
     end
   end
 
