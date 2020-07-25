@@ -225,6 +225,10 @@ class User < ApplicationRecord
       end
     end
 
+    if seat.present? && seat.handle.present?
+      return seat.handle
+    end
+
     return "No Username found."
   end
 

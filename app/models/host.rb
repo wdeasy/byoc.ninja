@@ -19,7 +19,7 @@ class Host < ApplicationRecord
             :users => {:only => [:name, :url, :discord_username, :discord_avatar],
               :include => {
                 :seat => {:only => [:seat, :clan, :handle]}
-              }, :methods => [:clan, :handle, :playing]
+              }
             },
             :game => {:only => [:name, :link]}
           }
@@ -173,7 +173,7 @@ class Host < ApplicationRecord
       when host.lan == true && host.network.name != "byoc"
         puts "Host is a lan game outside of quakecon"
       when host.source == "name" && Filter.contains(host.name)
-        puts "#{host.name[0..46]} has been filtered out by keyword."
+        puts "Host has been filtered out by keyword."
       else
         visible = true
       end
@@ -195,7 +195,7 @@ class Host < ApplicationRecord
 
     #byoc player in game
     host.users.each do |user|
-      if user.seat.present?
+      if user.seat.year == Date.today.year
         flags['BYOC Player in Game'] = true
       end
 

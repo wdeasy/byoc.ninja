@@ -7,7 +7,7 @@
   	  <div class="col-md-6 col-md-offset-3">
     		<div class="container center">
     			<%= display_avatar(@user) %><br />
-    			<%= @user.url == nil ? @user.discord_username : (sanitize link_to @user.name, slice_url(@user.url), {:target => "_blank"}) %>
+    			<%= @user.url == nil ? @user.username : (sanitize link_to @user.username, slice_url(@user.url), {:target => "_blank"}) %>
     		</div>
   	  </div>
   	</div>
@@ -46,7 +46,7 @@
     		  <%= f.text_field :discord_uid, class: 'form-control', :readonly => true %>
 
           <%= f.label :discord_username %>
-    		  <%= f.text_field :discord_username, class: 'form-control' %>                           
+    		  <%= f.text_field :discord_username, class: 'form-control' %>
     		<% end %>
 
     		<% if current_user?(@user) || current_user.admin? %>

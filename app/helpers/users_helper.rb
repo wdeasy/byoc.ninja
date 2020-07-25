@@ -16,11 +16,7 @@ module UsersHelper
     name = user.handle
 
     if user.seat.present?
-      if user.seat.handle.blank?
-        name.prepend("[#{user.seat.seat}] ")
-      else
-        name << "[#{user.seat.seat}] #{user.seat.handle}"
-      end
+      name.prepend("[#{user.seat.seat}] ")
     end
 
     length = name.scan(/\^[1-8]/).count*2+40
