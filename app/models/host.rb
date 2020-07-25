@@ -195,7 +195,7 @@ class Host < ApplicationRecord
 
     #byoc player in game
     host.users.each do |user|
-      if user.seat?
+      if user.seat.present?
         flags['BYOC Player in Game'] = true
       end
 
