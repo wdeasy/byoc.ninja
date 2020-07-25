@@ -19,7 +19,7 @@ class Host < ApplicationRecord
             :users => {:only => [:name, :url, :discord_username, :discord_avatar],
               :include => {
                 :seat => {:only => [:seat, :clan, :handle]}
-              }
+              }, :methods => [:clan, :handle, :playing]
             },
             :game => {:only => [:name, :link]}
           }
@@ -195,7 +195,7 @@ class Host < ApplicationRecord
 
     #byoc player in game
     host.users.each do |user|
-      if user.seat.year == Date.today.year
+      if user.seat.present?
         flags['BYOC Player in Game'] = true
       end
 
