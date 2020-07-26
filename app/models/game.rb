@@ -5,6 +5,8 @@ class Game < ApplicationRecord
   has_many :mods
   has_many :users
 
+  enum source: [:auto, :manual]
+
   def as_json(options={})
    super(:only => [:appid, :name, :image, :link])
   end
@@ -34,7 +36,7 @@ class Game < ApplicationRecord
       game.name = name.blank? ? Host.valid_name(info) : Host.valid_name(name)
       game.link        = link
       game.image       = image
-      game.source      = "auto"
+      game.source      = :auto
       game.multiplayer = multiplayer
       game.last_seen   = Time.now
     end

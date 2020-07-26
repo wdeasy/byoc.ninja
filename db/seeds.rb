@@ -41,4 +41,4 @@ message_list.each do |message, message_type, show|
 	Message.create!(message: message, message_type: message_type, show: show)
 end
 
-Game.create!(appid: 0, name: "NO GAME DATA FOUND")
+Game.create!(appid: 0, source: 1, name: "NO GAME DATA FOUND")

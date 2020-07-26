@@ -4,7 +4,7 @@
 <% if @game.link %>
 	<div class="row">
 	  <div class="col-md-6 col-md-offset-3">
-	  	<div class="container center"><%= sanitize link_to image_tag(@game.image), slice_url(@game.link), {:class => "img-responsive", :target => "_blank"} %></div>
+	  	<div class="container center"><%= (@game.image.blank? || @game.link.blank?) ? "" : (sanitize link_to image_tag(@game.image), slice_url(@game.link), {:class => "img-responsive", :target => "_blank"}) %></div>
 	  </div>
 	</div>
 	<br />

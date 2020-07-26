@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_26_045009) do
+ActiveRecord::Schema.define(version: 2020_07_26_171234) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -36,7 +36,7 @@ ActiveRecord::Schema.define(version: 2020_07_26_045009) do
     t.string "link"
     t.string "image"
     t.boolean "joinable", default: true
-    t.string "source"
+    t.integer "source"
     t.boolean "queryable", default: false, null: false
     t.boolean "multiplayer", default: true, null: false
     t.datetime "last_seen"
@@ -89,15 +89,18 @@ ActiveRecord::Schema.define(version: 2020_07_26_045009) do
 
   create_table "identities", force: :cascade do |t|
     t.string "uid", null: false
-    t.string "provider"
+    t.integer "provider"
     t.bigint "user_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "name"
+    t.string "avatar"
+    t.string "url"
   end
 
   create_table "messages", force: :cascade do |t|
     t.string "message"
-    t.integer "message_type"
+    t.integer "message_type", default: 0, null: false
     t.boolean "show", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

@@ -3,8 +3,8 @@ class GamesController < ApplicationController
   before_action :admin_user, :except => [:index]
 
   def index
-  	@games = Game.where(:source => 'auto', :multiplayer => true).order("name ASC")
-    @games = Game.where(:source => 'manual').order("name ASC") if params[:manual].present?
+  	@games = Game.where(:source => :auto, :multiplayer => true).order("name ASC")
+    @games = Game.where(:source => :manual).order("name ASC") if params[:manual].present?
     @games = Game.all.order("name ASC") if params[:all].present?
   end
 
@@ -28,7 +28,7 @@ class GamesController < ApplicationController
 
   def create
     @game = Game.new(add_params)
-    @game.source = 'manual'
+    @game.source = :manual
 
     if @game.save
       flash[:success] = "Game added."

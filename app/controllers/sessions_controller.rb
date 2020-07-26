@@ -33,6 +33,7 @@ class SessionsController < ApplicationController
     end
 
     if logged_in?
+      @identity.update_info(auth)
       User.update_with_omniauth(@identity.user.id, auth)
     end
 
