@@ -17,7 +17,7 @@
 	  <%= f.text_field :url, class: 'form-control' %>
 
 	  <%= f.label :enabled %>
-	  <%= f.select :enabled, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+	  <%= f.select :enabled, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
 
 	  <%= f.submit "Save", class: "btn btn-33 btn-primary pull-left" %>
 	  <%= link_to "Delete", @group, method: :delete, data: { confirm: "You sure?" }, class: "btn btn-33 btn-primary" %>

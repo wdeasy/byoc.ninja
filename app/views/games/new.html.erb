@@ -16,7 +16,7 @@
 	  <%= f.text_field :link, class: 'form-control' %>
 
 	  <%= f.label :multiplayer %>
-	  <%= f.select :multiplayer, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+	  <%= f.select :multiplayer, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
 
 	  <%= f.submit "Save changes", class: "btn btn-50 btn-primary pull-left" %>
 	  <%= link_to "Back", groups_url, class: "btn btn-50 btn-primary pull-right" %>

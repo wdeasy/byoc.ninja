@@ -22,7 +22,7 @@ class HostsController < ApplicationController
     @host.updated = true
     @host.source = 'manual'
     flags = {}
-    flags['Manually Added'] = true
+    flags[:manual] = true
     @host.flags = flags
 
     if @host.save

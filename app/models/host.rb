@@ -189,45 +189,45 @@ class Host < ApplicationRecord
     if host.name != nil
       #if host.name.downcase.include? "quakecon"
       if ["quakecon", "qcon", "byoc"].any? { |q| host.name.downcase.include? q }
-        flags['Quakecon in Host Name'] = true
+        flags[:name] = true
       end
     end
 
     #byoc player in game
     host.users.each do |user|
       if user.seat.present?
-        flags['BYOC Player in Game'] = true
+        flags[:player] = true
       end
 
       if ["quakecon", "qcon"].any? { |q| user.name.downcase.include? q }
-        flags['BYOC Player in Game'] = true
+        flags[:player] = true
       end
     end
 
     #hosted in byoc
     if host.network.name == "byoc"
-      flags['Hosted in BYOC'] = true
+      flags[:host] = true
       Host.pin(host)
     end
 
     #password protected
     if host.password == true
-      flags['Password Protected'] = true
+      flags[:password] = true
     end
 
     #is the server responding to queries?
     if host.respond == false
-      flags['Last Query Attempt Failed'] = true
+      flags[:unreachable] = true
     end
 
     #server was manually added
     if host.source == "manual"
-      flags['Manually Added'] = true
+      flags[:manual] = true
     end
 
     #server was added from file
     if host.source == "file"
-      flags['Added From File'] = true
+      flags[:file] = true
     end
 
     unless flags.empty? && host.flags.blank?
@@ -624,7 +624,7 @@ class Host < ApplicationRecord
           puts "Host address is nil"
         when host.last_successful_query < 5.minutes.ago
           puts "Host isn't responding"
-        when host.flags == nil || (host.flags['Hosted in BYOC'] == nil)
+        when host.flags == nil || (host.flags[:host] == nil)
           puts "Host is no longer flagged"
         else
           visible = true

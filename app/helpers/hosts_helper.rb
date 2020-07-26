@@ -3,31 +3,31 @@ module HostsHelper
 	def flags(host)
 		html = ''
 		if host.flags
-			if host.flags['Quakecon in Host Name']
+			if host.flags[:name]
 				html << '<span class="glyphicon glyphicon-ok" title="Quakecon in Host Name"></span>'
 			end
 
-			if host.flags['BYOC Player in Game']
+			if host.flags[:player]
 				html << '<span class="glyphicon glyphicon-user" title="BYOC Player in Game"></span>'
 			end
 
-			if host.flags['Hosted in BYOC']
+			if host.flags[:host]
 				html << '<span class="glyphicon glyphicon-home" title="Hosted in BYOC"></span>'
 			end
 
-			if host.flags['Password Protected']
+			if host.flags[:password]
 				html << '<span class="glyphicon glyphicon-lock" title="Password Protected"></span>'
 			end
 
-			if host.flags['Last Query Attempt Failed']
+			if host.flags[:unreachable]
 				html << '<span class="glyphicon glyphicon-remove" title="Last Query Attempt Failed"></span>'
 			end
 
-			if host.flags['Manually Added']
+			if host.flags[:manual]
 				html << '<span class="glyphicon glyphicon-pushpin" title="Pinned"></span>'
 			end
 
-			if host.flags['Added From File']
+			if host.flags[:file]
 				html << '<span class="glyphicon glyphicon-transfer" title="Found by qclan.info"></span>'
 			end
 

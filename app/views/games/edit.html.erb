@@ -26,13 +26,13 @@
 	  <%= f.text_field :link, class: 'form-control', :readonly => true %>
 
 	  <%= f.label :joinable %>
-	  <%= f.select :joinable, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+	  <%= f.select :joinable, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
 
 	  <%= f.label :queryable %>
-	  <%= f.select :queryable, [['yes',true],['no',false]], {},{:class => 'form-control', :readonly => true, :disabled => true} %>
+	  <%= f.select :queryable, [[:yes,true],[:no,false]], {},{:class => 'form-control', :readonly => true, :disabled => true} %>
 
 	  <%= f.label :multiplayer %>
-	  <%= f.select :multiplayer, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+	  <%= f.select :multiplayer, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
 
 		<%= f.label :last_seen %>
 	  <%= f.text_field :last_seen, class: 'form-control', :readonly => true %>

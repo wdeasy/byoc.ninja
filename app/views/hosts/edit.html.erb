@@ -7,13 +7,13 @@
 	  <%= render 'shared/error_messages', object: f.object %>
 
 	  <%= f.label :auto_update %>
-	  <%= f.select :auto_update, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+	  <%= f.select :auto_update, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
 
 	  <%= f.label :banned %>
-    <%= f.select :banned, [['yes',true],['no',false]], {},{:class => 'form-control', :disabled => true} %>
+    <%= f.select :banned, [[:yes,true],[:no,false]], {},{:class => 'form-control', :disabled => true} %>
 
 	  <%= f.label :pin %>
-	  <%= f.select :pin, [['yes',true],['no',false]], {},{:class => 'form-control'} %>
+	  <%= f.select :pin, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
 
 	  <%= f.label :source %>
 	  <%= f.select :source, [['auto','auto'],['manual','manual'],['byoc','byoc']], {},{:class => 'form-control'} %>

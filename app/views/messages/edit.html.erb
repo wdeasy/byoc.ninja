@@ -14,7 +14,7 @@
 	  <%= f.select :message_type, [['success (green)','success'], ['info (blue)','info'], ['warning (yellow)','warning'], ['danger (red)','danger']], {},{:class => 'form-control'} %>
 
 	  <%= f.label :show %>
-	  <%= f.select :show, [['yes',true],['no',false]], {}, {:class => 'form-control'} %>
+	  <%= f.select :show, [[:yes,true],[:no,false]], {}, {:class => 'form-control'} %>
 
 	  <%= f.submit "Save changes", class: "btn btn-33 btn-primary pull-left" %>
 	  <%= link_to "Delete", @message, method: :delete, data: { confirm: "You sure?" }, class: "btn btn-33 btn-primary" %>
