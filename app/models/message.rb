@@ -1,4 +1,5 @@
 class Message < ApplicationRecord
+  enum message_type: [:success, :info, :warning, :danger]
 
   def self.current(hidden_ids = nil)
     result = where(:show => true)

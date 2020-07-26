@@ -61,7 +61,7 @@ class UsersController < ApplicationController
         flash[:success] = result[:message]
         redirect_to root_url
       else
-        flash["danger"] = result[:message]
+        flash[:danger] = result[:message]
         redirect_to seat_url
       end
     end

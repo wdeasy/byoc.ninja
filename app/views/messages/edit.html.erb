@@ -11,7 +11,7 @@
 	  <%= f.text_field :message, class: 'form-control' %>
 
 	  <%= f.label :message_type %>
-	  <%= f.select :message_type, [['success (green)','success'], ['info (blue)','info'], ['warning (yellow)','warning'], ['danger (red)','danger']], {},{:class => 'form-control'} %>
+	  <%= f.select :message_type, Message.message_types.map { |key, value| [key.humanize, key] }, {},{:class => 'form-control'} %>
 
 	  <%= f.label :show %>
 	  <%= f.select :show, [[:yes,true],[:no,false]], {}, {:class => 'form-control'} %>
