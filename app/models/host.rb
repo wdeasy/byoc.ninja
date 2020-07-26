@@ -162,15 +162,15 @@ class Host < ApplicationRecord
       case
       when host.banned == true
         puts "Host is banned"
-      when ['banned','private'].include?(host.network.name)
+      when host.network.banned? || host.network.local?
         puts "Network is #{host.network.name}"
       when host.port == 0
         puts "Host port is 0"
       when host.lobby == nil && valid_ip == false
         puts "Host address is invalid"
-      # when host.respond == false && host.last_successful_query < 1.hour.ago && host.users_count < 2 && host.network.name != "byoc"
+      # when host.respond == false && host.last_successful_query < 1.hour.ago && host.users_count < 2 && host.network.name != :byoc
       #   puts "Host is not responding"
-      when host.lan == true && host.network.name != "byoc"
+      when host.lan == true && !host.network.byoc?
         puts "Host is a lan game outside of quakecon"
       when host.source == "name" && Filter.contains(host.name)
         puts "Host has been filtered out by keyword."
@@ -205,7 +205,7 @@ class Host < ApplicationRecord
     end
 
     #hosted in byoc
-    if host.network.name == "byoc"
+    if host.network.byoc?
       flags[:host] = true
       Host.pin(host)
     end
@@ -563,14 +563,14 @@ class Host < ApplicationRecord
   end
 
   def Host.update_byoc
-    Network.where(:name => 'byoc').each do |range|
+    Network.where(:name => :byoc).each do |range|
       if !range.cidr.blank?
         puts "Searching range #{range.cidr}"
-        cidr = NetAddr::CIDR.create(range.cidr)
+        cidr = NetAddr::IPv4Net.parse(range.cidr)
         i = 0
 
-        until i == cidr.size do
-          ip = cidr[i].ip
+        until i == cidr.len do
+          ip = cidr.nth(i).to_s
           api = SteamWebApi.get_servers_at_address(ip)
           parsed = SteamWebApi.get_json(api)
 

@@ -1,6 +1,8 @@
 class Network < ApplicationRecord
   has_many :hosts
 
+  enum name: [:wan, :local, :byoc, :banned]
+
   def name_cidr
     "#{name} -- #{cidr}"
   end
@@ -20,7 +22,7 @@ class Network < ApplicationRecord
   end
 
   def Network.location(i)
-    network = Network.where(:name => 'wan').first
+    network = Network.where(:name => :wan).first
 
     if i == nil
       return network.id
@@ -33,7 +35,7 @@ class Network < ApplicationRecord
       return network.id
     end
 
-    Network.where.not(:name => 'wan').each do |r|
+    Network.where.not(:name => :wan).each do |r|
       if !r.cidr.blank?
         begin
           cidr = NetAddr::IPv4Net.parse(r.cidr)
@@ -41,7 +43,7 @@ class Network < ApplicationRecord
           if cidr.contains(ip)
             network = r
 
-            if network == "banned"
+            if network == :banned
               return network.id
             end
           end

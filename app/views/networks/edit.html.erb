@@ -8,7 +8,7 @@
 	  <%= render 'shared/error_messages', object: f.object %>
 
 	  <%= f.label :name %>
-	  <%= f.text_field :name, class: 'form-control' %>
+	  <%= f.select :name, Network.names.map { |key, value| [key.humanize, key] }, {},{:class => 'form-control'} %>
 
 	  <%= f.label :cidr %>
 	  <%= f.text_field :cidr, class: 'form-control' %>
