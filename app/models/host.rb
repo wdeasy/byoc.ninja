@@ -173,7 +173,7 @@ class Host < ApplicationRecord
       when host.lan == true && !host.network.byoc?
         puts "Host is a lan game outside of quakecon"
       when host.source == "name" && Filter.contains(host.name)
-        puts "Host has been filtered out by keyword."
+        puts "#{host.address} has been filtered out by keyword."
       else
         visible = true
       end
