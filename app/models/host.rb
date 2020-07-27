@@ -11,6 +11,8 @@ class Host < ApplicationRecord
   has_many :users
   has_many :seats, :through => :users
 
+  enum source: [:auto, :manual, :keyword, :file, :byoc]
+
   serialize :flags
 
   def as_json(options={})
@@ -137,7 +139,7 @@ class Host < ApplicationRecord
         :max        => server[:max],
         :players    => players(server[:current], server[:max]),
         :map        => valid_name(server[:map]),
-        :source     => "name",
+        :source     => :keyword,
         :respond    => true,
         :last_successful_query => Time.now
       )
@@ -156,7 +158,7 @@ class Host < ApplicationRecord
   def Host.is_visible(host, valid_ip)
     visible = false
 
-    if host.source == 'manual'
+    if host.manual?
       visible = true
     else
       case
@@ -172,8 +174,8 @@ class Host < ApplicationRecord
       #   puts "Host is not responding"
       when host.lan == true && !host.network.byoc?
         puts "Host is a lan game outside of quakecon"
-      when host.source == "name" && Filter.contains(host.name)
-        puts "#{host.address} has been filtered out by keyword."
+      when host.keyword? && Filter.contains(host.name)
+        puts "#{host.address} has been filtered out."
       else
         visible = true
       end
@@ -221,12 +223,12 @@ class Host < ApplicationRecord
     end
 
     #server was manually added
-    if host.source == "manual"
+    if host.manual?
       flags[:manual] = true
     end
 
     #server was added from file
-    if host.source == "file"
+    if host.file?
       flags[:file] = true
     end
 
@@ -280,12 +282,12 @@ class Host < ApplicationRecord
     return info
   end
 
-  def Host.query_master_by_names
+  def Host.query_master_by_keywords
     servers = []
-    names = ['quakecon','qcon','byoc']
-    names.each do |name|
-      puts "Searching for servers that include \"#{name}\"."
-      api = SteamWebApi.get_server_list_by_name(name)
+    keywords = [:quakecon,:qcon,:byoc]
+    keywords.each do |keyword|
+      puts "Searching for servers that include \"#{keyword}\"."
+      api = SteamWebApi.get_server_list_by_keyword(keyword)
       parsed = SteamWebApi.get_json(api)
       info = nil
 
@@ -503,11 +505,11 @@ class Host < ApplicationRecord
     end
 
     #find hosts by name
-    name_servers = Host.query_master_by_names
-    name_servers.each do |server|
+    keyword_servers = Host.query_master_by_keywords
+    keyword_servers.each do |server|
       Host.update_host_from_master(server)
     end
-    m = name_servers.count
+    m = keyword_servers.count
 
     #import servers from qclan.info
     file_servers = Host.load_hosts_from_file
@@ -529,7 +531,7 @@ class Host < ApplicationRecord
     puts "Found #{u+n} users in games"
     puts "Found #{u} users in #{servers.count} servers and #{lobbies.count} lobbies"
     puts "Found #{n} users in non-joinable games"
-    puts "Found #{m} servers by name"
+    puts "Found #{m} servers by keyword"
     puts "Found #{f} servers by file"
   end
 
@@ -592,7 +594,7 @@ class Host < ApplicationRecord
                   :port       => port,
                   :address    => address,
                   :pin        => true,
-                  :source     => "byoc"
+                  :source     => :byoc
                 )
 
                 puts "Found a #{host.game.name} host at #{address}"
@@ -616,7 +618,7 @@ class Host < ApplicationRecord
       puts "#{host.address}"
       visible = false
 
-      if host.source == 'manual'
+      if host.manual?
         visible = true
       else
         case
@@ -666,7 +668,7 @@ class Host < ApplicationRecord
 
     i = 0
     hosts.each do |host|
-      if host.source != "manual"
+      unless host.manual?
         if host.address == nil
           Host.unpin(host)
           i += 1
@@ -793,7 +795,7 @@ class Host < ApplicationRecord
         :max        => server[:max],
         :players    => players(server[:current], server[:max]),
         :map        => valid_name(server[:map]),
-        :source     => "file",
+        :source     => :file,
         :respond    => true,
         :last_successful_query => Time.now
       )
@@ -807,7 +809,7 @@ class Host < ApplicationRecord
         )
       end
     else
-      if host.respond == false && host.source = "file"
+      if host.respond == false && host.file?
         host.update_attributes(
           :name       => valid_name(server[:name]),
           :current    => server[:current],

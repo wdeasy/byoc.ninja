@@ -20,7 +20,7 @@ class HostsController < ApplicationController
     @host.pin = true
     @host.visible = true
     @host.updated = true
-    @host.source = 'manual'
+    @host.source = :manual
     flags = {}
     flags[:manual] = true
     @host.flags = flags

@@ -69,8 +69,8 @@ class SteamWebApi < ApplicationRecord
     "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{get_key}&steamids="
   end
 
-  def self.get_server_list_by_name(name)
-    "https://api.steampowered.com/IGameServersService/GetServerList/v1/?filter=\\name_match\\*#{name}*&key=#{get_key}"
+  def self.get_server_list_by_keyword(keyword)
+    "https://api.steampowered.com/IGameServersService/GetServerList/v1/?filter=\\name_match\\*#{keyword}*&key=#{get_key}"
   end
 
   def self.get_server_list_by_address(address)
