@@ -7,6 +7,7 @@ class AdminController < ApplicationController
     @hosts = Host.includes(:game).where(banned: true).order("games.name ASC, address ASC") if params[:banned].present?
     @hosts = Host.includes(:game).where(source: :manual).order("games.name ASC, address ASC") if params[:manual].present?
     @hosts = Host.includes(:game).where(pin: true).order("games.name ASC, address ASC") if params[:pinned].present?
+    @hosts = Host.includes(:game).where(source: :keyword).order("games.name ASC, address ASC") if params[:keyword].present?
     @hosts = Host.includes(:game).order("games.name ASC, address ASC") if params[:all].present?
   end
 

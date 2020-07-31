@@ -4,7 +4,8 @@ module Api
       before_action :restrict_access
 
       def index
-        @seats = Seat.joins(:users).joins("LEFT JOIN hosts ON hosts.id = users.host_id").where("users.banned = false").order("seats.sort ASC").uniq
+        @seats = Seat.active.order(:sort).uniq
+
         render :json => @seats
       end
 

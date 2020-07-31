@@ -1,54 +1,57 @@
 class User < ApplicationRecord
+  include Name
+
   require 'open-uri'
 
-  belongs_to :host, counter_cache: true, optional: true
+  belongs_to :host, -> {where(visible: true)}, counter_cache: true, optional: true
   belongs_to :seat, optional:true
   belongs_to :game, optional: true
   belongs_to :mod, optional: true
   has_many :api_keys
-  has_many :identities
+  has_many :identities, -> {where(enabled: true)}
+  #has_many :active_identities, -> {where(enabled: true)}, :class_name => 'Identity'
+  #belongs_to :active_host, -> {where(visible: true)}, :class_name => 'Host'
 
-  def self.create_with_omniauth(auth)
-    user = nil
-    if auth['provider'] == 'steam'
-      user = User.where(steamid: auth.uid).first_or_create
-    elsif auth['provider'] == 'discord'
-      user = User.where(discord_uid: auth.uid).first_or_create
-    end
+  scope :active, -> { where( banned: false ) }
 
-    return user
+  def self.create_with_omniauth
+    User.create
   end
 
-  def self.update_with_omniauth(user_id, auth)
-    user = find_by(id: user_id)
-    if auth['provider'] == 'steam'
-      user.update_attributes(
-        :steamid => auth.uid,
-     	  :name	   => auth.info['nickname'],
-    	  :url 	   => auth.extra['raw_info']['profileurl'],
-    	  :avatar  => auth.extra['raw_info']['avatar']
-    	)
-    elsif auth['provider'] == 'discord'
-      user.update_attributes(
-        :discord_uid      => auth.uid,
-        :discord_username => "#{auth.extra['raw_info']['username']}\##{auth.extra['raw_info']['discriminator']}",
-    	  :discord_avatar   => auth.info['image']
-    	)
-    end
+  def self.update_with_omniauth(user_id, name)
+    user = User.find_by(:id => user_id)
+    name = Name.clean_name(name)
+    user.update_attributes(
+      clan: set_clan(name, user.id, user.seat_id),
+      handle: set_handle(name, user.id, user.seat_id)
+    )
   end
 
   def User.update(player, host_id, game_id, mod_id=nil)
+    identity = Identity.find_by(:uid => player["steamid"], :provider => :steam)
+    user = User.find_by(:id => identity.user_id)
+    if identity.nil?
+      puts "Could not find Identity for #{player["steamid"]}"
+      return
+    end
 
-    user = User.find_by_steamid(player["steamid"])
+    if user.nil?
+      puts "Could not find User for #{player["steamid"]}"
+      return
+    end
 
     if user.auto_update == true
+      identity.update_attributes(
+        :name => Name.clean_name(player["personaname"]),
+        :url => Name.clean_url(player["profileurl"]),
+        :avatar => player["avatar"]
+      )
       user.update_attributes(
-        :name => player["personaname"],
-        :url => player["profileurl"],
-        :avatar => player["avatar"],
         :host_id => host_id,
         :game_id => game_id,
         :mod_id => mod_id,
+        :clan => set_clan(player["personaname"], user.id, user.seat_id),
+        :handle => set_handle(player["personaname"], user.id, user.seat_id),
         :updated => true
       )
     else
@@ -199,7 +202,18 @@ class User < ApplicationRecord
   end
 
   def User.lookup(steamid)
-    user = User.where(steamid: steamid).first_or_create
+    identity = Identity.find_by(uid: steamid, provider: :steam)
+    if identity.nil?
+      identity = Identity.create(uid: steamid, provider: :steam, enabled: true)
+    end
+
+    if identity.user_id.nil?
+      user = User.create
+      identity.user = user
+      identity.save
+    end
+
+    return identity.user
   end
 
   def User.fill(steamid)
@@ -212,28 +226,8 @@ class User < ApplicationRecord
     end
   end
 
-  def username
-    if !name.nil?
-      return name
-    end
-
-    if !discord_username.nil?
-      if discord_username.include? "#"
-        return discord_username[0..(discord_username.rindex('#')-1)]
-      else
-        return discord_username
-      end
-    end
-
-    if seat.present? && seat.handle.present?
-      return seat.handle
-    end
-
-    return "No Username found."
-  end
-
-  def clan
-    h = username
+  def User.set_clan(username, user_id, seat_id)
+    h = Name.clean_name(username)
     if h.match(/^\[.*\S.*\].*\S.*$/)
       h.split(/[\[\]]/)[1].strip
     else
@@ -241,13 +235,36 @@ class User < ApplicationRecord
     end
   end
 
-  def handle
-    h = username
-    if h.match(/^\[.*\S.*\].*\S.*$/)
-      h.split(/[\[\]]/)[-1].strip
-    else
-      h
+  def User.set_handle(username, user_id, seat_id)
+    handle = Name.clean_name(username)
+    handle = username.index('#').nil? ? username : username[0..(username.rindex('#')-1)]
+
+    if handle.match(/^\[.*\S.*\].*\S.*$/)
+      handle = handle.split(/[\[\]]/)[-1].strip
     end
+
+    return handle
+  end
+
+  def display_handle
+    if seat_id.nil?
+      handle
+    else
+      prepend_seat(handle, id, seat_id)
+    end
+  end
+
+  def prepend_seat(handle, user_id, seat_id)
+    if seat_id.present?
+      seat = User.find_by(:id => user_id).seat
+      unless seat.nil?
+        handle.prepend("[#{seat.seat}] ")
+      end
+    end
+  end
+
+  def url
+    Identity.where(:user_id => id).specific(:steam).url
   end
 
   def playing
@@ -259,5 +276,4 @@ class User < ApplicationRecord
       nil
     end
   end
-
 end

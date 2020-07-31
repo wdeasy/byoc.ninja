@@ -28,7 +28,7 @@ gem 'record_tag_helper'
 gem 'omniauth-discord'
 
 group :development do
-  gem 'sqlite3'
+  #gem 'sqlite3'
   gem 'byebug'
   gem 'web-console'
   gem 'spring'

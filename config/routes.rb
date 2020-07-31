@@ -8,7 +8,7 @@ Rails.application.routes.draw do
 
   get       'admin/hosts'         => 'admin#hosts'
   get       'groups/auto'         => 'groups#auto'
-  get       'messages/clear'      => 'messages#clear'
+  get       'messages/clear_all'      => 'messages#clear_all'
   get       'settings'            => 'users#edit'
   get       'seats'               => 'seats#index'
   get       'seats/update'        => 'seats#update'
@@ -16,10 +16,10 @@ Rails.application.routes.draw do
   get       'logs/update_hosts'   => 'logs#update_hosts'
   get       'logs/update_seats'   => 'logs#update_seats'
 
-  get        'seat'               => 'users#seat'
+  #get        'seat'               => 'users#seat'
   get        'discord'            => 'users#discord'
   get        'lookup'             => 'seats#lookup'
-  match      'messages/:id/hide', to: 'messages#hide', as: 'hide_message', via: [:get, :post]
+  match      'messages/:id/clear', to: 'messages#clear', as: 'clear_message', via: [:get, :post]
 
   match      'users/:id/ban', to: 'users#ban', as: 'ban_user', via: :post
   match      'users/:id/unban', to: 'users#unban', as: 'unban_user', via: :post

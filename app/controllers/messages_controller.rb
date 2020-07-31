@@ -2,9 +2,9 @@ class MessagesController < ApplicationController
   before_action :logged_in_user, :except => [:hide]
   before_action :admin_user, :except => [:hide]
 
-  def hide
-    ids = [params[:id], *cookies.signed[:hidden_message_ids]]
-    cookies.permanent.signed[:hidden_message_ids] = ids
+  def clear
+    ids = [params[:id], *cookies.signed[:cleared_message_ids]]
+    cookies.permanent.signed[:cleared_message_ids] = ids
     respond_to do |format|
       format.html { redirect_back(fallback_location: root_path) }
       format.js
@@ -53,7 +53,7 @@ class MessagesController < ApplicationController
     redirect_to messages_url
   end
 
-  def clear
+  def clear_all
     if params[:clear].present?
       @clear = Message.clear_all
       flash[:success] = @clear

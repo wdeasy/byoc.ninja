@@ -10,25 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_27_011113) do
+ActiveRecord::Schema.define(version: 2020_07_31_015744) do
 
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
-  create_table "api_keys", force: :cascade do |t|
+  create_table "api_keys", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "access_token"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id"
+    t.uuid "user_id"
+    t.index ["user_id"], name: "index_api_keys_on_user_id"
   end
 
-  create_table "filters", force: :cascade do |t|
+  create_table "filters", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "games", force: :cascade do |t|
+  create_table "games", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.integer "appid"
     t.string "name"
     t.datetime "created_at", null: false
@@ -43,7 +45,7 @@ ActiveRecord::Schema.define(version: 2020_07_27_011113) do
     t.index ["appid"], name: "index_games_on_appid", unique: true
   end
 
-  create_table "groups", force: :cascade do |t|
+  create_table "groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.bigint "steamid", null: false
     t.string "name"
     t.string "url"
@@ -53,7 +55,7 @@ ActiveRecord::Schema.define(version: 2020_07_27_011113) do
     t.index ["steamid"], name: "index_groups_on_steamid", unique: true
   end
 
-  create_table "hosts", force: :cascade do |t|
+  create_table "hosts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "address"
     t.string "ip"
     t.integer "port"
@@ -76,29 +78,32 @@ ActiveRecord::Schema.define(version: 2020_07_27_011113) do
     t.text "flags"
     t.string "link"
     t.string "players"
-    t.bigint "game_id"
-    t.bigint "network_id"
     t.integer "source", default: 0, null: false
     t.bigint "steamid"
     t.boolean "pin", default: false
     t.boolean "lan"
-    t.integer "mod_id"
+    t.uuid "game_id"
+    t.uuid "mod_id"
+    t.uuid "network_id"
     t.index ["game_id"], name: "index_hosts_on_game_id"
+    t.index ["mod_id"], name: "index_hosts_on_mod_id"
     t.index ["network_id"], name: "index_hosts_on_network_id"
   end
 
-  create_table "identities", force: :cascade do |t|
+  create_table "identities", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "uid", null: false
     t.integer "provider"
-    t.bigint "user_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "name"
     t.string "avatar"
     t.string "url"
+    t.boolean "enabled"
+    t.uuid "user_id"
+    t.index ["user_id"], name: "index_identities_on_user_id"
   end
 
-  create_table "messages", force: :cascade do |t|
+  create_table "messages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "message"
     t.integer "message_type", default: 0, null: false
     t.boolean "show", default: true
@@ -106,23 +111,24 @@ ActiveRecord::Schema.define(version: 2020_07_27_011113) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "mods", force: :cascade do |t|
+  create_table "mods", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "steamid"
     t.string "name"
-    t.integer "game_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "last_seen"
+    t.uuid "game_id"
+    t.index ["game_id"], name: "index_mods_on_game_id"
   end
 
-  create_table "networks", force: :cascade do |t|
+  create_table "networks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.integer "name", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "cidr", null: false
   end
 
-  create_table "seats", force: :cascade do |t|
+  create_table "seats", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "seat", null: false
     t.string "clan"
     t.string "handle"
@@ -135,7 +141,7 @@ ActiveRecord::Schema.define(version: 2020_07_27_011113) do
     t.string "sort"
   end
 
-  create_table "steam_web_apis", force: :cascade do |t|
+  create_table "steam_web_apis", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "key"
     t.integer "calls", default: 0
     t.datetime "created_at", null: false
@@ -143,11 +149,7 @@ ActiveRecord::Schema.define(version: 2020_07_27_011113) do
     t.integer "yesterday"
   end
 
-  create_table "users", force: :cascade do |t|
-    t.bigint "steamid"
-    t.string "name"
-    t.string "url"
-    t.string "avatar"
+  create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.boolean "admin", default: false
     t.boolean "auto_update", default: true
     t.boolean "display", default: true
@@ -155,19 +157,16 @@ ActiveRecord::Schema.define(version: 2020_07_27_011113) do
     t.boolean "updated", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "host_id"
-    t.integer "game_id"
-    t.integer "mod_id"
     t.integer "seat_count", default: 0
-    t.string "discord_uid"
-    t.string "discord_username"
-    t.string "discord_avatar"
-    t.bigint "seat_id"
+    t.string "clan"
+    t.string "handle"
+    t.uuid "host_id"
+    t.uuid "game_id"
+    t.uuid "mod_id"
+    t.uuid "seat_id"
+    t.index ["game_id"], name: "index_users_on_game_id"
     t.index ["host_id"], name: "index_users_on_host_id"
-    t.index ["steamid"], name: "index_users_on_steamid", unique: true
+    t.index ["seat_id"], name: "index_users_on_seat_id"
   end
 
-  add_foreign_key "hosts", "games"
-  add_foreign_key "hosts", "networks"
-  add_foreign_key "users", "hosts"
 end

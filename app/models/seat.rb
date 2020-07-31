@@ -1,9 +1,10 @@
 class Seat < ApplicationRecord
-  has_many :users
+  has_many :users, -> { where( :banned => false ) }
   has_many :hosts, :through => :users
   has_many :games, :through => :hosts
+  has_many :identities, :through => :users
 
-  #scope :current_year, -> (user) { includes(:users).where(year: Date.today.year, users: {user: user})}
+  scope :active, -> { joins(:users).merge(User.active) }
 
   require 'open-uri'
   require 'json'
@@ -11,9 +12,10 @@ class Seat < ApplicationRecord
   def as_json(options={})
    super(:only => [:seat, :section, :row, :number],
       :include => {
-        :users => {:only => [:url, :name, :discord_username, :discord_avatar], :methods => [:clan, :handle, :playing],
+        :users => {:only => [:clan, :handle], :methods => [:playing],
           :include => {
-            :host => {:only => [:link]}
+            :host => {:only => [:link]},
+            :identities => {:only => [:provider, :name, :url, :avatar]}
           }
         }
       }

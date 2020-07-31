@@ -1,67 +1,54 @@
 <% provide(:title, "Settings")  %>
 <div class="jumbotron">
   <h3 class="center">Settings</h3>
-
-	<% if current_user.admin? %>
-  	<div class="row">
-  	  <div class="col-md-6 col-md-offset-3">
-    		<div class="container center">
-    			<%= display_avatar(@user) %><br />
-    			<%= @user.url == nil ? @user.username : (sanitize link_to @user.username, slice_url(@user.url), {:target => "_blank"}) %>
-    		</div>
-  	  </div>
-  	</div>
-	<% end %>
-
-  <div class="row">
+    <div class="row">
     <div class="col-md-6 col-md-offset-3">
-    	<%= form_for(@user) do |f| %>
-    	  <%= render 'shared/error_messages', object: f.object %>
+      <div class="col-md-8 col-md-offset-2">
+      <table class="table table-striped table-condensed games">
+        <thead>
+          <tr>
+            <th class="col-md-3 text-left">Service</th>
+            <th class="col-md-3 text-right">Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @identities.each do |i| %>
+            <tr>
+              <td class="text-left"><%= i.provider %></td>
+              <td class="text-right"><%= i.name %></td>
+            </tr>
+          <% end %>
+          </tbody>
+      </table>
+      </div>
 
-    	  <% if current_user?(@user) || current_user.admin? %>
-    		  <%= f.label "Display game information" %>
-    		  <%= f.select :display, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
-    	  <% end %>
 
-    	  <% if current_user.admin? %>
-          <%= f.label :seat %>
-          <%= f.collection_select :seat_id, @seats, :id, :seat, {:include_blank => true},{:class => 'form-control longtext'} %>
+    <% if current_user.admin? %>
+      <%= form_for(@user) do |f| %>
+        <%= render 'shared/error_messages', object: f.object %>
 
-          <%= f.label :banned %><br />
-          <%= f.select :banned, [[:yes,true],[:no,false]], {},{:class => 'form-control', :disabled => true} %>
+        <%= f.label "Display game information" %>
+        <%= f.select :display, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
 
-    		  <%= f.label :auto_update %>
-    		  <%= f.select :auto_update, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
+        <%= f.label :seat %>
+        <%= f.collection_select :seat_id, @seats, :id, :seat, {:include_blank => true},{:class => 'form-control longtext'} %>
 
-    		  <%= f.label :id %>
-    		  <%= f.text_field :steamid, class: 'form-control', :readonly => true %>
+        <%= f.label :banned %><br />
+        <%= f.select :banned, [[:yes,true],[:no,false]], {},{:class => 'form-control', :disabled => true} %>
 
-    		  <%= f.label :name %>
-    		  <%= f.text_field :name, class: 'form-control' %>
+        <%= f.label :auto_update %>
+        <%= f.select :auto_update, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
 
-    		  <%= f.label :url %>
-    		  <%= f.text_field :url, class: 'form-control' %>
+        <%= f.submit "Save changes", class: "btn btn-50 btn-primary pull-left" %>
+        <%= link_to "Back", users_url, class: "btn btn-50 btn-primary pull-right" %>
 
-          <%= f.label :discord_uid %>
-    		  <%= f.text_field :discord_uid, class: 'form-control', :readonly => true %>
-
-          <%= f.label :discord_username %>
-    		  <%= f.text_field :discord_username, class: 'form-control' %>
-    		<% end %>
-
-    		<% if current_user?(@user) || current_user.admin? %>
-    		  <%= f.submit "Save changes", class: "btn btn-50 btn-primary pull-left" %>
-    		  <%= link_to "Back", users_url, class: "btn btn-50 btn-primary pull-right" %>
-    		<% end %>
-    	<% end %>
-
-      <% if current_user.admin? %>
         <% if @user.banned? %>
           <%= button_to("Unban", unban_user_path(@user), :method => :post, :class => "btn btn-primary")%>
         <% else %>
           <%= button_to("Ban", ban_user_path(@user), :method => :post, :class => "btn btn-primary")%>
         <% end %>
       <% end %>
+    <% end %>
     </div>
   </div>
 </div>

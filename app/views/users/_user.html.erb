@@ -1,4 +1,4 @@
   <tr class="row">
       <td class="text-right"><% if user.seat.present? %><%= user.seat.seat %><% end %></td>
-      <td class="text-left longtext"><%= link_to user.username, edit_user_path(user) %></td>
+      <td class="text-left longtext"><%= link_to user.handle, edit_user_path(user) %></td>
   </tr>

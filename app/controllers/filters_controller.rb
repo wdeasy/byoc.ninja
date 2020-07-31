@@ -3,7 +3,7 @@ class FiltersController < ApplicationController
   before_action :admin_user
 
   def index
-  	@filters = Filter.order("name asc")
+  	@filters = Filter.order(name: :asc)
   end
 
   def new

@@ -7,13 +7,12 @@
       	<% if logged_in? %>
       	  <li class='dropdown'>
       	  	<%= link_to '#', :class => 'dropdown-toggle', :'data-toggle' => 'dropdown' do %>
-              <%= display_name(current_user) %>
+              <%= current_user.display_handle %>
       	  	<% end %>
       	    <ul class='dropdown-menu'>
               <% if logged_in? && current_user.admin? %>
                 <%= render 'layouts/admin' %>
               <% end %>
-              <li><%= link_to "Link your Seat", seat_path %></li>
       	      <li><%= link_to "Settings", edit_user_path(current_user) %></li>
               <li class="divider"></li>
       	      <li><%= link_to "Log out", logout_path, method: "delete" %></li>
@@ -21,7 +20,7 @@
       	  </li>
         <% else %>
           <li>
-            <%= link_to 'LINK YOUR SEAT', seat_path, :class => '' %>
+            <%= link_to "Sign in with Discord", "/auth/discord", method: :post %>
           </li>
       	<% end %>
       </ul>

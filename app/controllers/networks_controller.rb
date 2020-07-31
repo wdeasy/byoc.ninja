@@ -3,7 +3,7 @@ class NetworksController < ApplicationController
   before_action :admin_user
 
   def index
-  	@networks = Network.order("name asc")
+  	@networks = Network.order(name: :asc)
   end
 
   def new
@@ -56,5 +56,5 @@ class NetworksController < ApplicationController
     # Confirms an admin user.
     def admin_user
       redirect_to(root_url) unless current_user.admin?
-    end    
+    end
 end

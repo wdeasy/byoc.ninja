@@ -3,7 +3,7 @@ class SeatsController < ApplicationController
   before_action :admin_user, :except => [:lookup]
 
   def index
-	@seats = Seat.order("sort asc")
+	@seats = Seat.order(sort: :asc)
 	@seats = Seat.order(sort_column) if params[:sort].present?
   end
 

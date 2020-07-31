@@ -3,7 +3,7 @@ class ModsController < ApplicationController
   before_action :admin_user
 
   def index
-  	@mods = Mod.order("id asc")
+  	@mods = Mod.order(created_at: :desc)
   end
 
   def edit
@@ -43,5 +43,5 @@ class ModsController < ApplicationController
     # Confirms an admin user.
     def admin_user
       redirect_to(root_url) unless current_user.admin?
-    end    
+    end
 end

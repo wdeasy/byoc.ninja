@@ -4,9 +4,9 @@ class UsersController < ApplicationController
   before_action :admin_user, :except => [:edit, :update, :seat, :discord]
 
   def index
-    @users = User.includes(:seat).where.not(host_id: nil).order("name ASC")
-    @users = User.includes(:seat).where(banned: true).order("name ASC") if params[:banned].present?
-    @users = User.includes(:seat).order("name ASC") if params[:all].present?
+    @users = User.includes(:seat).where.not(host_id: nil).order(created_at: :desc)
+    @users = User.includes(:seat).where(banned: true).order(created_at: :desc) if params[:banned].present?
+    @users = User.includes(:seat).order(created_at: :desc) if params[:all].present?
   end
 
   def show
@@ -15,7 +15,8 @@ class UsersController < ApplicationController
 
   def edit
     @user = User.find(params[:id])
-    @seats = Seat.all.order("sort asc")
+    @seats = Seat.all.order(sort: :asc)
+    @identities = Identity.where(:user_id => params[:id], :enabled => true)
   end
 
   def update
@@ -49,11 +50,6 @@ class UsersController < ApplicationController
   end
 
   def seat
-    if cookies.signed[:hidden_message_ids].blank? || cookies.signed[:hidden_message_ids].include?("1")
-      ids = [1, *cookies.signed[:hidden_message_ids]]
-      cookies.permanent.signed[:hidden_message_ids] = ids
-    end
-
     @sections = Seat.all.order("sort asc").pluck(:section).uniq
     if params[:link].present?
       result = User.update_seat(params[:seat], params[:url])
@@ -68,16 +64,16 @@ class UsersController < ApplicationController
   end
 
   def discord
-    @sections = Seat.all.order("sort asc").pluck(:section).uniq
+    @sections = Seat.all.order(sort: :asc).pluck(:section).uniq
   end
 
   private
     def user_params
       unless current_user.admin?
-        params.extract!(:auto_update)
+        params.extract!(:display)
       end
 
-      params.require(:user).permit(:display, :auto_update, :name, :url, :seat_id, :discord_username)
+      params.require(:user).permit(:display, :auto_update, :seat_id)
     end
 
     # Confirms a logged-in user.

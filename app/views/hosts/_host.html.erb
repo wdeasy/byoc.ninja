@@ -1,12 +1,12 @@
 <tr>
-  <td class="text-left longtext" title="<%= game_name(host) %>">
-    <%= link(host) %>
+  <td class="text-left longtext" title="<%= host.mod.nil? ? host.game.name : host.mod.name %>">
+    <%= link(host.game.link, (host.mod.nil? ? host.game.name : host.mod.name), host.game.appid) %>
   </td>
   <td class="text-center longtext">
-    <%= flags(host).html_safe %>
+    <%= flags(host.flags).html_safe %>
   </td>
-  <td class="text-left longtext" title="<%= name(host) %>">
-    <%= name(host) %>
+  <td class="text-left longtext" title="<%= host.name %>">
+    <%= host.name %>
   </td>
   <td class="text-right">
     <%= host.players %>
@@ -17,7 +17,7 @@
       <%= link_to host.users.size, '#', :class => 'dropdown-toggle', :'data-toggle' => 'dropdown' %>
       <ul class="dropdown-menu">
         <% host.users.each do |user| %>
-          <li><%= link_to display_name(user), user.url, :target => '_blank' %></li>
+          <li><%= link_to user.display_handle, user.url, :target => '_blank' %></li>
         <% end %>
       </ul>
       </div>
@@ -26,9 +26,9 @@
     <% end %>
   </td>
   <td class="text-left longtext" title="<%= host.map %>">
-    <%= decolor_name(host.map) %>
+    <%= host.map %>
   </td>
   <td class="text-right longtext">
-    <%= join(host) %>
+    <%= join(host.game.multiplayer, host.address, host.link) %>
   </td>
 </tr>

@@ -4,11 +4,11 @@
       });
     </script>
   <div id="message">
-    <% Message.current(cookies.signed[:hidden_message_ids]).each do |m| %>
+    <% Message.current(cookies.signed[:cleared_message_ids]).each do |m| %>
       <%= div_for m do %>
         <div class="alert alert-<%= m.message_type %>">
           <%= sanitize m.message %>
-          <%= link_to hide_message_path(m), remote: true, :class => "close alert-link", "data-dismiss": "alert" do %>
+          <%= link_to clear_message_path(m), remote: true, :class => "close alert-link", "data-dismiss": "alert" do %>
             <span class="glyphicon glyphicon-remove"></span>
           <% end %>
         </div>

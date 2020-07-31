@@ -1,4 +1,6 @@
 class Host < ApplicationRecord
+  include Name
+
   require 'open-uri'
   require 'socket'
   require 'timeout'
@@ -8,8 +10,10 @@ class Host < ApplicationRecord
   belongs_to :game
   belongs_to :mod, optional: true
   belongs_to :network
-  has_many :users
+  has_many :users, -> { where( :banned => false ) }
   has_many :seats, :through => :users
+
+  scope :active, -> { where( :visible => true ).merge(Game.active) }
 
   enum source: [:auto, :manual, :keyword, :file, :byoc]
 
@@ -78,6 +82,7 @@ class Host < ApplicationRecord
     steamid     = player["gameserversteamid"] ? player["gameserversteamid"] : nil
     query_port  = (host.query_port != nil && query_port == nil) ? host.query_port : query_port
     lan         = (host.lan != nil && lan == nil) ? host.lan : lan
+    name        = format_name(lobby, address, player["personaname"], host.name)
 
     host.update_attributes(
       :game_id    => game_id,
@@ -90,7 +95,8 @@ class Host < ApplicationRecord
       :lobby      => lobby,
       :link       => link,
       :steamid    => steamid,
-      :lan        => lan
+      :lan        => lan,
+      :name       => name
     )
 
     visible = is_visible(host, valid_ip)
@@ -134,11 +140,11 @@ class Host < ApplicationRecord
         :address    => address,
         :link       => "steam://connect/#{address}",
         :steamid    => server[:steamid],
-        :name       => valid_name(server[:name]),
+        :name       => Name.clean_name(server[:name]),
         :current    => server[:current],
         :max        => server[:max],
         :players    => players(server[:current], server[:max]),
-        :map        => valid_name(server[:map]),
+        :map        => Name.clean_name(server[:map]),
         :source     => :keyword,
         :respond    => true,
         :last_successful_query => Time.now
@@ -201,8 +207,10 @@ class Host < ApplicationRecord
         flags[:player] = true
       end
 
-      if ["quakecon", "qcon"].any? { |q| user.name.downcase.include? q }
-        flags[:player] = true
+      unless user.handle.nil?
+        if ["quakecon", "qcon"].any? { |q| user.handle.downcase.include? q }
+          flags[:player] = true
+        end
       end
     end
 
@@ -330,8 +338,8 @@ class Host < ApplicationRecord
         password = info[:password] ? info[:password] : host.password
 
         host.update_attributes(
-          :name => valid_name(name),
-          :map => valid_name(map),
+          :name => Name.clean_name(name),
+          :map => Name.clean_name(map),
           :current => current,
           :max => max,
           :players => players(current, max),
@@ -394,18 +402,28 @@ class Host < ApplicationRecord
 
     puts "#{g} steamids from groups"
 
-    l = 0
-    #linked_users = User.where('id IN (SELECT user_id from seats_users)')
-    linked_users = User.where.not(seat_id: [nil, ""]).where.not(steamid: [nil, ""])
+    # l = 0
+    # #linked_users = User.where('id IN (SELECT user_id from seats_users)')
+    # linked_users = User.where.not(seat_id: [nil, ""])
+    #
+    # linked_users.each do |linked_user|
+    #   if !steamids.include? linked_user.steamid.to_s
+    #     steamids << linked_user.steamid.to_s
+    #     l += 1
+    #   end
+    # end
+    #
+    # puts "#{l} steamids from linked seats not in groups, #{linked_users.count} total"
 
-    linked_users.each do |linked_user|
-      if !steamids.include? linked_user.steamid.to_s
-        steamids << linked_user.steamid.to_s
-        l += 1
+    i=0
+    identities = Identity.where(:provider => :steam, :enabled => :true).pluck(:uid)
+    identities.each do |identity|
+      if !steamids.include? identity
+        steamids << identity
+        i+=1
       end
     end
-
-    puts "#{l} steamids from linked seats not in groups, #{linked_users.count} total"
+    puts "#{i} steamids from enabled identities, #{identities.count} total"
 
     return steamids
   end
@@ -699,19 +717,7 @@ class Host < ApplicationRecord
     false
   end
 
-  def Host.valid_name(name)
-    unless name.nil?
-      if !name.valid_encoding?
-        name = name.encode("UTF-16be", :invalid=>:replace, :replace=>"").encode('UTF-8')
-      end
 
-      name.strip!
-      name = name.gsub(/[^[:print:]]/i, '')
-      name = name.gsub(/(<color[^>]*>)|(<\/color>)/,'')
-    end
-
-    return name
-  end
 
   def Host.load_hosts_from_file
     puts "Loading servers by file."
@@ -790,11 +796,11 @@ class Host < ApplicationRecord
         :network_id => network_id,
         :address    => server[:address],
         :link       => "steam://connect/#{server[:address]}",
-        :name       => valid_name(name),
+        :name       => Name.clean_name(name),
         :current    => server[:current],
         :max        => server[:max],
         :players    => players(server[:current], server[:max]),
-        :map        => valid_name(server[:map]),
+        :map        => Name.clean_name(server[:map]),
         :source     => :file,
         :respond    => true,
         :last_successful_query => Time.now
@@ -811,11 +817,11 @@ class Host < ApplicationRecord
     else
       if host.respond == false && host.file?
         host.update_attributes(
-          :name       => valid_name(server[:name]),
+          :name       => Name.clean_name(server[:name]),
           :current    => server[:current],
           :max        => server[:max],
           :players    => players(server[:current], server[:max]),
-          :map        => valid_name(server[:map]),
+          :map        => Name.clean_name(server[:map]),
         )
       end
     end
@@ -838,5 +844,17 @@ class Host < ApplicationRecord
 
   def location
     network.name
+  end
+
+  def Host.format_name(lobby, address, user_name, host_name)
+    if host_name.present?
+      return host_name
+    end
+
+    if lobby.present?
+      "#{Name.clean_name(user_name)}'s Lobby"
+    else
+      nil
+    end
   end
 end

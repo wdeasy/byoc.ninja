@@ -21,7 +21,7 @@ class SessionsController < ApplicationController
       if @identity.user.present?
         log_in @identity.user
       else
-        user = User.create_with_omniauth(auth)
+        user = User.create_with_omniauth
         if user
           log_in user
           @identity.user = current_user
@@ -34,7 +34,10 @@ class SessionsController < ApplicationController
 
     if logged_in?
       @identity.update_info(auth)
-      User.update_with_omniauth(@identity.user.id, auth)
+      User.update_with_omniauth(@identity.user_id, @identity.name)
+      if @identity.discord?
+        Identity.update_connections(auth.credentials.token, @current_user.id)
+      end
     end
 
     if request.env['omniauth.params']['seat'].present?

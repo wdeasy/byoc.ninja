@@ -6,7 +6,7 @@ module Api
       before_action :admin_api_user, :except => [:index]
 
       def index
-        @games = Game.all.order("name ASC")
+        @games = Game.all.order(name: :asc)
         render :json => @games
       end
 

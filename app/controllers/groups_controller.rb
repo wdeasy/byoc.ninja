@@ -3,7 +3,7 @@ class GroupsController < ApplicationController
   before_action :admin_user
 
   def index
-  	@groups = Group.order("name asc")
+  	@groups = Group.order(name: :asc)
   end
 
   def new
@@ -13,7 +13,7 @@ class GroupsController < ApplicationController
   def auto
     if params[:auto].present?
       @group = Group.auto_add(params[:url])
-      if @group[0..4] == "Added"        
+      if @group[0..4] == "Added"
         flash[:success] = @group
         redirect_to groups_url
       else
@@ -70,5 +70,5 @@ class GroupsController < ApplicationController
     # Confirms an admin user.
     def admin_user
       redirect_to(root_url) unless current_user.admin?
-    end    
+    end
 end

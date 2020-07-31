@@ -1,9 +1,13 @@
 class Game < ApplicationRecord
+  include Name
+
   require 'open-uri'
 
   has_many :hosts
   has_many :mods
   has_many :users
+
+  scope :active, -> { where( :joinable => true ) }
 
   enum source: [:auto, :manual]
 
@@ -33,8 +37,8 @@ class Game < ApplicationRecord
         name = name_from_profile(profile)
       end
 
-      game.name = name.blank? ? Host.valid_name(info) : Host.valid_name(name)
-      game.link        = link
+      game.name = name.blank? ? Name.clean_name(info) : Name.clean_name(name)
+      game.link        = Name.clean_url(link)
       game.image       = image
       game.source      = :auto
       game.multiplayer = multiplayer
@@ -121,7 +125,7 @@ class Game < ApplicationRecord
 
     unless parsed.blank?
       if parsed["#{game.appid}"]['success']
-        name  = Host.valid_name(parsed["#{game.appid}"]['data']['name'])
+        name  = Name.clean_name(parsed["#{game.appid}"]['data']['name'])
         image = parsed["#{game.appid}"]['data']['header_image']
         link  = valid_link("https://store.steampowered.com/app/#{game.appid}")
       else
