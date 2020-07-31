@@ -70,7 +70,7 @@ class UsersController < ApplicationController
   private
     def user_params
       unless current_user.admin?
-        params.extract!(:display)
+        params.extract!(:auto_update, :seat_id)
       end
 
       params.require(:user).permit(:display, :auto_update, :seat_id)
