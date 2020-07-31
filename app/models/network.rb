@@ -1,4 +1,6 @@
 class Network < ApplicationRecord
+  validates :cidr, presence: true
+
   has_many :hosts
 
   enum name: [:wan, :local, :byoc, :banned]

@@ -1,15 +1,10 @@
 class Message < ApplicationRecord
   enum message_type: [:success, :info, :warning, :danger]
+  validates :message, presence: true
 
-  def self.current(hidden_ids = nil)
-    # if hidden_ids.present?
-    #   if hidden_ids.include? 1
-    #     hidden_ids = nil
-    #   end
-    # end
-
+  def self.current(cleared_ids = nil)
     result = where(:show => true)
-    result = result.where("id not in (?)", hidden_ids) if hidden_ids.present?
+    result = result.where("id not in (?)", cleared_ids) if cleared_ids.present?
     result
   end
 

@@ -8,7 +8,7 @@ Rails.application.routes.draw do
 
   get       'admin/hosts'         => 'admin#hosts'
   get       'groups/auto'         => 'groups#auto'
-  get       'messages/clear_all'      => 'messages#clear_all'
+  get       'messages/clear_all'  => 'messages#clear_all'
   get       'settings'            => 'users#edit'
   get       'seats'               => 'seats#index'
   get       'seats/update'        => 'seats#update'

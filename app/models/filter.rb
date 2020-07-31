@@ -1,4 +1,5 @@
 class Filter < ApplicationRecord
+  validates :name, presence: true
   before_save :lowercase
 
   def lowercase

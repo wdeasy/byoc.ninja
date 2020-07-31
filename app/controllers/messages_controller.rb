@@ -1,6 +1,6 @@
 class MessagesController < ApplicationController
-  before_action :logged_in_user, :except => [:hide]
-  before_action :admin_user, :except => [:hide]
+  before_action :logged_in_user, :except => [:clear]
+  before_action :admin_user, :except => [:clear]
 
   def clear
     ids = [params[:id], *cookies.signed[:cleared_message_ids]]
