@@ -12,6 +12,16 @@ class User < ApplicationRecord
   #has_many :active_identities, -> {where(enabled: true)}, :class_name => 'Identity'
   #belongs_to :active_host, -> {where(visible: true)}, :class_name => 'Host'
 
+  def as_json(options={})
+   super(:only => [:clan, :handle], :methods => [:playing],
+      :include => {
+        :seat => {:only => [:seat, :section, :row, :number]},
+        :host => {:only => [:link]},
+        :identities => {:only => [:uid, :provider, :name, :url, :avatar]}
+      }
+    )
+  end
+
   scope :active, -> { where( banned: false ) }
 
   def self.create_with_omniauth

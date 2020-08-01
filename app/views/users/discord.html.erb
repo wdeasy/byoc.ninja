@@ -43,7 +43,7 @@
 		$('#discord_submit').click(function(){
 			var seatVal = $("#number").val();
 			$('#discord_form').attr('action', function(i,value) {
-				return value + "?seat=" + seatVal;
+				return value + "?seat=" + seatVal + "&qconbyoc=TEST";
 			});
 		});
 	});

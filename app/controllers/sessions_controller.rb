@@ -38,11 +38,17 @@ class SessionsController < ApplicationController
       if @identity.discord?
         Identity.update_connections(auth.credentials.token, @current_user.id)
       end
-    end
 
-    if request.env['omniauth.params']['seat'].present?
-      result = User.update_seat_from_omniauth(@identity.user_id, request.env['omniauth.params']['seat'])
-      flash[result[:success] ? :success : :danger] = result[:message]
+      if request.env['omniauth.params']['seat'].present?
+        result = User.update_seat_from_omniauth(@identity.user_id, request.env['omniauth.params']['seat'])
+        flash[result[:success] ? :success : :danger] = result[:message]
+      end
+
+      if request.env['omniauth.params']['qconbyoc'].present?
+        Identity.create_with_qconbyoc(@identity.user_id, request.env['omniauth.params']['qconbyoc'])
+      end
+
+      Identity.update_qconbyoc(@identity.user_id)
     end
 
     redirect_to root_url

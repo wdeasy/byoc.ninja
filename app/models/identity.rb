@@ -6,14 +6,14 @@ class Identity < ApplicationRecord
   scope :active, -> { where( enabled: true ) }
   scope :specific, -> (provider) { where(:provider => provider).first }
 
-  enum provider: [:steam, :discord, :bnet]
+  enum provider: [:steam, :discord, :bnet, :qconbyoc]
 
   def self.find_with_omniauth(auth)
     find_by(uid: auth.uid, provider: auth.provider)
   end
 
   def self.create_with_omniauth(auth)
-    create(uid: auth.uid, provider: auth.provider)
+    create(uid: auth.uid, provider: auth.provider, enabled: true)
   end
 
   def self.update_connections(token, user_id)
@@ -33,15 +33,6 @@ class Identity < ApplicationRecord
       if ['battlenet', 'steam'].include? d['type']
         provider = d['type'] == 'battlenet' ? :bnet : :steam
         identity = Identity.where(uid: d['id'], provider: provider).first_or_create
-
-        # if provider == :steam && identity.user_id.present? && user_id != identity.user_id
-        #  unless user.banned || identity.user.banned
-        #   ids = Identity.where(user_id: identity_user_id).where.not(uid: d['id'])
-        #   if ids.blank?
-        #     User.destroy(identity.user_id)
-        #   end
-        #  end
-        # end
 
         identity.update_attributes(
           :name    => Name.clean_name(d['name']),
@@ -66,6 +57,28 @@ class Identity < ApplicationRecord
         :avatar  => Name.clean_url(auth.info['image']),
         :enabled => true
       )
+    end
+  end
+
+  def Identity.create_with_qconbyoc(user_id, uid)
+    identity = Identity.where(uid: uid, user_id: user_id, provider: :qconbyoc, enabled: true).first_or_create
+    seat = identity.user.seat.nil? ? nil : identity.user.seat.seat
+    identity.update_attributes(uid: uid, name: seat)
+  end
+
+  def Identity.update_qconbyoc(user_id)
+    unless ENV["QCONBYOC_ENDPOINT"].nil?
+      user = User.find_by(:id => user_id)
+      unless user.nil?
+        uri = URI(ENV["QCONBYOC_ENDPOINT"])
+        req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        req.body = user.as_json
+        res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+          http.request(req)
+        end
+      end
     end
   end
 end
