@@ -30,7 +30,6 @@ class Identity < ApplicationRecord
     request = Net::HTTP::Get.new(uri.request_uri)
     request["Authorization"] = "Bearer #{token}"
     request["Content-Type"] = 'application/x-www-form-urlencoded'
-    response = http.request(request)
 
     begin
       response = http.request(request)
