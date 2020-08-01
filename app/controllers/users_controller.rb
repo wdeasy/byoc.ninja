@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   before_action :logged_in_user, :except => [:seat, :discord]
-  before_action :correct_user, :only => [:edit, :update]
-  before_action :admin_user, :except => [:edit, :update, :seat, :discord]
+  #before_action :correct_user, :only => [:edit, :update]
+  before_action :admin_user, :except => [:seat, :discord]
 
   def index
     @users = User.includes(:seat).where.not(host_id: nil).order(created_at: :desc)

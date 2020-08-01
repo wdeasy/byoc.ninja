@@ -19,6 +19,8 @@ Rails.application.routes.draw do
   #get        'seat'               => 'users#seat'
   get        'discord'            => 'users#discord'
   get        'lookup'             => 'seats#lookup'
+  get        'link'               => 'identities#link'
+  get        'qconbyoc'           => 'identities#qconbyoc'  
   match      'messages/:id/clear', to: 'messages#clear', as: 'clear_message', via: [:get, :post]
 
   match      'users/:id/ban', to: 'users#ban', as: 'ban_user', via: :post

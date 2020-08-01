@@ -8,8 +8,12 @@ class Identity < ApplicationRecord
 
   enum provider: [:steam, :discord, :bnet, :qconbyoc]
 
-  def self.find_with_omniauth(auth)
-    find_by(uid: auth.uid, provider: auth.provider)
+  def self.find_with_omniauth(auth, user_id=nil)
+    if !user_id.nil?
+      find_by(user_id: user_id, provider: auth.provider)
+    else
+      find_by(uid: auth.uid, provider: auth.provider)
+    end
   end
 
   def self.create_with_omniauth(auth)
@@ -28,17 +32,26 @@ class Identity < ApplicationRecord
     request["Content-Type"] = 'application/x-www-form-urlencoded'
     response = http.request(request)
 
-    doc = JSON.parse(response.body)
-    doc.each do |d|
-      if ['battlenet', 'steam'].include? d['type']
-        provider = d['type'] == 'battlenet' ? :bnet : :steam
-        identity = Identity.where(uid: d['id'], provider: provider).first_or_create
+    begin
+      response = http.request(request)
+    rescue => e
+      puts "Unable to update Discord connections"
+      puts e.message
+    end
 
-        identity.update_attributes(
-          :name    => Name.clean_name(d['name']),
-          :user_id => user_id,
-          :enabled => ActiveModel::Type::Boolean.new.cast(d['visibility'])
-        )
+    if response.present?
+      doc = JSON.parse(response.body)
+      doc.each do |d|
+        if ['battlenet', 'steam'].include? d['type']
+          provider = d['type'] == 'battlenet' ? :bnet : :steam
+          identity = Identity.where(user_id: user_id, provider: provider).first_or_initialize
+          identity.update_attributes(
+            :uid     => d['id'],
+            :name    => Name.clean_name(d['name']),
+            :enabled => identity.enabled.nil? ? ActiveModel::Type::Boolean.new.cast(d['visibility']) : identity.enabled
+          )
+          identity.save
+        end
       end
     end
   end
@@ -46,6 +59,7 @@ class Identity < ApplicationRecord
   def update_info(auth)
     if steam?
       update_attributes(
+        :uid     => auth.uid,
         :name	   => Name.clean_name(auth.info['nickname']),
         :url 	   => Name.clean_url(auth.extra['raw_info']['profileurl']),
         :avatar  => Name.clean_url(auth.extra['raw_info']['avatar']),
@@ -53,17 +67,25 @@ class Identity < ApplicationRecord
       )
     elsif discord?
       update_attributes(
+        :uid     => auth.uid,
         :name    => "#{Name.clean_name(auth.extra['raw_info']['username'])}\##{auth.extra['raw_info']['discriminator']}",
         :avatar  => Name.clean_url(auth.info['image']),
+        :enabled => true
+      )
+    elsif bnet?
+      update_attributes(
+        :uid     => auth.uid,
+        :name    => auth.info['battletag'],
         :enabled => true
       )
     end
   end
 
   def Identity.create_with_qconbyoc(user_id, uid)
-    identity = Identity.where(uid: uid, user_id: user_id, provider: :qconbyoc, enabled: true).first_or_create
+    identity = Identity.where(user_id: user_id, provider: :qconbyoc).first_or_initialize
     seat = identity.user.seat.nil? ? nil : identity.user.seat.seat
-    identity.update_attributes(uid: uid, name: seat)
+    identity.update_attributes(uid: uid, name: seat, enabled: true)
+    identity.save
   end
 
   def Identity.update_qconbyoc(user_id)
@@ -75,8 +97,13 @@ class Identity < ApplicationRecord
         http.use_ssl = true
         http.verify_mode = OpenSSL::SSL::VERIFY_PEER
         req.body = user.as_json
-        res = Net::HTTP.start(uri.hostname, uri.port) do |http|
-          http.request(req)
+        begin
+          res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+            http.request(req)
+          end
+        rescue => e
+          puts "Unable to send update to qconbyoc"
+          puts e.message
         end
       end
     end

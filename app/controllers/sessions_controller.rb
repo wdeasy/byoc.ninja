@@ -7,7 +7,12 @@ class SessionsController < ApplicationController
   def create
     auth = request.env['omniauth.auth']
 
-    @identity = Identity.find_with_omniauth(auth)
+    if logged_in?
+      @identity = Identity.find_with_omniauth(auth, current_user.id)
+    else
+      @identity = Identity.find_with_omniauth(auth)
+    end
+
     if @identity.nil?
       @identity = Identity.create_with_omniauth(auth)
     end
@@ -44,14 +49,14 @@ class SessionsController < ApplicationController
         flash[result[:success] ? :success : :danger] = result[:message]
       end
 
-      if request.env['omniauth.params']['qconbyoc'].present?
-        Identity.create_with_qconbyoc(@identity.user_id, request.env['omniauth.params']['qconbyoc'])
+      if request.env['omniauth.params']['uid'].present?
+        Identity.create_with_qconbyoc(@identity.user_id, request.env['omniauth.params']['uid'])
       end
 
       Identity.update_qconbyoc(@identity.user_id)
     end
 
-    redirect_to root_url
+    redirect_to link_path
   end
 
   def failure
@@ -64,4 +69,9 @@ class SessionsController < ApplicationController
     redirect_to root_url
   end
 
+  private
+
+    def origin
+      request.env['omniauth.origin']
+    end
 end

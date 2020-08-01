@@ -26,6 +26,7 @@ gem 'steam-condenser'
 gem 'netaddr'
 gem 'record_tag_helper'
 gem 'omniauth-discord'
+gem 'omniauth-bnet'
 
 group :development do
   #gem 'sqlite3'
