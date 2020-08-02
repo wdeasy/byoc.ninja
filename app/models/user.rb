@@ -1,6 +1,5 @@
 class User < ApplicationRecord
   include Name
-
   require 'open-uri'
 
   belongs_to :host, -> {where(visible: true)}, counter_cache: true, optional: true
@@ -133,13 +132,24 @@ class User < ApplicationRecord
       return {:success => success, :message => message}
     end
 
-    seat = Seat.where(:seat => seat_id).first
-    if seat.nil?
-      message = "That seat doesn't exist!"
-      return {:success => success, :message => message}
+    if seat_id.downcase.strip == 'none'
+      success = user.update_attribute(:seat_id, nil)
+      if success == true
+        message = "You're unlinked from your seat!"
+        return {:success => success, :message => message}
+      else
+        message = "Unable to save your seat."
+        return {:success => success, :message => message}
+      end
+    else
+      seat = Seat.where(:seat => seat_id).first
+      if seat.nil?
+        message = "That seat doesn't exist!"
+        return {:success => success, :message => message}
+      end
     end
 
-    if (user.seat_count > 2 && user.admin == false)
+    if (user.banned == true || (user.seat_count > 2 && user.admin == false))
       message = "You're linked to #{seat.seat}!"
       return {:success => true, :message => message}
     else

@@ -5,12 +5,9 @@ class SessionsController < ApplicationController
   end
 
   def create
-    auth = request.env['omniauth.auth']
-
-    if logged_in?
+    @identity = Identity.find_with_omniauth(auth)
+    if logged_in? && @identity.nil?
       @identity = Identity.find_with_omniauth(auth, current_user.id)
-    else
-      @identity = Identity.find_with_omniauth(auth)
     end
 
     if @identity.nil?
@@ -44,13 +41,13 @@ class SessionsController < ApplicationController
         Identity.update_connections(auth.credentials.token, @current_user.id)
       end
 
-      if request.env['omniauth.params']['seat'].present?
-        result = User.update_seat_from_omniauth(@identity.user_id, request.env['omniauth.params']['seat'])
+      if param['seat'].present?
+        result = User.update_seat_from_omniauth(@identity.user_id, param['seat'])
         flash[result[:success] ? :success : :danger] = result[:message]
       end
 
-      if request.env['omniauth.params']['uid'].present?
-        Identity.create_with_qconbyoc(@identity.user_id, request.env['omniauth.params']['uid'])
+      if param['uid'].present?
+        Identity.create_with_qconbyoc(@identity.user_id, param['uid'])
       end
 
       Identity.update_qconbyoc(@identity.user_id)
@@ -73,5 +70,13 @@ class SessionsController < ApplicationController
 
     def origin
       request.env['omniauth.origin']
+    end
+
+    def param
+      request.env['omniauth.params']
+    end
+
+    def auth
+      request.env['omniauth.auth']
     end
 end

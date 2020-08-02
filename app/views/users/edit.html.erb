@@ -6,7 +6,34 @@
 
     <% if current_user.admin? %>
       <%= form_for(@user) do |f| %>
+        <%= label(:user, :identities) %>
+
+        <table class="table table-striped table-condensed games">
+          <thead>
+            <tr>
+              <th class="col-md-3 text-left">Provider</th>
+              <th class="col-md-3 text-center">UID</th>
+              <th class="col-md-3 text-right">Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @user.identities.each do |i| %>
+            <tr>
+              <td class="text-left"><%= i.provider %></td>
+              <td class="text-center"><%= i.uid %></td>
+              <td class="text-right"><%= i.name %></td>
+            </tr>
+            <% end %>
+          </tbody>
+        </table>
+
         <%= render 'shared/error_messages', object: f.object %>
+
+        <%= f.label :handle %>
+    	  <%= f.text_field :handle, class: 'form-control' %>
+
+        <%= f.label :clan %>
+    	  <%= f.text_field :clan, class: 'form-control' %>
 
         <%= f.label "Display game information" %>
         <%= f.select :display, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>

@@ -83,7 +83,11 @@ class Identity < ApplicationRecord
   def Identity.create_with_qconbyoc(user_id, uid)
     identity = Identity.where(user_id: user_id, provider: :qconbyoc).first_or_initialize
     seat = identity.user.seat.nil? ? nil : identity.user.seat.seat
-    identity.update_attributes(uid: uid, name: seat, enabled: true)
+    if seat.nil?
+      identity.update_attributes(uid: uid, name: seat, enabled: false)
+    else
+      identity.update_attributes(uid: uid, name: seat, enabled: true)
+    end
     identity.save
   end
 

@@ -36,74 +36,44 @@
 
 		$('#number').change(function(){
 			seat = $(this).val();
-			setSeat();
 		});
 
-    function setSeat() {
-			if (section == '' || row == '' || seat == '') {
-				$("#seat").val("");
-			} else {
-				seat = $("#number").val();
-				$("#seat").val(seat);
-			}
-		}
+		$('')
 
+		$('#discord_submit').click(function(){
+			var seatVal = $("#number").val();
+			$('#discord_form').attr('action', function(i,value) {
+				return value + "?seat=" + seatVal + "&qconbyoc=TEST";
+			});
+		});
 	});
 
 </script>
 
-<% provide(:title, "Seat Link")  %>
+<% provide(:title, "Link your BYOC seat to Discord!")  %>
 <div class="jumbotron">
-<h3 class="center">Link your seat to your steam account!</h3>
+<h3 class="center">Link your BYOC seat to your Discord, and more!</h3>
 <br />
 <p></p>
 	<div class="row">
 	  <div class="col-md-6 col-md-offset-3">
-		<%= form_tag(seat_path, method: "get") do %>
-		  <%= hidden_field :link, "true" %>
-
-		  <%= label_tag "1) Select your seat:" %>
-			<div class="row">
-        <div class="col-sm-4">
-		      <%= select_tag "section", options_for_select(@sections), :prompt => "Section", id: "section", class: "form-control" %>
+      When signing in through Discord, any Steam or Battle.net account that is connected to your Discord with "Display on profile" enabled will also be linked to your BYOC Seat!<br /><br />
+      <br />
+			<%= form_tag('/auth/discord', method: :post, id: "discord_form") do %>
+			  <div class="row">
+	        <div class="col-sm-4">
+			      <%= select_tag "section", options_for_select(@sections), :prompt => "Section", id: "section", class: "form-control" %>
+					</div>
+					<div class="col-sm-4">
+						<%= select_tag "row", "", :prompt => "Row", id: "row", class: "form-control" %>
+					</div>
+					<div class="col-sm-4">
+						<%= select_tag "number", "", :prompt => "Seat", id: "number", class: "form-control" %>
+					</div>
 				</div>
-				<div class="col-sm-4">
-					<%= select_tag "row", "", :prompt => "Row", id: "row", class: "form-control" %>
-				</div>
-				<div class="col-sm-4">
-					<%= select_tag "number", "", :prompt => "Seat", id: "number", class: "form-control" %>
-				</div>
-			</div>
 
-			<label>
-				2) Paste your <%= link_to 'Steam profile URL', 'steam://url/SteamIDMyProfile' %> here:
-			</label>
-		  <%= text_field_tag(:url, nil, :placeholder => 'https://steamcommunity.com/...', :class => 'form-control') %>
-
-
-			<label>
-				3) Paste this code anywhere in the <%= link_to 'Summary of your Steam Profile', 'steam://url/SteamIDEditPage' %>:
-			</label>
-		  <%= text_field_tag(:seat, nil, :readonly => true, :class => 'form-control') %>
-
-		  <%= label_tag "4) Click this button:" %>
-		  <%= submit_tag("Click me!", class: "btn btn-primary") %>
-
-		  <br /><br /><h5>
-		  Link your seat to help other people find games being played in the BYOC!<br/>
-		  <br />
-			Your steam profile needs to be set to public before your seat can be linked.<br />
-			<br />
-			You can remove the seat code from your summary after your seat is linked.<br />
-		  <br /><br/></h5>
-			<div class="alert alert-info">
-			<h5><%= link_to 'findyourseat.info', 'https://findyourseat.info/', :class => "alert-link" %> scans your <%= link_to 'steam profile summary', 'steam://url/SteamIDEditPage', :class => "alert-link" %> for these tags:</h5>
-
-			<b>CLAN</b>: Your Clan Here<br />
-			<b>CASE MOD</b>: CLASSIC, SCRATCH, or ID/BETHESDA<br />
-			<b>YEARS ATTENDED</b>: Number of years you've attended quakecon
-			</div>
-		<% end %>
-	  </div>
+				<%= submit_tag("Sign in with Discord!", class: "btn btn-primary", id: "discord_submit") %>
+			<% end %>
+		</div>
 	</div>
 </div>

@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
-  before_action :logged_in_user, :except => [:seat, :discord]
+  before_action :logged_in_user, :except => [:seat]
   #before_action :correct_user, :only => [:edit, :update]
-  before_action :admin_user, :except => [:seat, :discord]
+  before_action :admin_user, :except => [:seat]
 
   def index
     @users = User.includes(:seat).where.not(host_id: nil).order(created_at: :desc)
@@ -16,7 +16,7 @@ class UsersController < ApplicationController
   def edit
     @user = User.find(params[:id])
     @seats = Seat.all.order(sort: :asc)
-    @identities = Identity.where(:user_id => params[:id], :enabled => true)
+    #@identities = Identity.where(:user_id => params[:id], :enabled => true)
   end
 
   def update
@@ -50,30 +50,16 @@ class UsersController < ApplicationController
   end
 
   def seat
-    @sections = Seat.all.order("sort asc").pluck(:section).uniq
-    if params[:link].present?
-      result = User.update_seat(params[:seat], params[:url])
-      if result[:success]
-        flash[:success] = result[:message]
-        redirect_to root_url
-      else
-        flash[:danger] = result[:message]
-        redirect_to seat_url
-      end
-    end
-  end
-
-  def discord
     @sections = Seat.all.order(sort: :asc).pluck(:section).uniq
   end
 
   private
     def user_params
       unless current_user.admin?
-        params.extract!(:auto_update, :seat_id)
+        params.extract!(:auto_update, :seat_id, :clan, :handle)
       end
 
-      params.require(:user).permit(:display, :auto_update, :seat_id)
+      params.require(:user).permit(:display, :auto_update, :seat_id, :clan, :handle)
     end
 
     # Confirms a logged-in user.
