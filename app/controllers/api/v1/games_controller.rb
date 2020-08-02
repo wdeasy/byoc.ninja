@@ -27,7 +27,7 @@ module Api
       end
 
       def game_params
-        params.require(:game).permit(:name, :link, :image)
+        params.require(:game).permit(:name, :url, :image)
       end
 
       def admin_api_user

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_31_031426) do
+ActiveRecord::Schema.define(version: 2020_08_02_050315) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -35,7 +35,7 @@ ActiveRecord::Schema.define(version: 2020_07_31_031426) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "link"
+    t.string "url"
     t.string "image"
     t.boolean "joinable", default: true
     t.integer "source", default: 0, null: false
@@ -76,7 +76,7 @@ ActiveRecord::Schema.define(version: 2020_07_31_031426) do
     t.datetime "last_successful_query", default: "1969-12-31 18:00:00", null: false
     t.bigint "lobby"
     t.text "flags"
-    t.string "link"
+    t.string "url"
     t.string "players"
     t.integer "source", default: 0, null: false
     t.bigint "steamid"

@@ -20,19 +20,19 @@ class Host < ApplicationRecord
   serialize :flags
 
   def as_json(options={})
-   super(:only => [:name,:map,:users_count,:address,:lobby,:players,:flags,:link,:query_port], :methods => [:location],
+   super(:only => [:name,:map,:users_count,:address,:lobby,:players,:flags,:url,:query_port], :methods => [:location],
           :include => {
             :users => {:only => [:name, :url, :discord_username, :discord_avatar],
               :include => {
                 :seat => {:only => [:seat, :clan, :handle]}
               }, :methods => [:clan, :handle, :playing]
             },
-            :game => {:only => [:name, :link]}
+            :game => {:only => [:name, :url]}
           }
     )
   end
 
-  def Host.link(player)
+  def Host.url(player)
     if player["lobbysteamid"].present?
       "steam://joinlobby/#{player["gameid"]}/#{player["lobbysteamid"]}/#{player["steamid"]}"
     else
@@ -76,7 +76,7 @@ class Host < ApplicationRecord
       valid_ip    = true
     end
 
-    link        = link(player)
+    url        = url(player)
     lobby       = player["lobbysteamid"] ? player["lobbysteamid"] : nil
     address     = player["gameserverip"] ? player["gameserverip"] : nil
     steamid     = player["gameserversteamid"] ? player["gameserversteamid"] : nil
@@ -93,7 +93,7 @@ class Host < ApplicationRecord
       :network_id => network_id,
       :address    => address,
       :lobby      => lobby,
-      :link       => link,
+      :url        => url,
       :steamid    => steamid,
       :lan        => lan,
       :name       => name
@@ -138,7 +138,7 @@ class Host < ApplicationRecord
         :port       => server[:port],
         :network_id => network_id,
         :address    => address,
-        :link       => "steam://connect/#{address}",
+        :url       => "steam://connect/#{address}",
         :steamid    => server[:steamid],
         :name       => Name.clean_name(server[:name]),
         :current    => server[:current],
@@ -795,7 +795,7 @@ class Host < ApplicationRecord
         :port       => port,
         :network_id => network_id,
         :address    => server[:address],
-        :link       => "steam://connect/#{server[:address]}",
+        :url       => "steam://connect/#{server[:address]}",
         :name       => Name.clean_name(name),
         :current    => server[:current],
         :max        => server[:max],

@@ -16,7 +16,6 @@ class UsersController < ApplicationController
   def edit
     @user = User.find(params[:id])
     @seats = Seat.all.order(sort: :asc)
-    #@identities = Identity.where(:user_id => params[:id], :enabled => true)
   end
 
   def update

@@ -15,7 +15,7 @@ class User < ApplicationRecord
    super(:only => [:clan, :handle], :methods => [:playing],
       :include => {
         :seat => {:only => [:seat, :section, :row, :number]},
-        :host => {:only => [:link]},
+        :host => {:only => [:url]},
         :identities => {:only => [:uid, :provider, :name, :url, :avatar]}
       }
     )
@@ -29,11 +29,13 @@ class User < ApplicationRecord
 
   def self.update_with_omniauth(user_id, name)
     user = User.find_by(:id => user_id)
-    name = Name.clean_name(name)
-    user.update_attributes(
-      clan: set_clan(name, user.id, user.seat_id),
-      handle: set_handle(name, user.id, user.seat_id)
-    )
+    if user.auto_update == true
+      name = Name.clean_name(name)
+      user.update_attributes(
+        clan: set_clan(name, user.id, user.seat_id),
+        handle: set_handle(name, user.id, user.seat_id)
+      )
+    end
   end
 
   def User.update(player, host_id, game_id, mod_id=nil)

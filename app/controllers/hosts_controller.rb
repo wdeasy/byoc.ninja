@@ -3,7 +3,7 @@ class HostsController < ApplicationController
   before_action :admin_user, :except => [:index]
 
   def index
-  	@hosts = Host.includes(:game, :mod, :users, :seats).active.order("games.name ASC, users_count DESC, hosts.current IS NULL, hosts.current DESC, hosts.name DESC")    
+  	@hosts = Host.includes(:game, :mod, :users, :seats).active.order("games.name ASC, users_count DESC, hosts.current IS NULL, hosts.current DESC, hosts.name DESC")
     respond_to do |format|
       format.html
       format.js
@@ -34,7 +34,6 @@ class HostsController < ApplicationController
 
   def edit
   	@host = Host.find_by_id(params[:id])
-    @identities = Identities.find_by(:user_id => params[id])
   end
 
   def update

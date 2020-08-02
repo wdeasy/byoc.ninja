@@ -1,6 +1,6 @@
 <tr>
   <td class="text-left longtext" title="<%= host.mod.nil? ? host.game.name : host.mod.name %>">
-    <%= link(host.game.link, (host.mod.nil? ? host.game.name : host.mod.name), host.game.appid) %>
+    <%= link(host.game.url, (host.mod.nil? ? host.game.name : host.mod.name), host.game.appid) %>
   </td>
   <td class="text-center longtext">
     <%= flags(host.flags).html_safe %>
@@ -29,6 +29,6 @@
     <%= host.map %>
   </td>
   <td class="text-right longtext">
-    <%= join(host.game.multiplayer, host.address, host.link) %>
+    <%= join(host.game.multiplayer, host.address, host.url) %>
   </td>
 </tr>

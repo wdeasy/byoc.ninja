@@ -14,7 +14,7 @@ class Seat < ApplicationRecord
       :include => {
         :users => {:only => [:clan, :handle], :methods => [:playing],
           :include => {
-            :host => {:only => [:link]},
+            :host => {:only => [:url]},
             :identities => {:only => [:provider, :uid, :name, :url, :avatar]}
           }
         }

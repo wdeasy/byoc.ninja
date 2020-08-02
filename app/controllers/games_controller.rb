@@ -46,7 +46,7 @@ class GamesController < ApplicationController
 
   private
     def add_params
-      params.require(:game).permit(:appid, :name, :link, :source, :multiplayer)
+      params.require(:game).permit(:appid, :name, :url, :source, :multiplayer)
     end
 
     def game_params

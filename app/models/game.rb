@@ -12,7 +12,7 @@ class Game < ApplicationRecord
   enum source: [:auto, :manual]
 
   def as_json(options={})
-   super(:only => [:appid, :name, :image, :link])
+   super(:only => [:appid, :name, :image, :url])
   end
 
   def Game.update(appid, info, multiplayer, profile=nil)
@@ -22,14 +22,14 @@ class Game < ApplicationRecord
       parsed = SteamWebApi.get_json(url)
 
       name = nil
-      link = nil
+      url = nil
       image = nil
 
       unless parsed.blank?
         if parsed["#{appid}"] && parsed["#{appid}"]['success']
           name = parsed["#{appid}"]['data']['name']
           image = parsed["#{appid}"]['data']['header_image']
-          link = valid_link("https://store.steampowered.com/app/#{appid}")
+          url = valid_url("https://store.steampowered.com/app/#{appid}")
         end
       end
 
@@ -38,7 +38,7 @@ class Game < ApplicationRecord
       end
 
       game.name = name.blank? ? Name.clean_name(info) : Name.clean_name(name)
-      game.link        = Name.clean_url(link)
+      game.url        = Name.clean_url(url)
       game.image       = image
       game.source      = :auto
       game.multiplayer = multiplayer
@@ -60,7 +60,7 @@ class Game < ApplicationRecord
     return game.id
   end
 
-  def self.valid_link(url)
+  def self.valid_url(url)
     page = SteamWebApi.get_html(url)
 
     if page.blank?
@@ -121,15 +121,15 @@ class Game < ApplicationRecord
 
     name  = game.name
     image = game.image
-    link  = game.link
+    url   = game.url
 
     unless parsed.blank?
       if parsed["#{game.appid}"]['success']
         name  = Name.clean_name(parsed["#{game.appid}"]['data']['name'])
         image = parsed["#{game.appid}"]['data']['header_image']
-        link  = valid_link("https://store.steampowered.com/app/#{game.appid}")
+        url  = valid_url("https://store.steampowered.com/app/#{game.appid}")
       else
-        link = nil
+        url = nil
         image = nil
       end
     end
@@ -138,8 +138,8 @@ class Game < ApplicationRecord
       puts "Updating name to #{name}"
     end
 
-    unless game.link == link
-      puts "Updating link to #{link}"
+    unless game.url == url
+      puts "Updating URL to #{url}"
     end
 
     unless game.image == image
@@ -149,7 +149,7 @@ class Game < ApplicationRecord
     game.update_attributes(
       :name  => name,
       :image => image,
-      :link  => link
+      :url  => url
     )
   end
 

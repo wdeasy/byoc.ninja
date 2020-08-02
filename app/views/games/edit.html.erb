@@ -1,10 +1,10 @@
 <% provide(:title, "Edit Game") %>
 <div class="jumbotron">
 
-<% if @game.link %>
+<% if @game.url %>
 	<div class="row">
 	  <div class="col-md-6 col-md-offset-3">
-	  	<div class="container center"><%= (@game.image.blank? || @game.link.blank?) ? "" : (sanitize link_to image_tag(@game.image), slice_url(@game.link), {:class => "img-responsive", :target => "_blank"}) %></div>
+	  	<div class="container center"><%= (@game.image.blank? || @game.url.blank?) ? "" : (sanitize link_to image_tag(@game.image), @game.url, {:class => "img-responsive", :target => "_blank"}) %></div>
 	  </div>
 	</div>
 	<br />
@@ -22,8 +22,8 @@
 	  <%= f.label :name %>
 	  <%= f.text_field :name, class: 'form-control' %>
 
-		<%= f.label :link %>
-	  <%= f.text_field :link, class: 'form-control', :readonly => true %>
+		<%= f.label :url %>
+	  <%= f.text_field :url, class: 'form-control', :readonly => true %>
 
 	  <%= f.label :joinable %>
 	  <%= f.select :joinable, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
