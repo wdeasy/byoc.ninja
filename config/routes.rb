@@ -37,6 +37,7 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :identities, :except => [:new, :create]
   resources :contacts, :only => [:new, :create]
   resources :games
   resources :hosts

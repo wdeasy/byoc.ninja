@@ -1,4 +1,15 @@
 module IdentitiesHelper
+  def display_avatar(avatar, options={})
+    size = "_full.jpg"
+    #size = "_medium.jpg"
+
+    if avatar.include? "steam"
+  	   avatar = avatar.gsub(".jpg", size)
+    end
+
+    image_tag avatar, options
+  end
+
   def provider_link(provider)
     if provider != 'qconbyoc'
       link_to "Link", "/auth/#{provider}", method: :post

@@ -8,7 +8,7 @@ class SteamWebApi < ApplicationRecord
         return nil
       else
         puts "Adding Steam Web Api Key"
-        steam_key = SteamWebApi.create(:key => ENV["STEAM_WEB_API_KEY"])
+        steam_key = SteamWebApi.create(:key => ENV["STEAM_WEB_API_KEY"].hash)
       end
     end
 
@@ -23,7 +23,7 @@ class SteamWebApi < ApplicationRecord
       )
     end
 
-    return steam_key.key
+    return ENV["STEAM_WEB_API_KEY"]
   end
 
   def self.get_json(url)

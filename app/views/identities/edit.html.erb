@@ -1,0 +1,46 @@
+<% provide(:title, "Edit Identity") %>
+<div class="jumbotron">
+
+<% if @identity.avatar %>
+	<div class="row">
+	  <div class="col-md-6 col-md-offset-3">
+      <div class="container center">
+        <% if @identity.url %>
+  	  	  <%= sanitize link_to display_avatar(@identity.avatar), @identity.url, {:class => "img-responsive", :target => "_blank"} %>
+        <% else %>
+          <%= display_avatar(@identity.avatar) %>
+        <% end %>
+      </div>
+	  </div>
+	</div>
+	<br />
+<% end %>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+
+	<%= form_for(@identity) do |f| %>
+	  <%= render 'shared/error_messages', object: f.object %>
+
+	  <%= f.label :uid %>
+	  <%= f.text_field :uid, class: 'form-control', :readonly => true %>
+
+	  <%= f.label :name %>
+	  <%= f.text_field :name, class: 'form-control' %>
+
+		<%= f.label :url %>
+	  <%= f.text_field :url, class: 'form-control' %>
+
+    <%= f.label :avatar %>
+	  <%= f.text_field :avatar, class: 'form-control' %>
+
+	  <%= f.label :enabled %>
+	  <%= f.select :enabled, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
+
+	  <%= f.submit "Save changes", class: "btn btn-33 btn-primary pull-left" %>
+	  <%= link_to "Delete", @identity, method: :delete, data: { confirm: "You sure?" }, class: "btn btn-33 btn-primary" %>
+	  <%= link_to "Go To User", edit_user_path(@identity.user), class: "btn btn-33 btn-primary pull-right" %>
+  <% end %>
+  </div>
+</div>
+</div>

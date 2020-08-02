@@ -20,8 +20,8 @@
             <% @user.identities.each do |i| %>
             <tr>
               <td class="text-left"><%= i.provider %></td>
-              <td class="text-center"><%= i.uid %></td>
-              <td class="text-right"><%= i.name %></td>
+              <td class="text-center"><%= link_to i.uid, edit_identity_path(i) %></td>
+              <td class="text-right"><%= link_to i.name, edit_identity_path(i) %></td>
             </tr>
             <% end %>
           </tbody>

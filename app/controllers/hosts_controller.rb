@@ -4,10 +4,6 @@ class HostsController < ApplicationController
 
   def index
   	@hosts = Host.includes(:game, :mod, :users, :seats).active.order("games.name ASC, users_count DESC, hosts.current IS NULL, hosts.current DESC, hosts.name DESC")
-    respond_to do |format|
-      format.html
-      format.js
-    end
   end
 
   def new
