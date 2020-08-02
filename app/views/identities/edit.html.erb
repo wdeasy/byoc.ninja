@@ -22,6 +22,9 @@
 	<%= form_for(@identity) do |f| %>
 	  <%= render 'shared/error_messages', object: f.object %>
 
+		<%= f.label :provider %>
+	  <%= f.text_field :provider, class: 'form-control', :readonly => true %>
+
 	  <%= f.label :uid %>
 	  <%= f.text_field :uid, class: 'form-control', :readonly => true %>
 
@@ -36,6 +39,9 @@
 
 	  <%= f.label :enabled %>
 	  <%= f.select :enabled, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
+
+		<%= f.label :banned %>
+	  <%= f.select :banned, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
 
 	  <%= f.submit "Save changes", class: "btn btn-33 btn-primary pull-left" %>
 	  <%= link_to "Delete", @identity, method: :delete, data: { confirm: "You sure?" }, class: "btn btn-33 btn-primary" %>

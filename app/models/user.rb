@@ -7,7 +7,7 @@ class User < ApplicationRecord
   belongs_to :game, optional: true
   belongs_to :mod, optional: true
   has_many :api_keys
-  has_many :identities, -> {where(enabled: true)}
+  has_many :identities, -> {where(enabled: true).where(banned: false)}
   #has_many :active_identities, -> {where(enabled: true)}, :class_name => 'Identity'
   #belongs_to :active_host, -> {where(visible: true)}, :class_name => 'Host'
 

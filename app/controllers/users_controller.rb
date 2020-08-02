@@ -28,26 +28,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def ban
-    @user = User.find(params[:id])
-    if @user.update_attribute(:banned, true)
-      flash[:success] = "User banned."
-      redirect_to users_url
-    else
-      render 'edit'
-    end
-  end
-
-  def unban
-    @user = User.find(params[:id])
-    if @user.update_attribute(:banned, false)
-      flash[:success] = "User unbanned."
-      redirect_to users_url
-    else
-      render 'edit'
-    end
-  end
-
   def seat
     @sections = Seat.all.order(sort: :asc).pluck(:section).uniq
   end
@@ -55,10 +35,10 @@ class UsersController < ApplicationController
   private
     def user_params
       unless current_user.admin?
-        params.extract!(:auto_update, :seat_id, :clan, :handle)
+        params.extract!(:auto_update, :seat_id, :clan, :handle, :banned)
       end
 
-      params.require(:user).permit(:display, :auto_update, :seat_id, :clan, :handle)
+      params.require(:user).permit(:display, :auto_update, :seat_id, :clan, :handle, :banned)
     end
 
     # Confirms a logged-in user.

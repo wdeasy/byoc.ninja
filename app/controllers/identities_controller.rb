@@ -26,6 +26,7 @@ class IdentitiesController < ApplicationController
     @identities = Identity.where(:provider => :discord).order(created_at: :desc) if params[:discord].present?
     @identities = Identity.where(:provider => :bnet).order(created_at: :desc) if params[:bnet].present?
     @identities = Identity.where(:provider => :qconbyoc).order(created_at: :desc) if params[:qconbyoc].present?
+    @identities = Identity.where(:banned => true).order(created_at: :desc) if params[:banned].present?
   end
 
   def edit
@@ -51,7 +52,7 @@ class IdentitiesController < ApplicationController
   private
 
     def identity_params
-      params.require(:identity).permit(:uid, :name, :enabled, :url, :avatar)
+      params.require(:identity).permit(:uid, :name, :enabled, :url, :avatar, :banned)
     end
 
     # Confirms a logged-in user.

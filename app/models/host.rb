@@ -416,7 +416,7 @@ class Host < ApplicationRecord
     # puts "#{l} steamids from linked seats not in groups, #{linked_users.count} total"
 
     i=0
-    identities = Identity.where(:provider => :steam, :enabled => :true).pluck(:uid)
+    identities = Identity.active.where(:provider => :steam).pluck(:uid)
     identities.each do |identity|
       if !steamids.include? identity
         steamids << identity

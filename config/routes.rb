@@ -21,13 +21,7 @@ Rails.application.routes.draw do
   get        'link'               => 'identities#link'
   get        'qconbyoc'           => 'identities#qconbyoc'
   match      'identities/:id/unlink', to: 'identities#unlink', as: 'unlink_identity', via: :post
-
   match      'messages/:id/clear', to: 'messages#clear', as: 'clear_message', via: [:get, :post]
-
-  match      'users/:id/ban', to: 'users#ban', as: 'ban_user', via: :post
-  match      'users/:id/unban', to: 'users#unban', as: 'unban_user', via: :post
-  match      'hosts/:id/ban', to: 'hosts#ban', as: 'ban_host', via: :post
-  match      'hosts/:id/unban', to: 'hosts#unban', as: 'unban_host', via: :post
 
   namespace :api, defaults: {format: 'json'} do
     namespace :v1 do
@@ -37,16 +31,16 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :identities, :except => [:new, :create]
+  resources :identities, :except => [:new, :create, :show]
   resources :contacts, :only => [:new, :create]
-  resources :games
-  resources :hosts
-  resources :users
-  resources :groups
-  resources :networks
-  resources :messages
-  resources :mods
-  resources :filters
+  resources :games, :except => [:show]
+  resources :hosts, :except => [:show]
+  resources :users, :except => [:show]
+  resources :groups, :except => [:show]
+  resources :networks, :except => [:show]
+  resources :messages, :except => [:show]
+  resources :mods, :except => [:show]
+  resources :filters, :except => [:show]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

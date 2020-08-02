@@ -42,19 +42,13 @@
         <%= f.collection_select :seat_id, @seats, :id, :seat, {:include_blank => true},{:class => 'form-control longtext'} %>
 
         <%= f.label :banned %><br />
-        <%= f.select :banned, [[:yes,true],[:no,false]], {},{:class => 'form-control', :disabled => true} %>
+        <%= f.select :banned, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
 
         <%= f.label :auto_update %>
         <%= f.select :auto_update, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
 
         <%= f.submit "Save changes", class: "btn btn-50 btn-primary pull-left" %>
         <%= link_to "Back", users_url, class: "btn btn-50 btn-primary pull-right" %>
-
-        <% if @user.banned? %>
-          <%= button_to("Unban", unban_user_path(@user), :method => :post, :class => "btn btn-primary")%>
-        <% else %>
-          <%= button_to("Ban", ban_user_path(@user), :method => :post, :class => "btn btn-primary")%>
-        <% end %>
       <% end %>
     <% end %>
     </div>

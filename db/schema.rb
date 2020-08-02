@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_02_050315) do
+ActiveRecord::Schema.define(version: 2020_08_02_192818) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -100,6 +100,7 @@ ActiveRecord::Schema.define(version: 2020_08_02_050315) do
     t.string "url"
     t.boolean "enabled"
     t.uuid "user_id"
+    t.boolean "banned", default: false, null: false
     t.index ["user_id"], name: "index_identities_on_user_id"
   end
 

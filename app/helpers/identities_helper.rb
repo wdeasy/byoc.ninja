@@ -11,11 +11,7 @@ module IdentitiesHelper
   end
 
   def provider_link(provider)
-    if provider != 'qconbyoc'
-      link_to "Link", "/auth/#{provider}", method: :post
-    else
-      link_to "Link", "https://qconbyoc.com"
-    end
+    link_to "Link", "/auth/#{provider}", method: :post
   end
 
   def provider_unlink(provider, identities)
