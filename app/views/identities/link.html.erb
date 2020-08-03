@@ -13,14 +13,12 @@
           </tr>
         </thead>
         <tbody>
-          <% Identity.providers.each do |p| %>
-            <% unless p[0] == 'qconbyoc' %>
-              <tr>
-                <td class="text-left"><%= p[0] %></td>
-                <td class="text-center"><%= provider_name(p[0], @identities) %></td>
-                <td class="text-right"><%= provider_unlink(p[0], @identities) %></td>
-              </tr>
-            <% end %>
+          <% Identity.providers.without(:qconbyoc).each do |p| %>
+            <tr>
+              <td class="text-left"><%= p[0] %></td>
+              <td class="text-center"><%= provider_name(p[0], @identities) %></td>
+              <td class="text-right"><%= provider_unlink(p[0], @identities) %></td>
+            </tr>
           <% end %>
         </tbody>
       </table>

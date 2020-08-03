@@ -29,7 +29,7 @@ class User < ApplicationRecord
 
   def self.update_with_omniauth(user_id, name)
     user = User.find_by(:id => user_id)
-    if user.auto_update == true && user.banned == false
+    if user.auto_update == true
       name = Name.clean_name(name)
       user.update_attributes(
         clan: set_clan(name, user.id, user.seat_id),

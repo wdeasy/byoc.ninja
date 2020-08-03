@@ -44,7 +44,7 @@ class Identity < ApplicationRecord
         if ['battlenet', 'steam'].include? d['type']
           provider = d['type'] == 'battlenet' ? :bnet : :steam
           identity = Identity.where(user_id: user_id, provider: provider).first_or_initialize
-          if identity.banned == false && identity.user.banned == false && identity.user.auto_update == true
+          if identity.banned == false && identity.user.auto_update == true
             identity.update_attributes(
               :uid     => d['id'],
               :name    => Name.clean_name(d['name']),
@@ -63,29 +63,27 @@ class Identity < ApplicationRecord
   end
 
   def update_info(auth)
-    unless banned? || user.banned?
-      if steam?
-        update_attributes(
-          :uid     => auth.uid,
-          :name	   => Name.clean_name(auth.info['nickname']),
-          :url 	   => Name.clean_url(auth.extra['raw_info']['profileurl']),
-          :avatar  => Name.clean_url(auth.extra['raw_info']['avatar']),
-          :enabled => true
-        )
-      elsif discord?
-        update_attributes(
-          :uid     => auth.uid,
-          :name    => "#{Name.clean_name(auth.extra['raw_info']['username'])}\##{auth.extra['raw_info']['discriminator']}",
-          :avatar  => Name.clean_url(auth.info['image']),
-          :enabled => true
-        )
-      elsif bnet?
-        update_attributes(
-          :uid     => auth.uid,
-          :name    => auth.info['battletag'],
-          :enabled => true
-        )
-      end
+    if steam?
+      update_attributes(
+        :uid     => auth.uid,
+        :name	   => Name.clean_name(auth.info['nickname']),
+        :url 	   => Name.clean_url(auth.extra['raw_info']['profileurl']),
+        :avatar  => Name.clean_url(auth.extra['raw_info']['avatar']),
+        :enabled => true
+      )
+    elsif discord?
+      update_attributes(
+        :uid     => auth.uid,
+        :name    => "#{Name.clean_name(auth.extra['raw_info']['username'])}\##{auth.extra['raw_info']['discriminator']}",
+        :avatar  => Name.clean_url(auth.info['image']),
+        :enabled => true
+      )
+    elsif bnet?
+      update_attributes(
+        :uid     => auth.uid,
+        :name    => auth.info['battletag'],
+        :enabled => true
+      )
     end
   end
 

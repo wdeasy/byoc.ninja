@@ -1,7 +1,7 @@
 class IdentitiesController < ApplicationController
   before_action :logged_in_user, :except => [:qconbyoc]
   before_action :correct_user, :only => [:unlink]
-  before_action :admin_user, :except => [:qconbyoc, :unlink]
+  before_action :admin_user, :except => [:qconbyoc, :unlink, :link]
 
   def link
     @identities = Identity.where(:user_id => current_user.id, :enabled => true)
