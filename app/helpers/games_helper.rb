@@ -6,7 +6,7 @@ module GamesHelper
     elsif image.present?
       sanitize image_tag(image)
     else
-      ""
+      nil
     end
   end
 end
