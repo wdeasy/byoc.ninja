@@ -652,10 +652,14 @@ class Host < ApplicationRecord
       end
 
       if visible == true
-        player = {}
-        player["gameserverip"] = host.address
+        if host.address.present?
+          player = {}
+          player["gameserverip"] = host.address
 
-        Host.update(player, host.game_id)
+          Host.update(player, host.game_id)
+        else
+          host.update_attribute(:visible, visible)
+        end
       else
         Host.unpin(host)
       end
