@@ -46,7 +46,7 @@ module HostsHelper
 
   def join(multiplayer, address, url)
     if multiplayer == true && url.present?
-    	sanitize link_to (address.present? ? address : "Join Lobby") , url
+    	link_to (address.present? ? address : "Join Lobby") , url
     else
       address
     end

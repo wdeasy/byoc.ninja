@@ -5,7 +5,7 @@ class GamesController < ApplicationController
   def index
   	@games = Game.where(:source => :auto, :multiplayer => true).order(name: :asc)
     @games = Game.where(:source => :manual).order(name: :asc) if params[:manual].present?
-    @games = Game.all.order("name ASC") if params[:all].present?
+    @games = Game.all.order(name: :asc) if params[:all].present?
   end
 
   def edit

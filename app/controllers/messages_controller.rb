@@ -12,7 +12,7 @@ class MessagesController < ApplicationController
   end
 
   def index
-  	@messages = Message.order("updated_at desc")
+  	@messages = Message.order(updated_at: :desc)
   end
 
   def new
