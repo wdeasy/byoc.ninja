@@ -1,13 +1,20 @@
 module IdentitiesHelper
-  def display_avatar(avatar, options={})
+  def display_avatar(avatar, url)
+    options = {:class => "img-responsive", :target => "_blank"}
     size = "_full.jpg"
     #size = "_medium.jpg"
 
-    if avatar.include? "steam"
+    if avatar.present? && (avatar.include? "steam")
   	   avatar = avatar.gsub(".jpg", size)
     end
 
-    image_tag avatar, options
+    if avatar.present? && url.present?
+      sanitize link_to image_tag(avatar), url, options
+    elsif avatar.present?
+      sanitize image_tag avatar
+    else
+      nil
+    end
   end
 
   def provider_link(provider)

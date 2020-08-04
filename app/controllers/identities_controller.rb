@@ -49,10 +49,30 @@ class IdentitiesController < ApplicationController
     redirect_to identities_url
   end
 
+  def ban
+    @identity = Identity.find(params[:id])
+    if @identity.update_attribute(:banned, true)
+      flash[:success] = "Identity banned."
+      redirect_to identities_url
+    else
+      render 'edit'
+    end
+  end
+
+  def unban
+    @identity = Identity.find(params[:id])
+    if @identity.update_attribute(:banned, false)
+      flash[:success] = "Identity unbanned."
+      redirect_to identities_url
+    else
+      render 'edit'
+    end
+  end
+
   private
 
     def identity_params
-      params.require(:identity).permit(:uid, :name, :enabled, :url, :avatar, :banned)
+      params.require(:identity).permit(:uid, :name, :enabled, :url, :avatar)
     end
 
     # Confirms a logged-in user.

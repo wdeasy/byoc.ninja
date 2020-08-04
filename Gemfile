@@ -27,6 +27,7 @@ gem 'netaddr'
 gem 'record_tag_helper'
 gem 'omniauth-discord'
 gem 'omniauth-bnet'
+gem 'listen'
 
 group :development do
   #gem 'sqlite3'

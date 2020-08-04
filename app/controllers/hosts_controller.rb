@@ -42,13 +42,33 @@ class HostsController < ApplicationController
     end
   end
 
+  def ban
+    @host = Host.find(params[:id])
+    if @host.update_attribute(:banned, true)
+      flash[:success] = "Host banned."
+      redirect_to admin_hosts_url
+    else
+      render 'edit'
+    end
+  end
+
+  def unban
+    @host = Host.find(params[:id])
+    if @host.update_attribute(:banned, false)
+      flash[:success] = "Host unbanned."
+      redirect_to admin_hosts_url
+    else
+      render 'edit'
+    end
+  end
+
   private
     def add_params
       params.require(:host).permit(:game_id, :network_id, :address, :source, :name, :pin, :visible, :updated, :flags)
     end
 
     def host_params
-      params.require(:host).permit(:auto_update, :name, :map, :query_port, :network_id, :last_successful_query, :pin, :source, :banned)
+      params.require(:host).permit(:auto_update, :name, :map, :query_port, :network_id, :last_successful_query, :pin, :source)
     end
 
     # Confirms a logged-in user.

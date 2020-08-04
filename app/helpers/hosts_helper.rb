@@ -38,7 +38,7 @@ module HostsHelper
 
 	def link(url, name, appid)
 		if url.present?
-			link_to name, "steam://store/#{appid}"
+			sanitize link_to name, "steam://store/#{appid}"
 		else
 			name
 		end
@@ -46,7 +46,7 @@ module HostsHelper
 
   def join(multiplayer, address, url)
     if multiplayer == true
-    	link_to (address.present? ? address : "Join Lobby") , url
+    	sanitize link_to (address.present? ? address : "Join Lobby") , url
     else
       address
     end

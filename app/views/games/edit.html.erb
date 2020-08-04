@@ -1,46 +1,40 @@
 <% provide(:title, "Edit Game") %>
 <div class="jumbotron">
 
-<% if @game.url %>
-	<div class="row">
-	  <div class="col-md-6 col-md-offset-3">
-	  	<div class="container center"><%= (@game.image.blank? || @game.url.blank?) ? "" : (sanitize link_to image_tag(@game.image), @game.url, {:class => "img-responsive", :target => "_blank"}) %></div>
-	  </div>
-	</div>
-	<br />
-<% end %>
-
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
+		<div class="container center">
+			<%= display_image(@game.image, @game.url) %>
+		</div>
 
-	<%= form_for(@game) do |f| %>
-	  <%= render 'shared/error_messages', object: f.object %>
+		<%= form_for(@game) do |f| %>
+		  <%= render 'shared/error_messages', object: f.object %>
 
-	  <%= f.label :appid %>
-	  <%= f.text_field :appid, class: 'form-control', :readonly => true %>
+		  <%= f.label :appid %>
+		  <%= f.text_field :appid, class: 'form-control', :readonly => true %>
 
-	  <%= f.label :name %>
-	  <%= f.text_field :name, class: 'form-control' %>
+		  <%= f.label :name %>
+		  <%= f.text_field :name, class: 'form-control' %>
 
-		<%= f.label :url %>
-	  <%= f.text_field :url, class: 'form-control', :readonly => true %>
+			<%= f.label :url %>
+		  <%= f.text_field :url, class: 'form-control', :readonly => true %>
 
-	  <%= f.label :joinable %>
-	  <%= f.select :joinable, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
+		  <%= f.label :joinable %>
+		  <%= f.select :joinable, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
 
-	  <%= f.label :queryable %>
-	  <%= f.select :queryable, [[:yes,true],[:no,false]], {},{:class => 'form-control', :readonly => true, :disabled => true} %>
+		  <%= f.label :queryable %>
+		  <%= f.select :queryable, [[:yes,true],[:no,false]], {},{:class => 'form-control', :readonly => true, :disabled => true} %>
 
-	  <%= f.label :multiplayer %>
-	  <%= f.select :multiplayer, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
+		  <%= f.label :multiplayer %>
+		  <%= f.select :multiplayer, [[:yes,true],[:no,false]], {},{:class => 'form-control'} %>
 
-		<%= f.label :last_seen %>
-	  <%= f.text_field :last_seen, class: 'form-control', :readonly => true %>
+			<%= f.label :last_seen %>
+		  <%= f.text_field :last_seen, class: 'form-control', :readonly => true %>
 
-	  <%= f.submit "Save changes", class: "btn btn-33 btn-primary pull-left" %>
-	  <%= link_to "Delete", @game, method: :delete, data: { confirm: "You sure?" }, class: "btn btn-33 btn-primary" %>
-	  <%= link_to "Back", games_url, class: "btn btn-33 btn-primary pull-right" %>
-	<% end %>
+		  <%= f.submit "Save changes", class: "btn btn-33 btn-primary pull-left" %>
+		  <%= link_to "Delete", @game, method: :delete, data: { confirm: "You sure?" }, class: "btn btn-33 btn-primary" %>
+		  <%= link_to "Back", games_url, class: "btn btn-33 btn-primary pull-right" %>
+		<% end %>
   </div>
 </div>
 </div>
