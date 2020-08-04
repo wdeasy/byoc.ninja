@@ -33,10 +33,14 @@ class Host < ApplicationRecord
   end
 
   def Host.url(player)
-    if player["lobbysteamid"].present?
-      "steam://joinlobby/#{player["gameid"]}/#{player["lobbysteamid"]}/#{player["steamid"]}"
+    if player["gameserversteamid"].present? || player["lobbysteamid"].present?
+      if player["lobbysteamid"].present?
+        "steam://joinlobby/#{player["gameid"]}/#{player["lobbysteamid"]}/#{player["steamid"]}"
+      else
+        "steam://connect/#{player["gameserverip"]}"
+      end
     else
-      "steam://connect/#{player["gameserverip"]}"
+      nil
     end
   end
 
@@ -76,7 +80,7 @@ class Host < ApplicationRecord
       valid_ip    = true
     end
 
-    url        = url(player)
+    url         = url(player)
     lobby       = player["lobbysteamid"] ? player["lobbysteamid"] : nil
     address     = player["gameserverip"] ? player["gameserverip"] : nil
     steamid     = player["gameserversteamid"] ? player["gameserversteamid"] : nil
@@ -658,7 +662,10 @@ class Host < ApplicationRecord
 
           Host.update(player, host.game_id)
         else
-          host.update_attribute(:visible, visible)
+          host.update_attributes(
+            :visible => true,
+            :updated => true
+          )
         end
       else
         Host.unpin(host)
