@@ -17,7 +17,7 @@ Rails.application.routes.draw do
   get       'logs/update_hosts'   => 'logs#update_hosts'
   get       'logs/update_seats'   => 'logs#update_seats'
 
-  get        'seat'               => 'hosts#index'#'users#seat'
+  get        'seat'               => redirect("/")#'users#seat'
   get        'lookup'             => 'seats#lookup'
   get        'link'               => 'identities#link'
   get        'qconbyoc'           => 'identities#qconbyoc'

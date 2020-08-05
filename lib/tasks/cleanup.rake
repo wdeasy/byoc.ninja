@@ -42,6 +42,13 @@ namespace :cleanup do
     finish_time(beginning)
   end
 
+  desc "Fill in missing seats"
+  task :seats => :environment do
+    beginning = start_time
+    Seat.cleanup_seats
+    finish_time(beginning)
+  end
+
   def start_time
   	beginning = Time.now
   	puts beginning.to_formatted_s(:db)

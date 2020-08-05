@@ -40,6 +40,51 @@ class Seat < ApplicationRecord
     "#{seat} -- #{clan} #{handle}"[0..40]
   end
 
+  def Seat.cleanup_seats
+    puts "Filling in unavailable seats."
+    
+    s = Seat.distinct.pluck(:section)
+    r = Seat.distinct.pluck(:row)
+    n = Seat.distinct.pluck(:number)
+    puts "Sections: #{s.count}"
+    puts "Rows: #{r.count}"
+    puts "Numbers: #{n.count}"
+
+    i = 0
+    s.each do |sec|
+      r.each do |row|
+        n.each do |num|
+          seat = "#{sec}-#{row}-#{num}"
+          current_seat = Seat.find_by(seat: seat)
+          unless current_seat.present?
+
+            if row.to_s.length == 2
+              sort_letter = row.to_s
+            else
+              sort_letter = row.to_s.rjust(2, '0')
+            end
+
+            sort ="#{sec}#{sort_letter}#{sprintf '%02d', num.to_s}"
+
+            i+=1
+            puts "#{seat} #{sec} #{row} #{num} #{sort}"
+            new_seat = Seat.where(seat: seat).first_or_create
+          	new_seat.update_attributes(
+          	  :clan   => nil,
+          	  :handle => nil,
+              :section => sec,
+              :row => row,
+              :number => num,
+              :sort => sort,
+              :updated => true
+          	)
+          end
+        end
+      end
+    end
+    puts "Processed #{i} seats"
+  end
+
   def Seat.update_seats(file)
     if file == nil
       file = ENV["SEAT_API_URL"]

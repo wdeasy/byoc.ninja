@@ -376,9 +376,6 @@ input {
 }
 
 .form-comment {
-  position: fixed;
-  top: 100%;
-  background-color: $gray;
-  color: $gray;
-  border: 0px;
+  display: none !important;
+  visibility:hidden !important;
 }
