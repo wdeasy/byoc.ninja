@@ -19,6 +19,18 @@ html {
   overflow-y: scroll;
 }
 
+.alert-success {
+  background-color: #ff671f !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+.alert-danger {
+  background-color: #D22630 !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
 body {
   padding-top: 60px;
   background-color: #000000;//#424242;//#$gray-dark;
