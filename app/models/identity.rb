@@ -6,7 +6,7 @@ class Identity < ApplicationRecord
   scope :active, -> { where( enabled: true ).where( banned: false ) }
   scope :specific, -> (provider) { where(:provider => provider).first }
 
-  enum provider: [:steam, :discord, :bnet, :qconbyoc]
+  enum provider: [:steam, :discord, :bnet, :qconbyoc, :twitch]
 
   def self.find_with_omniauth(auth, user_id=nil)
     if !user_id.nil?
@@ -41,8 +41,16 @@ class Identity < ApplicationRecord
     if response.present?
       doc = JSON.parse(response.body)
       doc.each do |d|
-        if ['battlenet', 'steam'].include? d['type']
-          provider = d['type'] == 'battlenet' ? :bnet : :steam
+        if ['battlenet', 'steam', 'twitch'].include? d['type']
+          case d['type']
+          when 'battlenet'
+            provider = :bnet
+          when 'steam'
+            provider = :steam
+          when 'twitch'
+            provider = :twitch
+          end
+
           identity = Identity.where(user_id: user_id, provider: provider).first_or_initialize
           if identity.banned == false && identity.user.auto_update == true
             identity.update_attributes(
@@ -84,6 +92,14 @@ class Identity < ApplicationRecord
         :name    => auth.info['battletag'],
         :enabled => true
       )
+    elsif twitch?
+      update_attributes(
+        :uid     => auth.uid,
+        :name    => Name.clean_url(auth.extra['raw_info']['display_name']),
+        :url 	   => auth.info['urls'].present? ? Name.clean_url(auth.info['urls']['Twitch']) : nil,
+        :avatar  => Name.clean_url(auth.info['image']),
+        :enabled => true
+      )
     end
   end
 
@@ -99,23 +115,17 @@ class Identity < ApplicationRecord
   end
 
   def Identity.update_qconbyoc(user_id)
-    unless ENV["QCONBYOC_ENDPOINT"].nil?
-      user = User.find_by(:id => user_id)
-      unless user.nil?
-        uri = URI(ENV["QCONBYOC_ENDPOINT"])
-        req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
-        http.use_ssl = true
-        http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-        req.body = user.as_json
-        begin
-          res = Net::HTTP.start(uri.hostname, uri.port) do |http|
-            http.request(req)
-          end
-        rescue => e
-          puts "Unable to send update to qconbyoc"
-          puts e.message
-        end
+    uri = URI(ENV["QCONBYOC_ENDPOINT"])
+    req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+    begin
+      res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+        http.request(req)
       end
+    rescue => e
+      puts "Unable to send update to qconbyoc"
+      puts e.message
     end
   end
 end
