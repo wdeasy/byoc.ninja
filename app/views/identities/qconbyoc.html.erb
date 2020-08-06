@@ -1,9 +1,21 @@
 <% provide(:title, "Link your BYOC seat to Discord!")  %>
 <div class="jumbotron">
   <% if @invalid.present? %>
-    <h3 class="center">Invalid seat!</h3>
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <h3 class="center">Invalid seat!</h3>
+        <br />
+        <%= button_to("Return to qconbyoc.com", "https://qconbyoc.com", :method => :get, :class => "btn btn-primary")%>
+      </div>
+    </div>
   <% elsif @taken.present? %>
-    <h3 class="center">Seat is taken by <%= @taken %></h3>
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+      <h3 class="center">Seat is taken by <%= @taken %></h3>
+      <br />
+      <%= button_to("Return to qconbyoc.com", "https://qconbyoc.com", :method => :get, :class => "btn btn-primary")%>
+    </div>
+  </div>
   <% else %>
     <h3 class="center">Link your BYOC seat to your Discord, and more!</h3>
       <div class="row">
