@@ -36,8 +36,8 @@ class SessionsController < ApplicationController
 
     if logged_in? && !@current_user.banned? && !@identity.banned?
       @identity.update_info(auth)
-      User.update_with_omniauth(@identity.user_id, @identity.name)
       if @identity.discord?
+        User.update_with_omniauth(@identity.user_id, @identity.name)
         Identity.update_connections(auth.credentials.token, @current_user.id)
       end
 
