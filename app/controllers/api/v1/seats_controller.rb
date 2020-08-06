@@ -11,17 +11,24 @@ module Api
 
       def info
         @seat = Seat.where(seat: params[:seat])
-
-        render :json => @seat
+        if @seat.present?
+          render :json => @seat
+        else
+          render :json => 'invalid seat'
+        end          
       end
 
       def taken
-        @seat = Seat.where(seat: params[:seat]).first
-        @user = User.where(seat_id: @seat.id).first
-        if @user.nil?
-          render :json => false
+        @seat = Seat.where(seat: params[:seat])
+        if @seat.present?
+          @user = User.where(seat_id: @seat.id).first
+          if @user.nil?
+            render :json => false
+          else
+            render :json => true
+          end
         else
-          render :json => true
+          render :json => 'invalid seat'
         end
       end
 

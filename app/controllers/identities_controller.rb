@@ -8,6 +8,20 @@ class IdentitiesController < ApplicationController
   end
 
   def qconbyoc
+    @taken = nil
+    @invalid = nil
+    if params[:seat].present?
+      @taken_seat = Seat.where(seat: params[:seat]).first
+      if @taken_seat.present?
+        @user = User.where(seat_id: @taken_seat.id).first
+        unless @user.nil?
+          @taken = @user.handle
+        end
+      else
+        @invalid = true
+      end
+    end
+
     @seat = params[:seat].present? ? params[:seat] : nil
     @uid = params[:uid].present? ? params[:uid] : nil
   end
