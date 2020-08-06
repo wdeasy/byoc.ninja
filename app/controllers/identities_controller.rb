@@ -23,8 +23,6 @@ class IdentitiesController < ApplicationController
         @invalid = true
       end
     end
-
-    @uid = params[:uid].present? ? params[:uid] : nil
   end
 
   def unlink

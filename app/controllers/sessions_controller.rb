@@ -48,10 +48,6 @@ class SessionsController < ApplicationController
           Identity.update_qconbyoc
         end
       end
-
-      if param['uid'].present?
-        Identity.create_with_qconbyoc(@identity.user_id, param['uid'])
-      end
     end
 
     redirect_to link_path

@@ -27,7 +27,7 @@
         When signing in through Discord, any Steam, Battle.net, or Twitch account that is connected to your Discord with "Display on profile" enabled will also be linked to your BYOC Seat!<br /><br />
         <br />
         <% if @seat.present? %>
-          <%= button_to("Sign in with Discord!", "/auth/discord?seat=#{@seat.seat}&uid=#{@uid}", :method => :post, :class => "btn btn-primary")%>
+          <%= button_to("Sign in with Discord!", "/auth/discord?seat=#{@seat.seat}", :method => :post, :class => "btn btn-primary")%>
         <% else %>
           <%= button_to("Sign in with Discord!", "/auth/discord", :method => :post, :class => "btn btn-primary")%>
         <% end %>

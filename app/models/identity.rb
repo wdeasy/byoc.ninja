@@ -117,6 +117,8 @@ class Identity < ApplicationRecord
   def Identity.update_qconbyoc
     uri = URI.parse(ENV["QCONBYOC_ENDPOINT"])
     http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_PEER
 
     req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
     req.body = 'update'
