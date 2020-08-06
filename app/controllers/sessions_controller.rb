@@ -45,8 +45,10 @@ class SessionsController < ApplicationController
         result = User.update_seat_from_omniauth(@identity.user_id, param['seat'])
         flash[result[:success] ? :success : :danger] = result[:message]
         if result[:success]
-          Identity.update_qconbyoc(param['seat'])
+          Identity.update_qconbyoc(current_user.seat_id)
         end
+      elsif current_user.seat.present?
+        Identity.update_qconbyoc(current_user.seat_id, true)
       end
     end
 
