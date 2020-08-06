@@ -36,4 +36,8 @@ module IdentitiesHelper
       nil
     end
   end
+
+  def qconbyoc_link(name, seat)
+    link_to name, "https://qconbyoc.com?selected=#{seat}##{seat}", :target => "_new"
+  end
 end

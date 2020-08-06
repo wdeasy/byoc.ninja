@@ -22,19 +22,19 @@
           <% end %>
           <% if @seat.present? %>
           <tr>
-            <td class="text-left">qconbyoc</td>
-            <td class="text-center"><%= @seat %></td>
-            <td class="text-right"></td>
+            <td class="text-left">
+              <%= qconbyoc_link("qconbyoc",@seat) %>
+            </td>
+            <td class="text-center">
+              <%= qconbyoc_link(@seat, @seat) %>
+            </td>
+            <td class="text-right">
+              <%= qconbyoc_link("View Map",@seat) %>
+            </td>
           </tr>
           <% end %>
         </tbody>
       </table>
-      <br />
-      <% if @seat.present? %>
-        <%= button_to("Go to qconbyoc.com", "https://qconbyoc.com?selected=#{@seat}##{@seat}", :method => :get, :class => "btn btn-primary", form: {target: '_new'})%>
-      <% else %>
-        <%= button_to("Go to qconbyoc.com", "https://qconbyoc.com", :method => :get, :class => "btn btn-primary", form: {target: '_new'})%>
-      <% end %>
     </div>
   </div>
 </div>
