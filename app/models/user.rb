@@ -151,6 +151,13 @@ class User < ApplicationRecord
       end
     end
 
+    #just for 2020
+    taken_seat = User.where(seat_id: seat.id).first
+    if !taken_seat.nil? && taken_seat.id != user.id
+      message = "That seat is taken!"
+      return {:success => success, :message => message}
+    end
+
     if seat == user.seat
       message = "You're linked to #{seat.seat}!"
       return {:success => true, :message => message}
@@ -210,6 +217,13 @@ class User < ApplicationRecord
     response = search_summary_for_seat(steamid, seat.seat)
     if response == true
       user = User.lookup(steamid)
+
+      #just for 2020
+      taken_seat = User.where(seat_id: seat.id).first
+      if !taken_seat.nil? && taken_seat.id != user.id
+        message = "That seat is taken!"
+        return {:success => success, :message => message}
+      end
 
       if seat == user.seat
         message = "You're linked to #{seat.seat}!"

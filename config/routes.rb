@@ -36,6 +36,8 @@ Rails.application.routes.draw do
       resources :hosts, :only => [:index, :update]
       resources :games, :only => [:index, :update]
       resources :seats, :only => [:index]
+      match 'seat/:seat', to: 'seats#info', as: 'seat_info', via: :get
+      match 'seat/:seat/taken', to: 'seats#taken', as: 'seat_taken', via: :get
     end
   end
 
