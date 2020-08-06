@@ -21,7 +21,7 @@ html {
 
 body {
   padding-top: 60px;
-  background-color: #424242;//#$gray-dark;
+  background-color: #000000;//#424242;//#$gray-dark;
   /* background: url('temp');         */
   /* background-position: center;     */
   /* background-repeat: no-repeat;    */
@@ -47,6 +47,7 @@ textarea {
 
 h1, h2, h3, h4, h5, h6 {
   line-height: 1;
+  color: #ff671f !important;
 }
 
 h1 {
@@ -77,7 +78,7 @@ p {
   float: left;
   margin-right: 10px;
   font-size: 2em;
-  color: $gray-lighter;
+  color: #FFFFFF;//$gray-lighter;
   text-transform: uppercase;
   letter-spacing: 1px;
   padding-top: 7px;
@@ -87,6 +88,10 @@ p {
     text-decoration: none;
   }
 }
+
+// .navbar {
+//   background-color: #424242 !important;
+// }
 
 /* footer */
 
@@ -298,12 +303,12 @@ input {
 }
 
 .jumbotron {
-  background-color: $gray;
-  color: $gray-darker !important;
+  background-color: #424242;//$gray;
+  color: #b1b3b6 !important;//$gray-darker !important;
   a {
-    color: $gray-light;
+    color: #b1b3b6;//$gray-light;
     &:hover {
-      color: $gray-dark;
+      color: #ff671f;//$gray-dark;
     }
   }
 }
@@ -316,50 +321,50 @@ input {
   thead {
     tr{
       th{
-        color: $gray-darker !important;
-        border-color: $gray-darker !important;
-        background-color: $gray !important;
+        color: #b1b3b6 !important;//$gray-darker !important;
+        border-color: #000000 !important;//$gray-darker !important;
+        background-color: #424242;//$gray !important;
       }
     }
   }
   tbody{
     tr {
       td {
-        color: $gray-darker !important;
-        border-color: $gray-darker !important;
+        color: #424242 !important;//$gray-darker !important;
+        border-color: #000000 !important;//$gray-darker !important;
         a {
-          color: $gray-darker;
+          color: #424242;//$gray-darker;
           &:hover {
-            color: $gray-dark;
+            color: #ff671f;//$gray-dark;
           }
         }
       }
     }
     tr:nth-child(odd) {
-      background-color: $gray-light;
+      background-color: #b1b3b6;//#424242;//#b1b3b6;//$gray-light;
     }
     tr:nth-child(even) {
-      background-color: $gray;
+      background-color: #b1b3b6;//#424242;//$gray;
     }
   }
 }
 
 .footer {
   div {
-    color: $gray-light;
+    color: #b1b3b6;//$gray-light;
     a {
-      color: $gray-light;//$gray;
+      color: #b1b3b6;//$gray-light;//$gray;
       &:hover {
-        color: $gray-light;
+        color: #b1b3b6;//$gray-light;
       }
     }
   }
 }
 
 .form-control, .btn-primary {
-  background-color: $gray-light !important;
-  color: $gray-darker !important;
-  border: 1px solid $gray-darker !important;
+  background-color: #b1b3b6 !important;//$gray-light !important;
+  color: #000000 !important;//$gray-darker !important;
+  border: 1px solid #000000 !important;//$gray-darker !important;
 }
 
 ::placeholder {
