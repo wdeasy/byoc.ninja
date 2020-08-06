@@ -114,7 +114,7 @@ class Identity < ApplicationRecord
     identity.save
   end
 
-  def Identity.update_qconbyoc(user_id)
+  def Identity.update_qconbyoc
     uri = URI(ENV["QCONBYOC_ENDPOINT"])
     req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
     http.use_ssl = true
