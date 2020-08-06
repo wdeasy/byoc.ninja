@@ -105,12 +105,12 @@ class Identity < ApplicationRecord
 
   def Identity.update_qconbyoc(seat_id, update=nil)
     if seat_id.present?
-      seat = Seat.find_by(id: seat_id)
+      seat = Seat.where(id: seat_id).pluck(:seat).first
       if seat.present?
         if update.present?
-          uri = URI.parse("#{ENV["QCONBYOC_ENDPOINT"]}?seat=#{seat.seat}&type=update")
+          uri = URI.parse("#{ENV["QCONBYOC_ENDPOINT"]}?seat=#{seat}&type=update")
         else
-          uri = URI.parse("#{ENV["QCONBYOC_ENDPOINT"]}?seat=#{seat.seat}")
+          uri = URI.parse("#{ENV["QCONBYOC_ENDPOINT"]}?seat=#{seat}")
         end
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
