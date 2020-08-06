@@ -20,6 +20,13 @@
               <td class="text-right"><%= provider_unlink(p[0], @identities) %></td>
             </tr>
           <% end %>
+          <% if @seat.present? %>
+          <tr>
+            <td class="text-left">qconbyoc</td>
+            <td class="text-center"><%= @seat %></td>
+            <td class="text-right"></td>
+          </tr>
+          <% end %>
         </tbody>
       </table>
       <br />

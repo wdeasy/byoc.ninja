@@ -134,22 +134,22 @@ class User < ApplicationRecord
       return {:success => success, :message => message}
     end
 
-    if seat_id.downcase.strip == 'none'
-      success = user.update_attribute(:seat_id, nil)
-      if success == true
-        message = "You're unlinked from your seat!"
-        return {:success => success, :message => message}
-      else
-        message = "Unable to save your seat."
-        return {:success => success, :message => message}
-      end
-    else
+    # if seat_id.downcase.strip == 'none'
+    #   success = user.update_attribute(:seat_id, nil)
+    #   if success == true
+    #     message = "You're unlinked from your seat!"
+    #     return {:success => success, :message => message}
+    #   else
+    #     message = "Unable to save your seat."
+    #     return {:success => success, :message => message}
+    #   end
+    # else
       seat = Seat.where(:seat => seat_id).first
       if seat.nil?
         message = "That seat doesn't exist!"
         return {:success => success, :message => message}
       end
-    end
+    # end
 
     #just for 2020
     taken_seat = User.where(seat_id: seat.id).first
