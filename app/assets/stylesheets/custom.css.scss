@@ -335,7 +335,7 @@ input {
         a {
           color: #424242;//$gray-darker;
           &:hover {
-            color: #ff671f;//$gray-dark;
+            color: #000000;//#ff671f;//$gray-dark;
           }
         }
       }
@@ -355,7 +355,7 @@ input {
     a {
       color: #b1b3b6;//$gray-light;//$gray;
       &:hover {
-        color: #b1b3b6;//$gray-light;
+        color: #ffffff;//#b1b3b6;//$gray-light;
       }
     }
   }
@@ -372,7 +372,7 @@ input {
 }
 
 .dropdown-menu {
-  background-color: $gray-lighter !important;
+  background-color: #FFFFFF !important;//$gray-lighter !important;
 }
 
 .form-control:focus {
