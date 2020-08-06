@@ -33,7 +33,11 @@
 
 		  <%= f.submit "Save changes", class: "btn btn-33 btn-primary pull-left" %>
 		  <%= link_to "Delete", @identity, method: :delete, data: { confirm: "You sure?" }, class: "btn btn-33 btn-primary" %>
-		  <%= link_to "Go To User", edit_user_path(@identity.user), class: "btn btn-33 btn-primary pull-right" %>
+      <% if @identity.user.present? %>
+        <%= link_to "Go To User", edit_user_path(@identity.user), class: "btn btn-33 btn-primary pull-right" %>
+      <% else %>
+        <%= link_to "Back", identities_url, class: "btn btn-33 btn-primary pull-right" %>
+      <% end %>
 	  <% end %>
     <% if @identity.banned? %>
       <%= button_to("Unban", unban_identity_path(@identity), :method => :post, :class => "btn btn-primary")%>

@@ -103,20 +103,22 @@ class Identity < ApplicationRecord
     end
   end
 
-  def Identity.update_qconbyoc
-    uri = URI.parse(ENV["QCONBYOC_ENDPOINT"])
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+  def Identity.update_qconbyoc(seat)
+    if seat.present?
+      uri = URI.parse("#{ENV["QCONBYOC_ENDPOINT"]}?seat=#{seat}")
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
 
-    req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
-    req.body = 'update'
-    http.request(req)
-    begin
+      req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
+      req.body = 'update'
       http.request(req)
-    rescue => e
-      puts "Unable to send update to qconbyoc"
-      puts e.message
+      begin
+        http.request(req)
+      rescue => e
+        puts "Unable to send update to qconbyoc"
+        puts e.message
+      end
     end
   end
 end
