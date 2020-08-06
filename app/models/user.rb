@@ -163,7 +163,7 @@ class User < ApplicationRecord
       return {:success => true, :message => message}
     end
 
-    if (user.banned == true || (user.seat_count > 2 && user.admin == false))
+    if (user.banned == true )#|| (user.seat_count > 2 && user.admin == false))
       message = "You're linked to #{seat.seat}!"
       return {:success => true, :message => message}
     else
@@ -230,7 +230,7 @@ class User < ApplicationRecord
         return {:success => true, :message => message}
       end
 
-      unless (user.banned == true || (user.seat_count > 2 && user.admin == false))
+      unless (user.banned == true)# || (user.seat_count > 2 && user.admin == false))
         user.update_attributes(
           :seat_id => seat.id,
           :seat_count => user.seat_count + 1
