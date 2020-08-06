@@ -11,13 +11,15 @@
     <br />
     <b>Steam:</b> UID, Display Name, Avatar URL, Profile URL, and Current Game.<br />
     <b>Discord:</b> UID, Username, Discriminator, Avatar URL.<br />
-    <b>Battle.net:</b> UID and BattleTag<br />
+    <b>Battle.net:</b> UID and BattleTag.<br />
+    <b>Twitch:</b> UID, Display Name, Avatar URL, and Twitch URL.<br />
     <br /><%= link_to "Steam Subscriber Agreement", "https://store.steampowered.com/subscriber_agreement/", :target => '_blank' %>
   </ul>
 
 <h5><strong>When do we collect information?</strong></h5>
-<ul>Discord, Steam and Battle.net information is collected when signing in through Discord OAuth2.</ul>
-  <ul>Steam Information is collected every minute for anyone who has signed in through Discord with a connected steam account.</ul>
+<ul>Discord, Steam, Twitch and Battle.net information is collected when signing in through Discord.</ul>
+<ul>Steam, Twitch and Battle.net information is collected when linking the accounts using the <%= link_to "Linked Accounts", link_path %> page.</ul>
+<ul>Steam Information is collected every minute for anyone who has signed in through Discord with a connected steam account.</ul>
 
 <h5><strong>How do we use your information?</strong></h5>
   <ul>Your information is used to populate the server list to help users find games being played by others in the BYOC. Your information can also be used to enhance other community BYOC projects. Currently these projects include:
@@ -49,6 +51,7 @@
 <h5><strong>Changes to our Privacy Policy</strong></h5>
   <ul>If we decide to change our privacy policy, we will post those changes on this page.<br /><br />
 
+  2020-08-06 - Updated for Twitch integration.<br />
   2020-07-30 - Updated for Discord integration.<br />
   2018-08-04 - Added section on cookies and amended the information usage section.<br />
   2018-07-21 - Removed steam group references as those are disabled by default now.<br />
