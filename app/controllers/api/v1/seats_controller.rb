@@ -17,7 +17,8 @@ module Api
 
       def taken
         @seat = Seat.where(seat: params[:seat]).first
-        if @seat.nil?
+        @user = User.where(seat_id: @seat.id).first
+        if @user.nil?
           render :json => false
         else
           render :json => true
