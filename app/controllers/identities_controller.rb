@@ -5,6 +5,7 @@ class IdentitiesController < ApplicationController
 
   def link
     @identities = Identity.where(:user_id => current_user.id, :enabled => true)
+    @seat = current_user.seat.present? ? current_user.seat.seat : nil
   end
 
   def qconbyoc
