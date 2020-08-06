@@ -15,17 +15,17 @@ module Api
           render :json => @seat
         else
           render :json => 'invalid seat'
-        end          
+        end
       end
 
       def taken
-        @seat = Seat.where(seat: params[:seat])
+        @seat = Seat.where(seat: params[:seat]).first
         if @seat.present?
           @user = User.where(seat_id: @seat.id).first
-          if @user.nil?
-            render :json => false
-          else
+          if @user.present?
             render :json => true
+          else
+            render :json => false
           end
         else
           render :json => 'invalid seat'
