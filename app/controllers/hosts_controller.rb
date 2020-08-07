@@ -3,7 +3,7 @@ class HostsController < ApplicationController
   before_action :admin_user, :except => [:index]
 
   def index
-  	@hosts = Host.includes(:game, :mod, :users, :seats).active.order("games.name ASC, users_count DESC, hosts.current DESC, hosts.current DESC, hosts.name DESC")
+  	@hosts = Host.includes(:game, :mod, :users, :seats).active.order("games.name ASC, hosts.users_count DESC, hosts.current DESC, hosts.current DESC, hosts.name ASC")
   end
 
   def new

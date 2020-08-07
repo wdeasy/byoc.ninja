@@ -543,9 +543,12 @@ class Host < ApplicationRecord
     Host.update_pins
 
     if x == 0
+      c=0
       Host.where(:updated => true).each do |h|
         Host.reset_counters(h.id, :users)
+        c+=1
       end
+      puts "Reset counters for #{c} hosts."
 
       Host.where(:updated => false).update_all(:visible => false)
       User.where(:updated => false).update_all(:host_id => nil)
