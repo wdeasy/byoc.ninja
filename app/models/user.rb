@@ -71,10 +71,6 @@ class User < ApplicationRecord
         :updated => true
       )
     end
-
-    if host_id != nil
-      Host.reset_counters(host_id, :users)
-    end
   end
 
   def User.url_cleanup(url)
