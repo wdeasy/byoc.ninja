@@ -1,14 +1,8 @@
-  <script>
-    if(!window.reloadTimer) {
-      var SECONDS = 60;
-      window.reloadTimer=setTimeout(function(){
-        console.log("Refreshing Server List");
-        window.reloadTimer=undefined;
-          Turbolinks.visit(location.toString(),{action: "replace"});
-      }, SECONDS * 1000);
-      document.addEventListener("turbolinks:visit",function() {clearTimeout(window.reloadTimer);window.reloadTimer=undefined;});
-    }
-  </script>
+<script>
+  $(document).on('ready page:load', function () {
+    setTimeout(executeQuery, 60000);
+  });
+</script>
   <div id="message">
     <% Message.current(cookies.signed[:cleared_message_ids]).each do |m| %>
       <%= div_for m do %>
