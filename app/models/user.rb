@@ -279,7 +279,7 @@ class User < ApplicationRecord
 
   def User.set_handle(username, user_id, seat_id)
     handle = Name.clean_name(username)
-    handle = username.index('#').nil? ? username : username[0..(username.rindex('#')-1)]
+    handle = handle.index('#').nil? ? handle : handle[0..(handle.rindex('#')-1)]
 
     if handle.match(/^\[.*\S.*\].*\S.*$/)
       handle = handle.split(/[\[\]]/)[-1].strip
