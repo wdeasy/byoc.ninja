@@ -34,10 +34,12 @@ class Host < ApplicationRecord
 
   def Host.url(player)
     if player["gameserversteamid"].present? || player["lobbysteamid"].present?
-      if player["lobbysteamid"].present?
+      if player["gameserverip"].present?
+        "steam://connect/#{player["gameserverip"]}"
+      elsif player["lobbysteamid"].present?
         "steam://joinlobby/#{player["gameid"]}/#{player["lobbysteamid"]}/#{player["steamid"]}"
       else
-        "steam://connect/#{player["gameserverip"]}"
+        nil
       end
     else
       nil
