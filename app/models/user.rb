@@ -52,16 +52,16 @@ class User < ApplicationRecord
     end
 
     if user.auto_update == true
-      if (identity.updated_at < 1.day.ago || identity.url.blank? || identity.avatar.blank?)
-        identity.update_attributes(
-          :name => Name.clean_name(player["personaname"]),
-          :url => Name.clean_url(player["profileurl"]),
-          :avatar => Name.clean_url(player["avatar"])
-        )
-      else
-        identity.update_attributes(
-          :name => Name.clean_name(player["personaname"])
-        )
+      unless identity.name == player["personaname"]
+        identity.update_attribute(:name, Name.clean_name(player["personaname"]))
+      end
+
+      unless identity.url == player["profileurl"]
+        identity.update_attribute(:url, Name.clean_url(player["profileurl"]))
+      end
+
+      unless identity.avatar == player["avatar"]
+        identity.update_attribute(:avatar, Name.clean_url(player["avatar"]))
       end
 
       user.update_attributes(
