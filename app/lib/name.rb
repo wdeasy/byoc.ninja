@@ -40,11 +40,7 @@ module Name
     url.slice! "javascript:"
     url.slice! "data:"
 
-    if valid_url(url)
-      return url
-    else
-      return nil
-    end
+    return valid_url(url)
   end
 
   def Name.display_name(name)
@@ -71,7 +67,7 @@ module Name
 
   def Name.valid_url(url)
     unless url.present?
-      return false
+      return nil
     end
 
     uri = URI.parse(url)
