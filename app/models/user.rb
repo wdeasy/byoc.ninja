@@ -53,7 +53,6 @@ class User < ApplicationRecord
 
     if user.auto_update == true
       if (identity.updated_at < 1.day.ago || identity.url.blank? || identity.avatar.blank?)
-        puts "updating #{player['avatar']}"
         identity.update_attributes(
           :name => Name.clean_name(player["personaname"]),
           :url => Name.clean_url(player["profileurl"]),
