@@ -33,10 +33,17 @@ module Name
   end
 
   def Name.clean_url(url)
-    unless url.nil?
-      url.slice! "javascript:"
-      url.slice! "data:"
-      url
+    unless url.present?
+      return nil
+    end
+
+    url.slice! "javascript:"
+    url.slice! "data:"
+
+    if valid_url(url)
+      return url
+    else
+      return nil
     end
   end
 
@@ -59,5 +66,30 @@ module Name
     end
 
     return name
+  end
+
+
+  def Name.valid_url(url)
+    unless url.present?
+      return false
+    end
+
+    uri = URI.parse(url)
+    http = Net::HTTP.new(uri.host, uri.port)
+
+    if url.start_with?("https://")
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+    end
+
+    request = Net::HTTP::Get.new(uri.request_uri)
+    response = http.request(request)
+
+    if response.code == "404"
+      puts "response code #{response.code} for #{url}"
+      nil
+    else
+      url
+    end
   end
 end

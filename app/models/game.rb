@@ -39,7 +39,7 @@ class Game < ApplicationRecord
 
       game.name = name.blank? ? Name.clean_name(info) : Name.clean_name(name)
       game.url        = Name.clean_url(url)
-      game.image       = image
+      game.image       = Name.clean_url(image)
       game.source      = :auto
       game.multiplayer = multiplayer
       game.last_seen   = Time.now
@@ -126,7 +126,7 @@ class Game < ApplicationRecord
     unless parsed.blank?
       if parsed["#{game.appid}"]['success']
         name  = Name.clean_name(parsed["#{game.appid}"]['data']['name'])
-        image = parsed["#{game.appid}"]['data']['header_image']
+        image = Name.clean_url(parsed["#{game.appid}"]['data']['header_image'])
         url  = valid_url("https://store.steampowered.com/app/#{game.appid}")
       else
         url = nil
