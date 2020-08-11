@@ -82,7 +82,6 @@ module Name
     response = http.request(request)
 
     if response.code == "404"
-      puts "response code #{response.code} for #{url}"
       nil
     else
       url
