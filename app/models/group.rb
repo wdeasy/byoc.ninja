@@ -2,29 +2,45 @@ class Group < ApplicationRecord
   require 'open-uri'
 
   def Group.auto_add(url)
-  		if url.blank?
-  			return "Please enter a URL"
-  		end
+    success = false
+    message = nil
 
-      page =  SteamWebApi.get_html(url)
+		if url.blank?
+			message = "Please enter a URL"
+      return {success: success, message: message}
+		end
 
-      if !page.blank?
-		    name = page.css('title').text.strip
-		    name.slice!("Steam Community :: Group :: ")
+    page =  SteamWebApi.get_html(url)
+    if page.blank?
+      message = "Error reading URL"
+      return {success: success, message: message}
+		end
 
-				if id = page.xpath("//div[contains(@class,'joinchat_bg')]")
-				  steamid = id[0]['onclick']
-				  steamid.slice!("window.location='steam://friends/joinchat/")
-				  steamid.slice!("'")
-				end
+    name = page.css('title').text.strip
+    name.slice!("Steam Community :: Group :: ")
 
-				group = Group.where(steamid: steamid).first_or_create
-				group.update_attributes(
-				  :name		=> name,
-				  :url		=> url
-				)
+    if id = page.xpath("//div[contains(@class,'joinchat_bg')]")
+      steamid = id[0]['onclick']
+      steamid.slice!("window.location='steam://friends/joinchat/")
+      steamid.slice!("'")
+    else
+      message = "Could not read Steam ID"
+      return {success: success, message: message}
+    end
 
-				return "Added #{name}"
-      end
+    group = Group.where(steamid: steamid).first_or_create
+    group.update_attributes(
+      :name		=> name,
+      :url		=> url
+    )
+
+    if group.present? && group.name.present?
+      success = true
+      message = "Added #{name}"
+      return {success: success, message: message}
+    else
+      message = "Could not save group."
+      return {success: success, message: message}
+    end
   end
 end

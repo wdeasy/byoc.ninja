@@ -28,9 +28,7 @@ class IdentitiesController < ApplicationController
 
   def unlink
     @identity = Identity.find(params[:id])
-    if @identity.update_attribute(:enabled, false)
-      Identity.update_qconbyoc(current_user.seat_id, true)
-    else
+    unless @identity.update_attribute(:enabled, false)
       flash[:danger] = "Could not unlink account."
     end
     redirect_to link_path

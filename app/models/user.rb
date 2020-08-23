@@ -8,8 +8,6 @@ class User < ApplicationRecord
   belongs_to :mod, optional: true
   has_many :api_keys
   has_many :identities, -> {where(enabled: true).where(banned: false)}
-  #has_many :active_identities, -> {where(enabled: true)}, :class_name => 'Identity'
-  #belongs_to :active_host, -> {where(visible: true)}, :class_name => 'Host'
 
   def as_json(options={})
    super(:only => [:clan, :handle], :methods => [:playing],
@@ -51,47 +49,49 @@ class User < ApplicationRecord
       return
     end
 
-    if user.auto_update == true
-      unless identity.name == player["personaname"]
-        identity.update_attribute(:name, Name.clean_name(player["personaname"]))
-      end
-
-      unless identity.url == player["profileurl"]
-        identity.update_attribute(:url, Name.clean_url(player["profileurl"]))
-      end
-
-      unless identity.avatar == player["avatar"]
-        identity.update_attribute(:avatar, Name.clean_url(player["avatar"]))
-      end
-
-      user.update_attributes(
-        :host_id => host_id,
-        :game_id => game_id,
-        :mod_id => mod_id,
-        :clan => set_clan(player["personaname"], user.id, user.seat_id),
-        :handle => set_handle(player["personaname"], user.id, user.seat_id),
-        :updated => true
-      )
-    else
+    if user.auto_update == false
       user.update_attributes(
         :host_id => host_id,
         :updated => true
       )
+      return
     end
+
+    unless identity.name == player["personaname"]
+      identity.update_attribute(:name, Name.clean_name(player["personaname"]))
+    end
+
+    unless identity.url == player["profileurl"]
+      identity.update_attribute(:url, Name.clean_url(player["profileurl"]))
+    end
+
+    unless identity.avatar == player["avatar"]
+      identity.update_attribute(:avatar, Name.clean_url(player["avatar"]))
+    end
+
+    user.update_attributes(
+      :host_id => host_id,
+      :game_id => game_id,
+      :mod_id => mod_id,
+      :clan => set_clan(player["personaname"], user.id, user.seat_id),
+      :handle => set_handle(player["personaname"], user.id, user.seat_id),
+      :updated => true
+    )
   end
 
   def User.url_cleanup(url)
-    if url.include? "steamcommunity.com"
-      unless url.start_with? "steamcommunity.com"
-        url.slice!(0..(url.index('steamcommunity.com')-1))
-      end
+    return nil unless url.include? "steamcommunity.com"
 
-      url.prepend("https://")
-
-      if url.last != "/"
-        url << "/"
-      end
+    unless url.start_with? "steamcommunity.com"
+      url.slice!(0..(url.index('steamcommunity.com')-1))
     end
+
+    url.prepend("https://")
+
+    if url.last != "/"
+      url << "/"
+    end
+
     return url
   end
 
@@ -113,14 +113,14 @@ class User < ApplicationRecord
       html = URI.open(url)
       doc = Nokogiri::HTML(html)
 
-      if doc.css('div.profile_summary')
-        if doc.css('div.profile_summary').text.include? seat
-          return true
-        else
-          return "Could not find #{seat} in your steam profile summary."
-        end
-      else
+      if doc.css('div.profile_summary').blank?
         return "Please set your steam profile to public to link your seat."
+      end
+
+      if doc.css('div.profile_summary').text.include? seat
+        return true
+      else
+        return "Could not find #{seat} in your steam profile summary."
       end
     rescue => e
       return "Unable to read your steam profile. Please try again."
@@ -137,22 +137,11 @@ class User < ApplicationRecord
       return {:success => success, :message => message}
     end
 
-    # if seat_id.downcase.strip == 'none'
-    #   success = user.update_attribute(:seat_id, nil)
-    #   if success == true
-    #     message = "You're unlinked from your seat!"
-    #     return {:success => success, :message => message}
-    #   else
-    #     message = "Unable to save your seat."
-    #     return {:success => success, :message => message}
-    #   end
-    # else
-      seat = Seat.where(:seat => seat_id).first
-      if seat.nil?
-        message = "That seat doesn't exist!"
-        return {:success => success, :message => message}
-      end
-    # end
+    seat = Seat.where(:seat => seat_id).first
+    if seat.nil?
+      message = "That seat doesn't exist!"
+      return {:success => success, :message => message}
+    end
 
     #just for 2020
     taken_seat = User.where(seat_id: seat.id).first
@@ -166,22 +155,22 @@ class User < ApplicationRecord
       return {:success => true, :message => message}
     end
 
-    if (user.banned == true )#|| (user.seat_count > 2 && user.admin == false))
+    if (user.banned == true)
       message = "You're linked to #{seat.seat}!"
       return {:success => true, :message => message}
-    else
-      success = user.update_attributes(
-        :seat_id => seat.id,
-        :seat_count => user.seat_count + 1
-      )
+    end
 
-      if success == true
-        message = "You're linked to #{seat.seat}!"
-        return {:success => success, :message => message}
-      else
-        message = "Unable to save your seat."
-        return {:success => success, :message => message}
-      end
+    success = user.update_attributes(
+      :seat_id => seat.id,
+      :seat_count => user.seat_count + 1
+    )
+
+    if success == true
+      message = "You're linked to #{seat.seat}!"
+      return {:success => success, :message => message}
+    else
+      message = "Unable to save your seat."
+      return {:success => success, :message => message}
     end
   end
 
@@ -218,36 +207,36 @@ class User < ApplicationRecord
     end
 
     response = search_summary_for_seat(steamid, seat.seat)
-    if response == true
-      user = User.lookup(steamid)
-
-      #just for 2020
-      taken_seat = User.where(seat_id: seat.id).first
-      if !taken_seat.nil? && taken_seat.id != user.id
-        message = "That seat is taken!"
-        return {:success => success, :message => message}
-      end
-
-      if seat == user.seat
-        message = "You're linked to #{seat.seat}!"
-        return {:success => true, :message => message}
-      end
-
-      unless (user.banned == true)# || (user.seat_count > 2 && user.admin == false))
-        user.update_attributes(
-          :seat_id => seat.id,
-          :seat_count => user.seat_count + 1
-        )
-        User.fill(steamid)
-      end
-
-      success = true
-      message =  "You're linked to #{seat.seat}!"
-      return {:success => success, :message => message}
-    else
+    if response == false
       message = response
       return {:success => success, :message => message}
     end
+
+    user = User.lookup(steamid)
+
+    #just for 2020
+    taken_seat = User.where(seat_id: seat.id).first
+    if !taken_seat.nil? && taken_seat.id != user.id
+      message = "That seat is taken!"
+      return {:success => success, :message => message}
+    end
+
+    if seat == user.seat
+      message = "You're linked to #{seat.seat}!"
+      return {:success => true, :message => message}
+    end
+
+    unless (user.banned == true)
+      user.update_attributes(
+        :seat_id => seat.id,
+        :seat_count => user.seat_count + 1
+      )
+      User.fill(steamid)
+    end
+
+    success = true
+    message =  "You're linked to #{seat.seat}!"
+    return {:success => success, :message => message}
   end
 
   def User.lookup(steamid)
@@ -276,6 +265,8 @@ class User < ApplicationRecord
   end
 
   def User.set_clan(username, user_id, seat_id)
+    return nil if username.blank?
+
     h = Name.clean_name(username)
     if h.match(/^\[.*\S.*\].*\S.*$/)
       h.split(/[\[\]]/)[1].strip
@@ -285,6 +276,8 @@ class User < ApplicationRecord
   end
 
   def User.set_handle(username, user_id, seat_id)
+    return nil if username.blank?
+    
     handle = Name.clean_name(username)
     handle = handle.index('#').nil? ? handle : handle[0..(handle.rindex('#')-1)]
 
@@ -304,11 +297,11 @@ class User < ApplicationRecord
   end
 
   def prepend_seat(handle, user_id, seat_id)
-    if seat_id.present?
-      seat = User.find_by(:id => user_id).seat
-      unless seat.nil?
-        handle.prepend("[#{seat.seat}] ")
-      end
+    return handle if seat_id.blank?
+
+    seat = User.find_by(:id => user_id).seat
+    unless seat.nil?
+      handle.prepend("[#{seat.seat}] ")
     end
   end
 

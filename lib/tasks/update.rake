@@ -8,6 +8,14 @@ namespace :update do
     system("touch /tmp/finished")
   end
 
+  desc "Queries host information from steam groups"
+  task :qconbyoc => :environment do
+    beginning = start_time
+    Identity.update_qconbyoc
+    finish_time(beginning)
+    system("touch /tmp/qconbyoc")
+  end
+
   desc "Update byoc seat information args[file]"
   task :seats, [:file] => :environment do |t, args|
     beginning = start_time

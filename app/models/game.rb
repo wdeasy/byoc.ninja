@@ -25,12 +25,10 @@ class Game < ApplicationRecord
       url = nil
       image = nil
 
-      unless parsed.blank?
-        if parsed["#{appid}"] && parsed["#{appid}"]['success']
-          name = parsed["#{appid}"]['data']['name']
-          image = parsed["#{appid}"]['data']['header_image']
-          url = valid_url("https://store.steampowered.com/app/#{appid}")
-        end
+      if parsed.present? && parsed["#{appid}"] && parsed["#{appid}"]['success']
+        name = parsed["#{appid}"]['data']['name']
+        image = parsed["#{appid}"]['data']['header_image']
+        url = valid_url("https://store.steampowered.com/app/#{appid}")
       end
 
       if name.nil? && !profile.nil?
@@ -43,6 +41,11 @@ class Game < ApplicationRecord
       game.source      = :auto
       game.multiplayer = multiplayer
       game.last_seen   = Time.now
+    end
+
+    if game.updated_at < 1.month.ago
+      Game.update_game(game.appid)
+      game.touch
     end
 
     if multiplayer == true && game.multiplayer == false
@@ -123,15 +126,15 @@ class Game < ApplicationRecord
     image = game.image
     url   = game.url
 
-    unless parsed.blank?
-      if parsed["#{game.appid}"]['success']
-        name  = Name.clean_name(parsed["#{game.appid}"]['data']['name'])
-        image = Name.clean_url(parsed["#{game.appid}"]['data']['header_image'])
-        url  = valid_url("https://store.steampowered.com/app/#{game.appid}")
-      else
-        url = nil
-        image = nil
-      end
+    return if parsed.blank?
+
+    if parsed["#{game.appid}"]['success']
+      name  = Name.clean_name(parsed["#{game.appid}"]['data']['name'])
+      image = Name.clean_url(parsed["#{game.appid}"]['data']['header_image'])
+      url  = valid_url("https://store.steampowered.com/app/#{game.appid}")
+    else
+      url = nil
+      image = nil
     end
 
     unless game.name == name

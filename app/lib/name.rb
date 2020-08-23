@@ -79,7 +79,13 @@ module Name
     end
 
     request = Net::HTTP::Get.new(uri.request_uri)
-    response = http.request(request)
+
+    begin
+      response = http.request(request)
+    rescue => e
+      logger.info "Unable to update Discord connections"
+      logger.info e.message
+    end
 
     if response.code == "404"
       nil

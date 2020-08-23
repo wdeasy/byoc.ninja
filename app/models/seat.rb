@@ -42,7 +42,7 @@ class Seat < ApplicationRecord
 
   def Seat.cleanup_seats
     puts "Filling in unavailable seats."
-    
+
     s = Seat.distinct.pluck(:section)
     r = Seat.distinct.pluck(:row)
     n = Seat.distinct.pluck(:number)
@@ -132,9 +132,9 @@ class Seat < ApplicationRecord
 
         line = ""
         info.each do |k,v|
-          unless v.nil?
-            line << "#{v} "
-          end
+          next if v.nil?
+
+          line << "#{v} "
         end
         puts line
 

@@ -5,51 +5,23 @@ class SessionsController < ApplicationController
   end
 
   def create
-    @identity = Identity.find_with_omniauth(auth)
-    if logged_in? && @identity.nil?
-      @identity = Identity.find_with_omniauth(auth, current_user.id)
-    end
-
-    if @identity.nil?
-      @identity = Identity.create_with_omniauth(auth)
-    end
-
     if logged_in?
-      unless @identity.user == current_user
-        @identity.user = current_user
-        @identity.save
-      end
+      @identity = Identity.update_with_omniauth(auth, current_user.id)
     else
-      if @identity.user.present?
-        log_in @identity.user
-      else
-        user = User.create_with_omniauth
-        if user
-          log_in user
-          @identity.user = current_user
-          @identity.save
-        else
-          flash.now[:danger] = 'Failed to create session.'
-        end
-      end
+      @identity = Identity.update_with_omniauth(auth)
+      log_in @identity.user
     end
 
-    if logged_in? && !@current_user.banned? && !@identity.banned?
-      @identity.update_info(auth)
-      if @identity.discord?
-        User.update_with_omniauth(@identity.user_id, @identity.name)
-        Identity.update_connections(auth.credentials.token, @current_user.id)
-      end
+    if @identity.blank? || @identity.user.blank?
+      flash.now[:danger] = 'Failed to create session.'
+      redirect_to root_url
+    end
 
-      if param['seat'].present?
-        result = User.update_seat_from_omniauth(@identity.user_id, param['seat'])
-        flash[result[:success] ? :success : :danger] = result[:message]
-        if result[:success]
-          Identity.update_qconbyoc(current_user.seat_id)
-        end
-      elsif current_user.seat.present?
-        Identity.update_qconbyoc(current_user.seat_id, true)
-      end
+    if @identity.discord?
+      result = Identity.update(@identity.id, auth, auth.credentials.token, param['seat'])
+      flash[result[:success] ? :success : :danger] = result[:message] unless result.nil?
+    else
+      result = Identity.update(@identity.id, auth)
     end
 
     redirect_to link_path

@@ -21,7 +21,6 @@ class UsersController < ApplicationController
   def update
   	@user = User.find(params[:id])
     if @user.update_attributes(user_params)
-      Identity.update_qconbyoc(@user.seat_id, true)
       flash[:success] = "User updated."
       redirect_to users_url
     else

@@ -2,14 +2,12 @@ class SteamWebApi < ApplicationRecord
   def SteamWebApi.get_key
     steam_key = SteamWebApi.first
 
-    if steam_key.nil?
-      if ENV["STEAM_WEB_API_KEY"].nil?
-        puts "Could not find steam web api key."
-        return nil
-      else
-        puts "Adding Steam Web Api Key"
-        steam_key = SteamWebApi.create(:key => ENV["STEAM_WEB_API_KEY"].hash)
-      end
+    if steam_key.nil? && ENV["STEAM_WEB_API_KEY"].present?
+      puts "Adding Steam Web Api Key"
+      steam_key = SteamWebApi.create(:key => ENV["STEAM_WEB_API_KEY"].hash)
+    elsif steam_key.nil?
+      puts "Could not find steam web api key."
+      return nil
     end
 
     if Time.now.day == steam_key.updated_at.day

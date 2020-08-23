@@ -84,6 +84,9 @@ Rails.application.configure do
     logger           = ActiveSupport::Logger.new(STDOUT)
     logger.formatter = config.log_formatter
     config.logger    = ActiveSupport::TaggedLogging.new(logger)
+    
+    # Keeps the Last 5 log files which are rotated at every 10MB
+    config.logger = Logger.new(config.paths[“log”].first, 5, 10.megabytes)
   end
 
   # Do not dump schema after migrations.
@@ -109,6 +112,8 @@ Rails.application.configure do
   # config.active_record.database_selector = { delay: 2.seconds }
   # config.active_record.database_resolver = ActiveRecord::Middleware::DatabaseSelector::Resolver
   # config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
+
+
 
   config.action_mailer.default_url_options = { :host => ENV["EMAIL_DOMAIN"] }
   config.action_mailer.delivery_method = :smtp

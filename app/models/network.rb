@@ -38,20 +38,18 @@ class Network < ApplicationRecord
     end
 
     Network.where.not(:name => :wan).each do |r|
-      if !r.cidr.blank?
-        begin
-          cidr = NetAddr::IPv4Net.parse(r.cidr)
+      next if r.cidr.blank?
 
-          if cidr.contains(ip)
-            network = r
+      begin
+        cidr = NetAddr::IPv4Net.parse(r.cidr)
 
-            if network == :banned
-              return network.id
-            end
-          end
-        rescue NetAddr::ValidationError
-          puts "Invalid CIDR: #{r.cidr}"
+        if cidr.contains(ip)
+          network = r
+
+          return network.id if network == :banned
         end
+      rescue NetAddr::ValidationError
+        puts "Invalid CIDR: #{r.cidr}"
       end
     end
 
