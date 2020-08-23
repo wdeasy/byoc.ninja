@@ -147,4 +147,11 @@ class Seat < ApplicationRecord
 
     puts "Processed #{i} seats"
   end
+
+  def Seat.mark_for_update(seat_id)
+    seat = Seat.where(:seat => seat_id).first
+    return if seat.nil?
+
+    seat.update_attribute(:updated, :false)
+  end
 end

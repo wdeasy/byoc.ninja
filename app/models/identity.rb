@@ -141,22 +141,22 @@ class Identity < ApplicationRecord
   end
 
   def Identity.update_qconbyoc
-    seats = Seat.where(updated: false).pluck(:seat)
+    seats = Seat.where(updated: false)
     seats.each do |seat|
-      uri = URI.parse("#{ENV["QCONBYOC_ENDPOINT"]}?seat=#{seat}")
-
+      uri = URI.parse("#{ENV["QCONBYOC_ENDPOINT"]}?seat=#{seat.seat}")
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
       http.verify_mode = OpenSSL::SSL::VERIFY_PEER
 
       req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
       req.body = 'update'
-      http.request(req)
       begin
+        puts "Sending #{seat.seat} to qconbyoc"
         http.request(req)
+        seat.update_attribute(:updated, :true)
       rescue => e
-        logger.info "Unable to send update to qconbyoc"
-        logger.info e.message
+        puts "Unable to send update to qconbyoc"
+        puts e.message
       end
     end
   end
@@ -171,8 +171,11 @@ class Identity < ApplicationRecord
       User.update_with_omniauth(identity.user_id, identity.name)
       Identity.update_connections(token, identity.user_id)
     end
-    
-    result = User.update_seat_from_omniauth(identity.user_id, seat) if seat.present?
+
+    if seat.present?
+      result = User.update_seat_from_omniauth(identity.user_id, seat)
+      Seat.mark_for_update(seat)
+    end
 
     return result
   end
