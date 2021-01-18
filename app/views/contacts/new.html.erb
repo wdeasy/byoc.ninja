@@ -1,4 +1,11 @@
 <% provide(:title, "Contact")  %>
+<script>
+  $(document).ready(function() {
+    document.getElementById("plr").style = "display: none !important;";
+    document.getElementById("plr").style = "visibility:hidden !important;";
+    document.getElementById("plr").value = "Rockets";
+  });
+</script>
 <div class="jumbotron">
 <h3 class="center">Contact</h3>
 <div class="row">
@@ -6,9 +13,7 @@
     <%= form_for(@contact) do |f| %>
       <%= render 'shared/error_messages', object: f.object %>
 
-      <%# this is a honeypot field %>
-      <%= f.label :comment, class: 'form-comment' %>
-      <%= f.text_field :comment, class: 'form-comment' %>
+      <%= text_field_tag(:plr, nil, :placeholder => "Quakecon is 4 days of Peace, Love and ...", :class => 'form-control') %>
 
       <%= f.label :name %>
       <%= f.text_field :name, class: 'form-control' %>

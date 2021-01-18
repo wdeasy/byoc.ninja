@@ -5,14 +5,14 @@ class ContactsController < ApplicationController
 
   def create
     @contact = Contact.new(params[:contact])
-    if @contact.valid?
-      if @contact.comment.blank?
+    if @contact.valid? && params[:plr].present? &&
+      params[:plr].gsub(/[^0-9A-Za-z]/, '').downcase == 'rockets'
         ContactMailer.email(@contact).deliver
-      end
-
-      flash[:success] = "Message sent!"
-      redirect_to root_url
+        flash[:success] = "Message sent!"
+        redirect_to root_url
     else
+      puts "Spam bot detected."
+      flash[:danger] = "Wrong answer!"
       render :action => 'new'
     end
   end
