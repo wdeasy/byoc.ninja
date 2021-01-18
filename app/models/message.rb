@@ -11,7 +11,7 @@ class Message < ApplicationRecord
   def Message.clear_all
     message = Message.where(:show => true)
     message.each do |m|
-	    m.update_attributes(
+	    m.update(
 	      :show	=> false
 	    )
     end

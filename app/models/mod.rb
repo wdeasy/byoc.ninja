@@ -25,7 +25,7 @@ class Mod < ApplicationRecord
     end
 
     if mod.last_seen.nil? || !mod.last_seen.today?
-      mod.update_attributes(
+      mod.update(
         :last_seen => Time.now
       )
     end

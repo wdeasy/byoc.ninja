@@ -18,7 +18,7 @@ module Api
           @host = Host.find_by_address(address)
           if @host.nil?
             render :json => {:error => "address not found"}
-          elsif @host.update_attributes(host_params)
+          elsif @host.update(host_params)
             render :json => @host
           else
             render :json => {:error => "unable to update host"}

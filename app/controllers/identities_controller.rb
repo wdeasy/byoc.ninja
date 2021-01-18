@@ -50,7 +50,7 @@ class IdentitiesController < ApplicationController
 
   def update
   	@identity = Identity.find(params[:id])
-    if @identity.update_attributes(identity_params)
+    if @identity.update(identity_params)
       flash[:success] = "Identity updated."
       redirect_to identities_url
     else

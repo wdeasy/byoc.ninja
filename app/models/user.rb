@@ -29,7 +29,7 @@ class User < ApplicationRecord
     user = User.find_by(:id => user_id)
     if user.auto_update == true
       name = Name.clean_name(name)
-      user.update_attributes(
+      user.update(
         clan: set_clan(name, user.id, user.seat_id),
         handle: set_handle(name, user.id, user.seat_id)
       )
@@ -50,7 +50,7 @@ class User < ApplicationRecord
     end
 
     if user.auto_update == false
-      user.update_attributes(
+      user.update(
         :host_id => host_id,
         :updated => true
       )
@@ -69,7 +69,7 @@ class User < ApplicationRecord
       identity.update_attribute(:avatar, Name.clean_url(player["avatar"]))
     end
 
-    user.update_attributes(
+    user.update(
       :host_id => host_id,
       :game_id => game_id,
       :mod_id => mod_id,
@@ -160,7 +160,7 @@ class User < ApplicationRecord
       return {:success => true, :message => message}
     end
 
-    success = user.update_attributes(
+    success = user.update(
       :seat_id => seat.id,
       :seat_count => user.seat_count + 1
     )
@@ -227,7 +227,7 @@ class User < ApplicationRecord
     end
 
     unless (user.banned == true)
-      user.update_attributes(
+      user.update(
         :seat_id => seat.id,
         :seat_count => user.seat_count + 1
       )
@@ -277,7 +277,7 @@ class User < ApplicationRecord
 
   def User.set_handle(username, user_id, seat_id)
     return nil if username.blank?
-    
+
     handle = Name.clean_name(username)
     handle = handle.index('#').nil? ? handle : handle[0..(handle.rindex('#')-1)]
 

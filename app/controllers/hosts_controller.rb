@@ -34,7 +34,7 @@ class HostsController < ApplicationController
 
   def update
   	@host = Host.find_by_id(params[:id])
-    if @host.update_attributes(host_params)
+    if @host.update(host_params)
       flash[:success] = "Host updated."
       redirect_to admin_hosts_url
     else

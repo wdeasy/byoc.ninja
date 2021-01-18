@@ -25,7 +25,7 @@ class Seat < ApplicationRecord
   def Seat.update(info)
   	seat = Seat.where(seat: info["seat"]).first_or_create
 
-  	seat.update_attributes(
+  	seat.update(
   	  :clan   => info["clan"],
   	  :handle => info["handle"],
       :section => info["section"],
@@ -69,7 +69,7 @@ class Seat < ApplicationRecord
             i+=1
             puts "#{seat} #{sec} #{row} #{num} #{sort}"
             new_seat = Seat.where(seat: seat).first_or_create
-          	new_seat.update_attributes(
+          	new_seat.update(
           	  :clan   => nil,
           	  :handle => nil,
               :section => sec,

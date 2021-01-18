@@ -39,7 +39,7 @@ class GroupsController < ApplicationController
 
   def update
   	@group = Group.find(params[:id])
-    if @group.update_attributes(group_params)
+    if @group.update(group_params)
       flash[:success] = "Group updated."
       redirect_to groups_url
     else

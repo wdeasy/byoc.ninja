@@ -29,7 +29,7 @@ class Group < ApplicationRecord
     end
 
     group = Group.where(steamid: steamid).first_or_create
-    group.update_attributes(
+    group.update(
       :name		=> name,
       :url		=> url
     )

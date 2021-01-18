@@ -21,22 +21,22 @@ class Identity < ApplicationRecord
 
     case identity.provider.to_sym
     when :steam
-      identity.update_attributes(
+      identity.update(
         :name	   => Name.clean_name(auth.info['nickname']),
         :url 	   => Name.clean_url(auth.extra['raw_info']['profileurl']),
         :avatar  => Name.clean_url(auth.extra['raw_info']['avatar'])
       )
     when :discord
-      identity.update_attributes(
+      identity.update(
         :name    => "#{Name.clean_name(auth.extra['raw_info']['username'])}\##{auth.extra['raw_info']['discriminator']}",
         :avatar  => Name.clean_url(auth.info['image'])
       )
     when :bnet
-      identity.update_attributes(
+      identity.update(
         :name    => auth.info['battletag']
       )
     when :twitch
-      identity.update_attributes(
+      identity.update(
         :name    => Name.clean_url(auth.extra['raw_info']['display_name']),
         :url 	   => auth.info['urls'].present? ? Name.clean_url(auth.info['urls']['Twitch']) : nil,
         :avatar  => Name.clean_url(auth.info['image'])
@@ -81,13 +81,13 @@ class Identity < ApplicationRecord
 
       identity = Identity.where(user_id: user_id, provider: provider).first_or_initialize
       if identity.banned == false && identity.user.auto_update == true
-        identity.update_attributes(
+        identity.update(
           :uid     => d['id'],
           :name    => Name.clean_name(d['name']),
           :enabled => identity.enabled.nil? ? ActiveModel::Type::Boolean.new.cast(d['visibility']) : identity.enabled
         )
       else
-        identity.update_attributes(
+        identity.update(
           :uid     => identity.uid.nil? ? d['id'] : identity.uid,
           :enabled => identity.enabled.nil? ? ActiveModel::Type::Boolean.new.cast(d['visibility']) : identity.enabled
         )

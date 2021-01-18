@@ -26,7 +26,7 @@ class NetworksController < ApplicationController
 
   def update
   	@network = Network.find_by_id(params[:id])
-    if @network.update_attributes(network_params)
+    if @network.update(network_params)
       flash[:success] = "Network updated."
       redirect_to networks_url
     else

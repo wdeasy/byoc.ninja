@@ -11,11 +11,11 @@ class SteamWebApi < ApplicationRecord
     end
 
     if Time.now.day == steam_key.updated_at.day
-      steam_key.update_attributes(
+      steam_key.update(
         :calls  => steam_key.calls+1
       )
     else
-      steam_key.update_attributes(
+      steam_key.update(
         :yesterday => steam_key.calls,
         :calls  => 1
       )

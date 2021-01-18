@@ -20,7 +20,7 @@ class UsersController < ApplicationController
 
   def update
   	@user = User.find(params[:id])
-    if @user.update_attributes(user_params)
+    if @user.update(user_params)
       Seat.mark_for_update(@user.seat.seat) if @user.seat.present?
       flash[:success] = "User updated."
       redirect_to users_url

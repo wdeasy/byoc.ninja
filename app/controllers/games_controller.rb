@@ -14,7 +14,7 @@ class GamesController < ApplicationController
 
   def update
   	@game = Game.find(params[:id])
-    if @game.update_attributes(game_params)
+    if @game.update(game_params)
       flash[:success] = "Game updated."
       redirect_to games_url
     else

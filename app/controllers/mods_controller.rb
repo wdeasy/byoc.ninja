@@ -12,7 +12,7 @@ class ModsController < ApplicationController
 
   def update
   	@mod = Mod.find(params[:id])
-    if @mod.update_attributes(mod_params)
+    if @mod.update(mod_params)
       flash[:success] = "Mod updated."
       redirect_to mods_url
     else

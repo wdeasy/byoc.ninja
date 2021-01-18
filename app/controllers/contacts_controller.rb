@@ -11,7 +11,7 @@ class ContactsController < ApplicationController
         flash[:success] = "Message sent!"
         redirect_to root_url
     else
-      puts "Spam bot detected."
+      logger.info "Spam bot detected."
       flash[:danger] = "Wrong answer!"
       render :action => 'new'
     end

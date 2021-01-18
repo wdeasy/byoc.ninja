@@ -90,7 +90,7 @@ class Host < ApplicationRecord
     lan         = (host.lan != nil && lan == nil) ? host.lan : lan
     name        = format_name(lobby, address, player["personaname"], host.name)
 
-    host.update_attributes(
+    host.update(
       :game_id    => game_id,
       :mod_id     => mod_id,
       :query_port => query_port,
@@ -111,7 +111,7 @@ class Host < ApplicationRecord
         update_server_info(host)
       end
 
-      host.update_attributes(
+      host.update(
         :flags => flags(host),
         :updated => true,
         :visible => true
@@ -135,7 +135,7 @@ class Host < ApplicationRecord
     network_id  = Network.location(ip)
     valid_ip = Network.valid_ip(ip)
 
-    host.update_attributes(
+    host.update(
       :game_id    => game_id,
       :query_port => query_port,
       :ip         => ip,
@@ -156,7 +156,7 @@ class Host < ApplicationRecord
 
     visible = is_visible(host, valid_ip)
     if visible == true
-      host.update_attributes(
+      host.update(
         :flags => flags(host),
         :updated => true,
         :visible => true
@@ -334,7 +334,7 @@ class Host < ApplicationRecord
       max = info[:max] ? info[:max] : host.max
       password = info[:password] ? info[:password] : host.password
 
-      host.update_attributes(
+      host.update(
         :name => Name.clean_name(name),
         :map => Name.clean_name(map),
         :current => current,
@@ -348,7 +348,7 @@ class Host < ApplicationRecord
       host.game.update_attribute(:queryable, true) if host.game.queryable == false
 
     elsif host.last_successful_query != Time.at(0)
-      host.update_attributes(
+      host.update(
         :respond => false
       )
     end
@@ -606,7 +606,7 @@ class Host < ApplicationRecord
           game_id = Game.update(server["appid"],server["gamedir"], true)
           host = Host.where(address: address).first_or_create
 
-          host.update_attributes(
+          host.update(
             :game_id    => game_id,
             :query_port => query_port.to_i,
             :ip         => ip,
@@ -660,7 +660,7 @@ class Host < ApplicationRecord
 
         Host.update(player, host.game_id)
       else
-        host.update_attributes(
+        host.update(
           :visible => true,
           :updated => true
         )
@@ -671,7 +671,7 @@ class Host < ApplicationRecord
   def Host.pin(host)
     if host.pin == false
       puts "Pinning #{host.ip}:#{host.query_port}"
-      host.update_attributes(
+      host.update(
         :pin => true
       )
     end
@@ -680,7 +680,7 @@ class Host < ApplicationRecord
   def Host.unpin(host)
     if host.pin == true
       puts "Unpinning #{host.ip}:#{host.query_port}"
-      host.update_attributes(
+      host.update(
         :pin => false
       )
     end
@@ -777,7 +777,7 @@ class Host < ApplicationRecord
     if host.updated == true
       return unless (host.respond == false && host.file?)
 
-      host.update_attributes(
+      host.update(
         :name       => Name.clean_name(server[:name]),
         :current    => server[:current],
         :max        => server[:max],
@@ -806,7 +806,7 @@ class Host < ApplicationRecord
     network_id = Network.location(ip)
     valid_ip = Network.valid_ip(ip)
 
-    host.update_attributes(
+    host.update(
       :game_id    => game_id,
       :query_port => query_port,
       :ip         => ip,
@@ -826,7 +826,7 @@ class Host < ApplicationRecord
 
     visible = is_visible(host, valid_ip)
     if visible == true
-      host.update_attributes(
+      host.update(
         :flags => flags(host),
         :updated => true,
         :visible => true

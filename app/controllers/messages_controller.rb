@@ -39,7 +39,7 @@ class MessagesController < ApplicationController
 
   def update
   	@message = Message.find_by_id(params[:id])
-    if @message.update_attributes(message_params)
+    if @message.update(message_params)
       flash[:success] = "Message updated."
       redirect_to messages_url
     else

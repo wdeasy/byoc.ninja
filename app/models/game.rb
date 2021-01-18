@@ -49,13 +49,13 @@ class Game < ApplicationRecord
     end
 
     if multiplayer == true && game.multiplayer == false
-      game.update_attributes(
+      game.update(
         :multiplayer => true
       )
     end
 
     if game.last_seen.nil? || !game.last_seen.today?
-      game.update_attributes(
+      game.update(
         :last_seen => Time.now
       )
     end
@@ -149,7 +149,7 @@ class Game < ApplicationRecord
       puts "Updating image to #{image}"
     end
 
-    game.update_attributes(
+    game.update(
       :name  => name,
       :image => image,
       :url  => url
