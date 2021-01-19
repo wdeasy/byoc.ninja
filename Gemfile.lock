@@ -102,10 +102,10 @@ GEM
     capistrano-rvm (0.1.2)
       capistrano (~> 3.0)
       sshkit (~> 1.2)
-    capistrano3-puma (4.0.0)
+    capistrano3-puma (5.0.2)
       capistrano (~> 3.7)
       capistrano-bundler
-      puma (~> 4.0)
+      puma (>= 4.0, < 6.0)
     chronic (0.10.2)
     coffee-rails (5.0.0)
       coffee-script (>= 2.2.0)
@@ -295,7 +295,7 @@ DEPENDENCIES
   capistrano-figaro
   capistrano-rails
   capistrano-rvm
-  capistrano3-puma (= 4.0.0)
+  capistrano3-puma
   coffee-rails
   figaro
   jbuilder
