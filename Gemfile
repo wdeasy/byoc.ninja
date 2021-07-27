@@ -20,7 +20,7 @@ gem 'capistrano-rails'
 gem 'capistrano-bundler'
 gem 'therubyracer'
 gem 'pg'
-gem "omniauth-steam", github: "krtschmr/omniauth-steam"
+gem "omniauth-steam"#, github: "krtschmr/omniauth-steam"
 gem 'omniauth-rails_csrf_protection'
 gem 'steam-condenser'
 gem 'netaddr'
