@@ -38,7 +38,7 @@ module HostsHelper
 
 	def link(url, name, appid)
 		if url.present?
-			sanitize link_to name, "steam://store/#{appid}"
+			link_to name, "steam://store/#{appid}"
 		else
 			name
 		end
