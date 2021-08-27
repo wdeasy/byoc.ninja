@@ -181,8 +181,8 @@ class Host < ApplicationRecord
     # when host.respond == false && host.last_successful_query < 1.hour.ago && host.users_count < 2 && host.network.name != :byoc
     #   puts "Host is not responding"
     when host.lan == true && !host.network.byoc?
-      puts "Host is a lan game outside of quakecon"
-    when host.keyword? && Filter.contains(host.name)
+      puts "Host is a lan game outside of BYOC"
+    when host.keyword? && Filter.contains(host.name, :exclusive)
       puts "#{host.address} has been filtered out."
     else
       visible = true
@@ -194,8 +194,8 @@ class Host < ApplicationRecord
   def Host.flags(host)
     flags = {}
 
-    #check for quakecon in hostname
-    if host.name != nil && (["quakecon", "qcon", "byoc"].any? { |q| host.name.downcase.include? q })
+    #check for keyword in hostname
+    if host.name.present? && Filter.contains(host.name, :inclusive)
       flags[:name] = true
     end
 
@@ -205,7 +205,7 @@ class Host < ApplicationRecord
         flags[:player] = true
       end
 
-      if user.handle.present? && (["quakecon", "qcon"].any? { |q| user.handle.downcase.include? q })
+      if user.handle.present? && Filter.contains(user.handle, :inclusive)
         flags[:player] = true
       end
     end
@@ -287,9 +287,9 @@ class Host < ApplicationRecord
   end
 
   def Host.query_master_by_keywords
+    puts "Querying master servers for keywords."
     servers = []
-    keywords = [:quakecon,:qcon,:byoc]
-    keywords.each do |keyword|
+    Filter.include_filter.pluck(:name).each do |keyword|
       puts "Searching for servers that include \"#{keyword}\"."
       api = SteamWebApi.get_server_list_by_keyword(keyword)
       parsed = SteamWebApi.get_json(api)
@@ -650,7 +650,7 @@ class Host < ApplicationRecord
       end
 
       if visible == false
-        Host.unpin(host)
+        #Host.unpin(host)
         next
       end
 

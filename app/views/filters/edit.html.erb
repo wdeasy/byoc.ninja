@@ -10,6 +10,9 @@
 	  <%= f.label :name %>
 	  <%= f.text_field :name, class: 'form-control' %>
 
+    <%= f.label :filter_type %>
+	  <%= f.select :filter_type, Filter.filter_types.map { |key, value| [key.humanize, key] }, {},{:class => 'form-control'} %>
+
     <%= f.submit "Save", class: "btn btn-33 btn-primary pull-left" %>
 	  <%= link_to "Delete", @filter, method: :delete, data: { confirm: "You sure?" }, class: "btn btn-33 btn-primary" %>
 	  <%= link_to "Back", filters_url, class: "btn btn-33 btn-primary pull-right" %>

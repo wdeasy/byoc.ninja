@@ -29,16 +29,29 @@ namespace :cleanup do
   desc "Clear out tables for a new year"
   task :tables => :environment do
     beginning = start_time
+    
     hosts = Host.where(:visible => true)
     puts "Hiding #{hosts.count} hosts."
     hosts.update_all(:visible => false)
-    users= User.where("admin = false")
+
+    puts "Deleting #{ApiKey.all.count} API Keys."
+    ApiKey.destroy_all
+
+    admin_ids = User.where(:admin => true).pluck(:id)
+    identities = Identity.where.not(user_id: admin_ids)
+    puts "Deleting #{identities.count} Identities."
+    identities.destroy_all
+
+    users = User.where(:admin => false)
     puts "Deleting #{users.count} users."
-    users.delete_all
+    users.destroy_all
+
     puts "Deleting #{Seat.all.count} seats."
     Seat.destroy_all
+
     puts "Resetting User seat counts."
     User.update_all(:seat_count => 0);
+
     finish_time(beginning)
   end
 

@@ -20,9 +20,7 @@ class Group < ApplicationRecord
     name.slice!("Steam Community :: Group :: ")
 
     if id = page.xpath("//div[contains(@class,'joinchat_bg')]")
-      steamid = id[0]['onclick']
-      steamid.slice!("window.location='steam://friends/joinchat/")
-      steamid.slice!("'")
+      steamid = id[0]['onclick'].delete('^0-9')
     else
       message = "Could not read Steam ID"
       return {success: success, message: message}

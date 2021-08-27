@@ -6,17 +6,6 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-group_list = [
-	[103582791429524812,"quakecon","https://steamcommunity.com/groups/quakecon"],
-	[103582791432330298,"Quakecon™","https://steamcommunity.com/groups/Quakecon-PeaceLoveRockets"],
-	[103582791432341478,"Quakecon Forum Wh0r3s","https://steamcommunity.com/groups/wh0r3s"],
-	[103582791434503100,"/r/Quakecon","https://steamcommunity.com/groups/rQuakecon"]
-]
-
-group_list.each do |steamid, name, url|
-	Group.create!(steamid: steamid, name: name, url: url)
-end
-
 network_list = [
 	[0,"0.0.0.0/0"],
 	[1,"10.0.0.0/8"],

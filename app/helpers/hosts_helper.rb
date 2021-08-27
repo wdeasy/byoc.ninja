@@ -4,7 +4,7 @@ module HostsHelper
 		html = ''
 		if f.present?
 			if f[:name]
-				html << '<span class="glyphicon glyphicon-ok" title="Quakecon in Host Name"></span>'
+				html << '<span class="glyphicon glyphicon-ok" title="BYOC in Host Name"></span>'
 			end
 
 			if f[:player]

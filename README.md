@@ -3,7 +3,7 @@
 ### tasks ###
 
 rake update:hosts updates the server list  
-rake update:seats updates seat information from quakecon.org  
+rake update:seats updates seat information 
 rake cleanup:hosts removes old hosts from the database  
 rake cleanup:pins removes pins from unreachable hosts
 

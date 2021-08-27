@@ -42,7 +42,7 @@ class FiltersController < ApplicationController
 
   private
     def filter_params
-      params.require(:filter).permit(:name)
+      params.require(:filter).permit(:name, :filter_type)
     end
 
     # Confirms a logged-in user.

@@ -9,6 +9,9 @@
 	  <%= f.label :name %>
 	  <%= f.text_field :name, class: 'form-control' %>
 
+    <%= f.label :include %>
+    <%= f.select :filter_type, Filter.filter_types.map { |key, value| [key.humanize, key] }, {},{:class => 'form-control'} %>
+
 	  <%= f.submit "Save changes", class: "btn btn-50 btn-primary pull-left" %>
 	  <%= link_to "Back", filters_url, class: "btn btn-50 btn-primary pull-right" %>
 	<% end %>
