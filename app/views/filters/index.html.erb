@@ -2,19 +2,24 @@
 <div class="jumbotron">
   <h3 class="center">Filters</h3>
 
-  <table class="table table-striped table-condensed games">
-    <thead>
-      <tr class="row">
-        <th class="col-md-6 text-center">Name</th>
-        <th class="col-md-6 text-center">Filter Type</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% if @filters.empty? %>
+  <% if @filters.empty? %>
+    <table class="table table-striped table-condensed games">
+      <tbody>
         <tr class="row"><td colspan="3" class="col-md-offset-2 text-center">No Filters Found.</td></tr>
-      <% else %>
-        <%= render @filters %>
-      <% end %>
-    </tbody>
-  </table>
+      </tbody>
+    </table>
+  <% else %>
+    <% Filter.filter_types.map.each do |key, value|  %>
+      <table class="table table-striped table-condensed games">
+        <thead>
+          <tr class="row">
+            <th class="col-md-12 text-center"><%= key.humanize %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <%= render @filters.where(:filter_type => key) %>
+        </tbody>
+      </table>
+    <% end %>
+  <% end %>
 </div>

@@ -3,7 +3,7 @@
 ### tasks ###
 
 rake update:hosts updates the server list  
-rake update:seats updates seat information 
+rake update:seats updates seat information
 rake cleanup:hosts removes old hosts from the database  
 rake cleanup:pins removes pins from unreachable hosts
 
@@ -12,7 +12,7 @@ rake cleanup:pins removes pins from unreachable hosts
 install git
 > sudo apt-get install git
 
-clone this repo. in this example i have it cloned in ~/Development/qcon_steam_browser
+clone this repo. in this example i have it cloned in ~/Development/byoc.ninja
 
 > git clone https://github.com/wdeasy/byoc.ninja.git ~/Development/byoc.ninja
 
@@ -22,7 +22,7 @@ install ruby on rails
 install postgres  
 > sudo apt-get install postgresql libpq-dev
 
-create the qconservers role in postgres
+create the usergoeshere role in postgres
 >sudo su postgres  
 >psql  
 >create role usergoeshere with createdb login password 'passgoeshere';  
@@ -43,9 +43,9 @@ to
 >sudo service postgresql restart
 
 create default gemset and bundle install
-> cd ~/Development/qcon_steam_browser  
-> rvm gemset create qcon_steam_browser  
-> rvm use ruby-2.X.X@qcon_steam_browser --default
+> cd ~/Development/byoc.ninja  
+> rvm gemset create byoc.ninja  
+> rvm use ruby-2.X.X@byoc.ninja --default
 > gem install bundler  
 > bundle install
 
@@ -72,14 +72,14 @@ the group_list array needs group steam id, group steam name and group url
 the user_list array needs user steamid, name, url, avatar, and admin bool  
 
 setup the database
-> cd ~/Development/qcon_steam_browser  
+> cd ~/Development/byoc.ninja  
 > rake db:setup
 
 run rake update:servers to see if it works  
 run rails server, navigate to localhost:3000 and see if it works
 
 run whenever and copy into cron
->cd ~/Development/qcon_steam_browser  
+>cd ~/Development/byoc.ninja
 >whenever  
 >crontab -e
 
@@ -107,28 +107,28 @@ passenger_root should be the output of passenger-config --root
 passenger_ruby should be the output of which ruby   
 
 setup vhosts file
-> nano /etc/nginx/sites-available/qcon_steam_browser
+> nano /etc/nginx/sites-available/byoc.ninja
 
 >server {  
 >  listen 80;  
->  server_name qconsteambrowser.com www.qconsteambrowser.com;  
+>  server_name byoc.ninja www.byoc.ninja;  
 >  
 >	 passenger_enabled on;  
 >	 rails_env	development;  
->	 root		/home/user/Development/qcon_steam_browser/public;  
+>	 root		/home/user/Development/byoc.ninja/public;  
 >}  
 
->sudo ln -s /etc/nginx/sites-available/qcon_steam_browser /etc/nginx/sites-enabled/qcon_steam_browser  
+>sudo ln -s /etc/nginx/sites-available/byoc.ninja /etc/nginx/sites-enabled/byoc.ninja  
 
 edit /etc/hosts  
 >sudo nano /etc/hosts  
 
 add and save  
->127.0.0.1	qconsteambrowser.com www.qconsteambrowser.com
+>127.0.0.1	byoc.ninja www.byoc.ninja
 
 >sudo service nginx restart  
 >rake assets:clobber  
 >rake assets:precompile  
 
-Once everything is set up, you should be able to navigate to http://qconsteambrowser.com   
+Once everything is set up, you should be able to navigate to http://byoc.ninja  
 You will see the admin options in the drop down menu once you sign in through steam with the user you put in the seeds.rb file.

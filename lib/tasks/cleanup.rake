@@ -29,7 +29,7 @@ namespace :cleanup do
   desc "Clear out tables for a new year"
   task :tables => :environment do
     beginning = start_time
-    
+
     hosts = Host.where(:visible => true)
     puts "Hiding #{hosts.count} hosts."
     hosts.update_all(:visible => false)
@@ -49,8 +49,9 @@ namespace :cleanup do
     puts "Deleting #{Seat.all.count} seats."
     Seat.destroy_all
 
-    puts "Resetting User seat counts."
+    puts "Resetting User seats."
     User.update_all(:seat_count => 0);
+    User.update_all(:seat_id => nil);
 
     finish_time(beginning)
   end
