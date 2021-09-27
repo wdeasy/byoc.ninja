@@ -158,7 +158,7 @@ GEM
     net-ssh (6.1.0)
     netaddr (2.0.4)
     nio4r (2.5.8)
-    nokogiri (1.12.3)
+    nokogiri (1.12.5)
       mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
     oauth2 (1.4.7)
