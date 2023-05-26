@@ -30,6 +30,8 @@ gem 'omniauth-discord'
 gem 'omniauth-bnet'
 gem 'omniauth-twitch'
 gem 'listen'
+gem 'ed25519'
+gem 'bcrypt_pbkdf'
 
 group :development do
   #gem 'sqlite3'
