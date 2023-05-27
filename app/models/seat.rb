@@ -110,7 +110,8 @@ class Seat < ApplicationRecord
         number = seat["label"]
         number.strip!
 
-        seat = "#{section}-#{row_letter}-#{number}"
+        #seat = "#{section}-#{row_letter}-#{number}"
+        seat = "#{row_letter}-#{number}"
         clan = nil
         handle = nil
 
