@@ -120,7 +120,7 @@ class Seat < ApplicationRecord
         else
           sort_letter = row_letter.rjust(2, '0')
         end
-        sort ="#{section}#{sort_letter}#{sprintf '%02d', number}"
+        sort ="#{section}#{sort_letter}#{sprintf '%03d', number}"
 
         info = { "seat"   => seat,
              "clan"   => clan,
