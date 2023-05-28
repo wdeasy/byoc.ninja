@@ -13,7 +13,7 @@
           </tr>
         </thead>
         <tbody>
-          <% Identity.providers.without(:qconbyoc).each do |p| %>
+          <% Identity.providers.without(:discord).each do |p| %>
             <tr>
               <td class="text-left"><%= p[0] %></td>
               <td class="text-center"><%= provider_name(p[0], @identities) %></td>
