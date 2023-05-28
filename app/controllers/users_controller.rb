@@ -34,14 +34,6 @@ class UsersController < ApplicationController
   end
 
   def change_seat
-    unless logged_in?
-      redirect_to root_url and return
-    end
-
-    if params.nil? || params['seat'].nil?
-      redirect_to root_url and return
-    end
-
     result = User.update_seat_from_omniauth(current_user.id, params['seat'])
     flash[result[:success] ? :success : :danger] = result[:message] unless result.nil?
 
