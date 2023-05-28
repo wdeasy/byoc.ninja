@@ -250,7 +250,7 @@ class Host < ApplicationRecord
       server = SourceServer.new(ip, query_port)
       server.init
 
-      if server != nil
+      if server != nil && server.server_info != nil
         info = {}
         info[:name] = server.server_info[:server_name]
         info[:map] = server.server_info[:map_name]
