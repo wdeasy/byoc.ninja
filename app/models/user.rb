@@ -160,10 +160,18 @@ class User < ApplicationRecord
       return {:success => true, :message => message}
     end
 
+    seats = []
+    seats.append(user.seat.seat) if user.seat.present?
+    seats.append(seat.seat) if seats.exclude? seat.seat
+
     success = user.update(
       :seat_id => seat.id,
       :seat_count => user.seat_count + 1
     )
+
+    seats.each do |s|
+      Seat.mark_for_update(s)
+    end
 
     if success == true
       message = "You're linked to #{seat.seat}!"
@@ -300,7 +308,7 @@ class User < ApplicationRecord
     return handle if seat_id.blank?
 
     seat = User.find_by(:id => user_id).seat
-    unless seat.nil?
+    unless seat.nil? || handle.nil?
       handle.prepend("[#{seat.seat}] ")
     end
   end
