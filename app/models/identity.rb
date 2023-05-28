@@ -174,7 +174,6 @@ class Identity < ApplicationRecord
 
     if seat.present?
       result = User.update_seat_from_omniauth(identity.user_id, seat)
-      Seat.mark_for_update(seat)
     end
 
     return result
