@@ -17,8 +17,8 @@ class SessionsController < ApplicationController
       redirect_to root_url
     end
 
-    if @identity.discord?
-      result = Identity.update(@identity.id, auth, auth.credentials.token, param['seat'])
+    if param['seat']
+      result = Identity.update(@identity.id, auth, param['seat'])
       flash[result[:success] ? :success : :danger] = result[:message] unless result.nil?
     else
       result = Identity.update(@identity.id, auth)

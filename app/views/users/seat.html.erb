@@ -43,7 +43,7 @@
 		$('#discord_submit').click(function(){
 			var seatVal = $("#number").val();
 			$('#discord_form').attr('action', function(i,value) {
-				return value + "?seat=" + seatVal + "&qconbyoc=TEST";
+				return value + "?seat=" + seatVal;
 			});
 		});
 	});
@@ -52,12 +52,11 @@
 
 <% provide(:title, "Link your BYOC seat to Discord!")  %>
 <div class="jumbotron">
-<h3 class="center">Link your BYOC seat to your Discord, and more!</h3>
+<h3 class="center">Link your BYOC seat to your Discord!</h3>
 <br />
 <p></p>
 	<div class="row">
 	  <div class="col-md-6 col-md-offset-3">
-      When signing in through Discord, any Steam or Battle.net account that is connected to your Discord with "Display on profile" enabled will also be linked to your BYOC Seat!<br /><br />
       <br />
 			<%= form_tag('/auth/discord', method: :post, id: "discord_form") do %>
 			  <div class="row">

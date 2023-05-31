@@ -46,56 +46,6 @@ class Identity < ApplicationRecord
     return identity
   end
 
-  def self.update_connections(token, user_id)
-    uri = URI.parse("https://discord.com/api/users/@me/connections")
-
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-
-    request = Net::HTTP::Get.new(uri.request_uri)
-    request["Authorization"] = "Bearer #{token}"
-    request["Content-Type"] = 'application/x-www-form-urlencoded'
-
-    begin
-      response = http.request(request)
-    rescue => e
-      logger.info "Unable to update Discord connections"
-      logger.info e.message
-    end
-
-    return unless response.present?
-
-    doc = JSON.parse(response.body)
-    doc.each do |d|
-      next unless  ['battlenet', 'steam', 'twitch'].include? d['type']
-
-      case d['type']
-      when 'battlenet'
-        provider = :bnet
-      when 'steam'
-        provider = :steam
-      when 'twitch'
-        provider = :twitch
-      end
-
-      identity = Identity.where(user_id: user_id, provider: provider).first_or_initialize
-      if identity.banned == false && identity.user.auto_update == true
-        identity.update(
-          :uid     => d['id'],
-          :name    => Name.clean_name(d['name']),
-          :enabled => identity.enabled.nil? ? ActiveModel::Type::Boolean.new.cast(d['visibility']) : identity.enabled
-        )
-      else
-        identity.update(
-          :uid     => identity.uid.nil? ? d['id'] : identity.uid,
-          :enabled => identity.enabled.nil? ? ActiveModel::Type::Boolean.new.cast(d['visibility']) : identity.enabled
-        )
-      end
-      identity.save
-    end
-  end
-
   def update_info(auth)
     update_attribute(:uid, auth.uid) unless uid == auth.uid
     update_attribute(:enabled, true) unless enabled == true
@@ -138,6 +88,9 @@ class Identity < ApplicationRecord
         update_attribute(:avatar, Name.clean_url(auth.info['image']))
       end
     end
+
+    update_attribute(:clan, Name.get_clan(name))
+    update_attribute(:handle, Name.get_handle(name))
   end
 
   def Identity.update_qconbyoc
@@ -161,16 +114,13 @@ class Identity < ApplicationRecord
     end
   end
 
-  def Identity.update(id, auth, token=nil, seat=nil)
+  def Identity.update(id, auth, seat=nil)
     identity = Identity.find_by(id: id)
     return if (identity.banned? || identity.user.banned?)
 
     result = nil
     identity.update_info(auth)
-    if identity.discord?
-      User.update_with_omniauth(identity.user_id, identity.name)
-      Identity.update_connections(token, identity.user_id)
-    end
+    User.update_with_omniauth(identity.user_id, identity.name)
 
     if seat.present?
       result = User.update_seat_from_omniauth(identity.user_id, seat)

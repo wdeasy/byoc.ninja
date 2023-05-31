@@ -93,4 +93,28 @@ module Name
       url
     end
   end
+
+  def Name.get_clan(username)
+    return nil if username.blank?
+
+    h = clean_name(username)
+    if h.match(/^\[.*\S.*\].*\S.*$/)
+      h.split(/[\[\]]/)[1].strip
+    else
+      nil
+    end
+  end
+
+  def Name.get_handle(username)
+    return nil if username.blank?
+
+    handle = clean_name(username)
+    handle = handle.index('#').nil? ? handle : handle[0..(handle.rindex('#')-1)]
+
+    if handle.match(/^\[.*\S.*\].*\S.*$/)
+      handle = handle.split(/[\[\]]/)[-1].strip
+    end
+
+    return handle
+  end  
 end
