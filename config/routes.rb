@@ -13,7 +13,8 @@ Rails.application.routes.draw do
   get       'settings'            => 'users#edit'
   get       'seats'               => 'seats#index'
   get       'seats/update'        => 'seats#update'
-  post       'seats/change'        => 'users#change_seat'
+  post      'seats/change'        => 'users#change_seat'
+  post      'seats/unlink'        => 'users#unlink_seat' 
 
   get       'logs/update_hosts'   => 'logs#update_hosts'
   get       'logs/update_seats'   => 'logs#update_seats'

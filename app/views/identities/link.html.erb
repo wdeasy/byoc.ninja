@@ -20,19 +20,15 @@
               <td class="text-right"><%= provider_unlink(p[0], @identities) %></td>
             </tr>
           <% end %>
-          <% if @seat.present? %>
-          <tr>
-            <td class="text-left">
-              <%= qconbyoc_link("qconbyoc",@seat) %>
-            </td>
-            <td class="text-center">
-              <%= qconbyoc_link(@seat, @seat) %>
-            </td>
-            <td class="text-right">
-              <%= qconbyoc_link("View Map",@seat) %>
-            </td>
-          </tr>
-          <% end %>
+          <td class="text-left">
+            <%= qconbyoc_link("qconbyoc",@seat) %>
+          </td>
+          <td class="text-center">
+            <%= qconbyoc_link(@seat, @seat) if @seat.present? %>
+          </td>
+          <td class="text-right">
+            <%= qconbyoc_unlink(@seat) %>
+          </td>
         </tbody>
       </table>
     </div>
