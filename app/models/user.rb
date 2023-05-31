@@ -28,16 +28,16 @@ class User < ApplicationRecord
   def self.update_with_omniauth(user_id, name)
     user = User.find_by(:id => user_id)
     if user.auto_update == true
-      name = Name.clean_name(name)
+      clan, handle = get_clan_and_handle(user_id)
       user.update(
-        clan: set_clan(name, user.id, user.seat_id),
-        handle: set_handle(name, user.id, user.seat_id)
+        clan: clan,
+        handle: handle
       )
     end
   end
 
   def User.update(player, host_id, game_id, mod_id=nil)
-    identity = Identity.find_by(:uid => player["steamid"], :provider => :steam)
+    identity = Identity.find_by(:uid => player["steamid"], :provider => :steam, :enabled => true)
     user = User.find_by(:id => identity.user_id)
     if identity.nil?
       puts "Could not find Identity for #{player["steamid"]}"
@@ -73,10 +73,24 @@ class User < ApplicationRecord
       :host_id => host_id,
       :game_id => game_id,
       :mod_id => mod_id,
-      :clan => set_clan(player["personaname"], user.id, user.seat_id),
-      :handle => set_handle(player["personaname"], user.id, user.seat_id),
       :updated => true
     )
+
+    clan = identity.clan
+    handle = identity.handle
+
+    identity.update(
+      :clan => Name.get_clan(player["personaname"]),
+      :handle => Name.get_handle(player["personaname"])
+    )
+
+    if clan != identity.clan || handle != identity.handle
+      clan, handle = get_clan_and_handle(user.id)
+      user.update(
+        :clan => clan,
+        :handle => handle
+      )
+    end    
   end
 
   def User.url_cleanup(url)
@@ -272,28 +286,17 @@ class User < ApplicationRecord
     end
   end
 
-  def User.set_clan(username, user_id, seat_id)
-    return nil if username.blank?
+  def User.get_clan_and_handle(user_id)
+    clan = nil
+    handle = nil
 
-    h = Name.clean_name(username)
-    if h.match(/^\[.*\S.*\].*\S.*$/)
-      h.split(/[\[\]]/)[1].strip
-    else
-      nil
-    end
-  end
+    Identity.where(user_id: user_id, enabled: true).find_each do |identity|
+      handle = identity.handle if handle.nil?
 
-  def User.set_handle(username, user_id, seat_id)
-    return nil if username.blank?
-
-    handle = Name.clean_name(username)
-    handle = handle.index('#').nil? ? handle : handle[0..(handle.rindex('#')-1)]
-
-    if handle.match(/^\[.*\S.*\].*\S.*$/)
-      handle = handle.split(/[\[\]]/)[-1].strip
+      return identity.clan, identity.handle if identity.clan?
     end
 
-    return handle
+    return nil, handle
   end
 
   def display_handle
@@ -314,7 +317,7 @@ class User < ApplicationRecord
   end
 
   def url
-    Identity.where(:user_id => id).specific(:steam).url
+    Identity.where(:user_id => id, enabled: true).specific(:steam).url
   end
 
   def playing

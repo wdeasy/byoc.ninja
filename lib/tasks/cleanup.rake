@@ -63,6 +63,37 @@ namespace :cleanup do
     finish_time(beginning)
   end
 
+  desc "Fix missing clans and handles"
+  task :clans => :environment do
+    beginning = start_time
+    Identity.where(:enabled => false).destroy_all
+
+    identities = Identity.where(:enabled => true)
+    identities.each do |identity|
+      identity.update(
+        clan: Name.get_clan(identity.name),
+        handle: Name.get_handle(identity.name)
+      )
+      puts "updating #{identity.name}: clan: #{identity.clan} handle: #{identity.handle}"
+    end
+
+    users = User.where(:auto_update => true)
+    users.each do |user|
+      clan, handle = User.get_clan_and_handle(user.id)
+
+      if clan.present?
+        user.update(
+          clan: clan,
+          handle: handle
+        )
+
+        puts "updating #{user.id}: clan: #{user.clan} handle: #{user.handle}"
+      end
+    end
+
+    finish_time(beginning)
+  end
+
   def start_time
   	beginning = Time.now
   	puts beginning.to_formatted_s(:db)

@@ -88,7 +88,7 @@ class IdentitiesController < ApplicationController
   private
 
     def identity_params
-      params.require(:identity).permit(:uid, :name, :enabled, :url, :avatar)
+      params.require(:identity).permit(:uid, :name, :enabled, :url, :avatar, :clan, :handle)
     end
 
     # Confirms a logged-in user.

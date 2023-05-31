@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2021_08_24_045303) do
+ActiveRecord::Schema[7.0].define(version: 2023_05_30_024649) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -101,6 +101,8 @@ ActiveRecord::Schema[7.0].define(version: 2021_08_24_045303) do
     t.boolean "enabled"
     t.uuid "user_id"
     t.boolean "banned", default: false, null: false
+    t.string "clan"
+    t.string "handle"
     t.index ["user_id"], name: "index_identities_on_user_id"
   end
 
