@@ -37,7 +37,19 @@ module IdentitiesHelper
     end
   end
 
-  def qconbyoc_link(name, seat)
-    link_to name, "https://www.qconbyoc.com?selected=#{seat}##{seat}", :target => "_new"
+  def qconbyoc_link(name=nil, seat=nil)
+    if seat.present?
+      link_to name, "https://www.qconbyoc.com?selected=#{seat}##{seat}", :target => "_new"
+    else
+      link_to name, "https://www.qconbyoc.com", :target => "_new"
+    end
+  end
+
+  def qconbyoc_unlink(seat=nil)
+    if seat.present?
+      link_to "Unlink", seats_unlink_url, method: :post
+    else
+      link_to "Link", "https://www.qconbyoc.com", :target => "_new"
+    end
   end
 end

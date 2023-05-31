@@ -141,6 +141,34 @@ class User < ApplicationRecord
     end
   end
 
+  def User.unlink_seat(user_id)
+    success = false
+    message = ""
+
+    user = User.find_by(id: user_id)
+    if user.nil?
+      message = "That user doesn't exist!"
+      return {:success => success, :message => message}
+    end
+
+    seat = user.seat.seat if user.seat.present?
+
+    success = user.update(
+      :seat_id => nil,
+      :seat_count => user.seat_count + 1
+    )
+
+    Seat.mark_for_update(seat) if seat.present?
+
+    if success == true
+      message = "You've unlinked your seat!"
+      return {:success => success, :message => message}
+    else
+      message = "Unable to save your seat."
+      return {:success => success, :message => message}
+    end
+  end
+
   def User.update_seat_from_omniauth(user_id, seat_id)
     success = false
     message = ""

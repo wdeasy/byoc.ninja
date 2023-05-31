@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   before_action :logged_in_user, :except => [:seat]
   #before_action :correct_user, :only => [:edit, :update]
-  before_action :admin_user, :except => [:seat, :change_seat]
+  before_action :admin_user, :except => [:seat, :change_seat, :unlink_seat]
 
   def index
     @users = User.includes(:seat).where.not(host_id: nil).order(created_at: :desc)
@@ -35,6 +35,13 @@ class UsersController < ApplicationController
 
   def change_seat
     result = User.update_seat_from_omniauth(current_user.id, params['seat'])
+    flash[result[:success] ? :success : :danger] = result[:message] unless result.nil?
+
+    redirect_to link_path
+  end
+
+  def unlink_seat
+    result = User.unlink_seat(current_user.id)
     flash[result[:success] ? :success : :danger] = result[:message] unless result.nil?
 
     redirect_to link_path

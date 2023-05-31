@@ -29,7 +29,7 @@ class IdentitiesController < ApplicationController
   def unlink
     @identity = Identity.find(params[:id])
     if @identity.update_attribute(:enabled, false)
-      Seat.mark_for_update(@identity.user.seat.seat)
+      Seat.mark_for_update(@identity.user.seat.seat) if @identity.user.seat.present?
     else
       flash[:danger] = "Could not unlink account."
     end
