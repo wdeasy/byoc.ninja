@@ -17,9 +17,12 @@ class SessionsController < ApplicationController
       redirect_to root_url
     end
 
+    Seat.mark_for_update(@identity.user.seat.seat) if @identity.user.seat.present?
+
     if param['seat']
       result = Identity.update(@identity.id, auth, param['seat'])
       flash[result[:success] ? :success : :danger] = result[:message] unless result.nil?
+      Seat.mark_for_update(param['seat'])
     else
       result = Identity.update(@identity.id, auth)
     end
