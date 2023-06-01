@@ -20,6 +20,8 @@ class UsersController < ApplicationController
 
   def update
   	@user = User.find(params[:id])
+    Seat.mark_for_update(@user.seat.seat) if @user.seat.present?
+
     if @user.update(user_params)
       Seat.mark_for_update(@user.seat.seat) if @user.seat.present?
       flash[:success] = "User updated."
@@ -34,13 +36,19 @@ class UsersController < ApplicationController
   end
 
   def change_seat
+    Seat.mark_for_update(current_user.seat.seat) if current_user.seat.present?    
+
     result = User.update_seat_from_omniauth(current_user.id, params['seat'])
     flash[result[:success] ? :success : :danger] = result[:message] unless result.nil?
+
+    Seat.mark_for_update(params['seat']) if current_user.seat.present?
 
     redirect_to link_path
   end
 
   def unlink_seat
+    Seat.mark_for_update(current_user.seat.seat) if current_user.seat.present?
+
     result = User.unlink_seat(current_user.id)
     flash[result[:success] ? :success : :danger] = result[:message] unless result.nil?
 

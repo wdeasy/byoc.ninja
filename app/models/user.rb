@@ -151,14 +151,10 @@ class User < ApplicationRecord
       return {:success => success, :message => message}
     end
 
-    seat = user.seat.seat if user.seat.present?
-
     success = user.update(
       :seat_id => nil,
       :seat_count => user.seat_count + 1
     )
-
-    Seat.mark_for_update(seat) if seat.present?
 
     if success == true
       message = "You've unlinked your seat!"
@@ -202,18 +198,10 @@ class User < ApplicationRecord
       return {:success => true, :message => message}
     end
 
-    seats = []
-    seats.append(user.seat.seat) if user.seat.present?
-    seats.append(seat.seat) if seats.exclude? seat.seat
-
     success = user.update(
       :seat_id => seat.id,
       :seat_count => user.seat_count + 1
     )
-
-    seats.each do |s|
-      Seat.mark_for_update(s)
-    end
 
     if success == true
       message = "You're linked to #{seat.seat}!"
