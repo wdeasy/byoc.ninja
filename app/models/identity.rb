@@ -37,7 +37,7 @@ class Identity < ApplicationRecord
       )
     when :twitch
       identity.update(
-        :name    => Name.clean_url(auth.extra['raw_info']['display_name']),
+        :name    => Name.clean_name(auth.extra['raw_info']['display_name']),
         :url 	   => auth.info['urls'].present? ? Name.clean_url(auth.info['urls']['Twitch']) : nil,
         :avatar  => Name.clean_url(auth.info['image'])
       )
