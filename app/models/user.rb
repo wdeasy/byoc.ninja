@@ -165,6 +165,32 @@ class User < ApplicationRecord
     end
   end
 
+  def User.unlink_identity(user_id, identity_id)
+    identity = Identity.find_by(id: identity_id)
+    if identity.nil?
+      return false
+    end
+
+    user = User.find_by(id: user_id)
+    if user.nil?
+      return false
+    end
+
+    unless identity.update_attribute(:enabled, false)
+      return false
+    end
+
+    if user.banned == false && user.auto_update == true
+      clan, handle = get_clan_and_handle(user_id)
+      user.update(
+        clan: clan,
+        handle: handle
+      )
+    end
+
+    return true
+  end
+
   def User.update_seat_from_omniauth(user_id, seat_id)
     success = false
     message = ""
@@ -306,7 +332,8 @@ class User < ApplicationRecord
     clan = nil
     handle = nil
 
-    Identity.where(user_id: user_id, enabled: true).find_each do |identity|
+    identities = Identity.where(user_id: user_id, enabled: true).order("provider ASC")
+    identities.each do |identity|
       handle = identity.handle if handle.nil?
 
       return identity.clan, identity.handle if identity.clan?
