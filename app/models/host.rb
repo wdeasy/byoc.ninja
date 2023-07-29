@@ -370,9 +370,9 @@ class Host < ApplicationRecord
   end
 
   def self.gather_steamids
-    steamids = []
-
     puts "Gathering steamids"
+    steamids = []
+    return steamids #disabling because of hitting rate limit
 
     #iterate through groups to gather steam ids
     groups = Group.where(:enabled => true)
