@@ -14,11 +14,13 @@ class SteamWebApi < ApplicationRecord
       steam_key.update(
         :calls  => steam_key.calls+1
       )
+      steam_key.save!
     else
       steam_key.update(
         :yesterday => steam_key.calls,
         :calls  => 1
       )
+      steam_key.save!
     end
 
     return ENV["STEAM_WEB_API_KEY"]
