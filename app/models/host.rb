@@ -527,7 +527,7 @@ class Host < ApplicationRecord
 
     Host.update_pins
 
-    unless x == 0
+    # unless x == 0
       c=0
       Host.where(:updated => true).each do |h|
         Host.reset_counters(h.id, :users)
@@ -539,7 +539,7 @@ class Host < ApplicationRecord
       User.where(:updated => false).update_all(:host_id => nil)
       User.where(:updated => false).update_all(:game_id => nil)
       User.where(:updated => false).update_all(:mod_id => nil)
-    end
+    # end
 
     puts "Processed #{j} steam ids"
     puts "Found #{u+n} users in games"
